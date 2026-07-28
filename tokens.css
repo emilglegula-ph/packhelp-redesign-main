@@ -1,0 +1,100 @@
+/* ==========================================================================
+   Design tokens — Packhelp Design System
+
+   Two layers:
+   1. Primitives — raw values, never used directly in component/page CSS.
+   2. Semantic — named by purpose, aliasing a primitive. Components and
+      pages should only ever reference semantic tokens.
+
+   Primitive names now mirror the official brand palette's own step numbers
+   (Grey 100-600, PH Blue, Rich Blue, etc.) — a --blue-500 duplicate of
+   --blue-600 with no distinct brand color of its own was dropped.
+   ========================================================================== */
+
+:root {
+  /* ---- primitives: blue ---- */
+  --blue-50:  #EAF2FF; /* Powder Blue Light */
+  --blue-100: #D6E6FF; /* Powder Blue */
+  --blue-600: #2757FF; /* PH Blue — brand blue */
+  --blue-700: #0B38D5; /* Dark Blue (CTA primary hover) — brand blue, pressed/hover */
+
+  /* ---- primitives: neutral ---- */
+  --white:     #FFFFFF; /* White */
+  --gray-100:  #F8F8F8; /* Grey 100 */
+  --gray-200:  #F2F2F2; /* Grey 200 */
+  --gray-300:  #E7E7E7; /* Grey 300 */
+  --gray-400:  #CFCFCF; /* Grey 400 */
+  --gray-500:  #86868B; /* Grey 500 */
+  --gray-600:  #555555; /* Grey 600 */
+  --rich-blue: #00061A; /* Rich Blue */
+
+  /* ---- primitives: red ---- */
+  --red-500: #8A140C; /* Red */
+
+  /* ---- primitives: yellow ---- */
+  --yellow-light: #F7F2BE; /* Yellow light */
+
+  /* ---- semantic: text ---- */
+  --color-text-primary:   var(--rich-blue);
+  --color-text-secondary: var(--gray-600);
+  --color-text-muted:     var(--gray-500);
+  --color-text-on-accent: var(--white);
+
+  /* ---- semantic: background ---- */
+  --color-bg-page:          var(--white);
+  --color-bg-surface:       var(--white);
+  --color-bg-muted:         var(--gray-100);
+  --color-bg-muted-hover:   var(--gray-200);
+  --color-bg-accent-subtle: var(--blue-100); /* light blue tint: announcement bar, marquee, gradients */
+  --color-bg-accent-faint:  var(--blue-50);  /* lightest blue tint: quick-box builder cards */
+  --color-bg-inverse:       var(--rich-blue); /* dark surfaces, e.g. the CTA mockup card */
+  --color-bg-notice:        var(--yellow-light); /* pale yellow note/callout background */
+
+  /* ---- semantic: border ---- */
+  --color-border-default: var(--gray-300);
+  --color-border-hover:   var(--gray-400);
+
+  /* ---- semantic: accent / interactive ---- */
+  --color-accent:       var(--blue-600);
+  --color-accent-hover: var(--blue-700);
+  --color-focus-ring:   rgba(39, 87, 255, .16);
+
+  /* ---- semantic: status ---- */
+  --color-danger: var(--red-500);
+
+  /* ---- spacing ----
+     Strict 4px grid (8px preferred, 4px as the finer exception) — the
+     half-steps Tailwind offers (0.5/1.5/2.5/3.5) were dropped since every
+     one sat exactly between two grid steps with no real "nearest" side. */
+  --space-1:   0.25rem;  /* 4px */
+  --space-2:   0.5rem;   /* 8px */
+  --space-3:   0.75rem;  /* 12px */
+  --space-4:   1rem;     /* 16px */
+  --space-5:   1.25rem;  /* 20px */
+  --space-6:   1.5rem;   /* 24px */
+  --space-7:   1.75rem;  /* 28px */
+  --space-8:   2rem;     /* 32px */
+  --space-10:  2.5rem;   /* 40px */
+  --space-12:  3rem;     /* 48px */
+  --space-14:  3.5rem;   /* 56px */
+  --space-16:  4rem;     /* 64px */
+  --space-20:  5rem;     /* 80px */
+  --space-24:  6rem;     /* 96px */
+  --space-32:  8rem;     /* 128px */
+  --space-40:  10rem;    /* 160px */
+
+  /* ---- radius ----
+     Real, distinct steps already used in the page — kept as-is. The one
+     consolidation: three different ways of expressing "fully rounded pill"
+     (999px / 100px / 1.125rem-as-half-of-box-height) collapsed into
+     --radius-full, same pattern as the duplicate blues in the color section. */
+  --radius-sm:   8px;
+  --radius-md:   1rem;    /* 16px */
+  --radius-lg:   1.25rem; /* 20px */
+  --radius-xl:   1.5rem;  /* 24px */
+  --radius-2xl:  2rem;    /* 32px */
+  --radius-full: 999px;
+
+  /* ---- layout ---- */
+  --max-w: 1280px;
+}

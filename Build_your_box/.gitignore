@@ -1,0 +1,30 @@
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist-ssr
+*.local
+
+# dist/ is intentionally tracked here (unlike a typical Vite project): the
+# static pages elsewhere in this repo (index.html, Listing/packaging.html,
+# Industries/index.html) link straight to Build_your_box/dist/index.html so
+# the box configurator works by double-clicking the file, no dev server or
+# build step required. Re-run `npm run build` after changing src/ and commit
+# the result.
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

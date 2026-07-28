@@ -1,0 +1,11 @@
+.DS_Store
+
+# Local Claude Code settings (per-machine permission allowlists, not
+# project config) — matches at any depth, covers Build_your_box/.claude
+# and Industries/.claude too.
+.claude/
+
+# Build_your_box/ and Industries/ used to be separately deployed repos;
+# their GitHub Actions Pages-deploy workflows are specific to those old
+# repos/secrets and must not run in this one.
+.github/

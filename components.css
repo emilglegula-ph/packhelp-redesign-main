@@ -1,0 +1,726 @@
+/* ==========================================================================
+   Components — reusable UI atoms. Requires tokens.css + base.css.
+
+   Scope note: only pieces already proven reusable (used in nav, hero, cta,
+   footer, etc.) live here. Page/section-specific layout (hero, statement
+   tiles, category grid, footer grid...) stays in the page for now and
+   graduates here once it's actually reused across more than one page.
+   ========================================================================== */
+
+/* ---------- Button: .btn-pill ---------- */
+.btn-pill {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  border: none;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color .15s ease;
+  font-weight: 400;
+}
+
+.btn-pill:hover { background: var(--color-accent-hover); }
+
+.btn-pill.sm { height: 2rem; font-size: 0.8125rem; line-height: 1; letter-spacing: -0.02em; padding: 0 var(--space-3); }
+
+.btn-pill.md { height: 2.5rem; font-size: 0.8125rem; line-height: 1; letter-spacing: -0.02em; padding: 0 var(--space-5); }
+
+.btn-pill.lg {
+  display: flex;
+  width: fit-content;
+  height: var(--space-12);
+  padding: 0 var(--space-6);
+  justify-content: center;
+  align-items: center;
+  font-size: 0.9375rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.btn-pill.secondary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid rgba(0,0,0,.15);
+}
+
+.btn-pill.secondary:hover { background: rgba(0,0,0,.04); }
+
+.btn-arrow {
+  flex: none;
+  width: 0;
+  margin-left: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: width 0.2s ease, margin-left 0.2s ease, opacity 0.2s ease;
+}
+
+.btn-pill:hover .btn-arrow {
+  width: 16px;
+  margin-left: var(--space-2);
+  opacity: 1;
+}
+
+/* Modifier: points the arrow down instead of right, e.g. a CTA that jumps
+   to a section further down the same page rather than navigating away. */
+.btn-arrow-down {
+  transform: rotate(90deg);
+}
+
+.btn-pill.outline-light {
+  background: transparent;
+  color: var(--color-text-on-accent);
+  border: 1px solid rgba(255,255,255,.35);
+}
+
+.btn-pill.outline-light:hover {
+  background: rgba(255,255,255,.08);
+}
+
+/* ---------- Badge: nav "New" tag ---------- */
+.nav-badge-new {
+  display: inline-flex;
+  align-items: center;
+  margin-left: var(--space-1);
+  padding: 0.25rem 0.25rem;
+  background: var(--color-bg-accent-subtle);
+  color: var(--color-accent);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  border-radius: var(--radius-full);
+  vertical-align: middle;
+}
+
+/* ---------- Indicator: pulsing "click here" dot ----------
+   Drop `<span class="pulse-dot"></span>` inside any element that is (or has
+   an ancestor that is) position:relative — it self-positions to the top
+   right corner. Used to draw the eye to an action without adding copy. */
+.pulse-dot {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-danger);
+  pointer-events: none;
+}
+
+.pulse-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+  animation: pulse-dot-ping 1.6s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes pulse-dot-ping {
+  0% { transform: scale(1); opacity: 0.7; }
+  75%, 100% { transform: scale(2.4); opacity: 0; }
+}
+
+/* Toggled by nav-header.js (reads the shared "pulseDotsHidden" localStorage
+   flag on every page) and by index.html's Page customization panel — one
+   switch, effective site-wide since every page shares nav-header.js. */
+body.hide-pulse-dots .pulse-dot {
+  display: none;
+}
+
+/* ---------- Icon button ---------- */
+.icon-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-primary);
+  padding: var(--space-1);
+}
+
+.icon-btn svg { width: 20px; height: 20px; }
+
+/* ---------- Input: search ---------- */
+.search-wrap {
+  justify-self: center;
+  pointer-events: auto;
+  width: 100%;
+  max-width: 30rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 2.5rem;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--color-bg-muted);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.search-wrap:hover {
+  background: var(--color-bg-muted-hover);
+}
+
+.search-wrap:focus-within {
+  background: var(--color-bg-surface);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  color: var(--color-text-muted);
+  flex: none;
+}
+
+.search-wrap input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  background: none;
+  outline: none;
+  font: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.search-wrap input::placeholder { color: var(--color-text-muted); }
+
+/* ---------- Input: newsletter (pill, on muted background) ---------- */
+.footer-newsletter-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 2.5rem;
+  padding: 0 var(--space-4);
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  border-radius: var(--radius-full);
+  background: var(--color-bg-muted);
+  font-family: inherit;
+  font-size: 0.8125rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  transition: background-color .15s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.footer-newsletter-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.footer-newsletter-input:hover {
+  background: var(--color-bg-muted-hover);
+}
+
+.footer-newsletter-input:focus {
+  outline: none;
+  background: var(--color-bg-surface);
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* ---------- Input: bordered text field ---------- */
+.password-gate-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--color-border-default);
+  font-size: 0.9375rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.password-gate-input:hover {
+  border-color: var(--color-border-hover);
+}
+
+.password-gate-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+/* ---------- Input: dimension field (labeled, with unit suffix) ---------- */
+.dimension-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+}
+
+.dimension-field {
+  display: block;
+  min-width: 0;
+  font-size: 0.8125rem;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--color-text-secondary);
+}
+
+.dimension-field-label { display: block; margin-bottom: var(--space-2); }
+
+.dimension-input-wrap {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-surface);
+  box-sizing: border-box;
+  transition: border-color .15s ease, box-shadow .15s ease;
+}
+
+.dimension-input-wrap:focus-within {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.dimension-input {
+  flex: 1;
+  min-width: 0;
+  border: none;
+  outline: none;
+  background: none;
+  font: inherit;
+  font-size: 0.9375rem;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+}
+
+.dimension-unit { flex: none; color: var(--color-text-muted); font-size: 0.9375rem; line-height: 1.32; letter-spacing: -0.02em; }
+
+/* ---------- Toggle switch ---------- */
+.site-toggle {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 24px;
+  flex: none;
+}
+
+.site-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.site-toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--color-border-default);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 0.2s ease, box-shadow 0.15s ease;
+}
+
+.site-toggle:hover .site-toggle-track {
+  background: var(--color-border-hover);
+}
+
+.site-toggle:hover input:checked + .site-toggle-track {
+  background: var(--color-accent-hover);
+}
+
+.site-toggle input:focus-visible + .site-toggle-track {
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.site-toggle-thumb {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-bg-surface);
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+  transition: transform 0.2s ease;
+}
+
+.site-toggle input:checked + .site-toggle-track {
+  background: var(--color-accent);
+}
+
+.site-toggle input:checked + .site-toggle-track .site-toggle-thumb {
+  transform: translateX(16px);
+}
+
+/* ---------- Top nav (sticky bar + nav-wrapper) — markup injected by nav-header.js ---------- */
+.nav-wrapper {
+  position: relative;
+  z-index: 1;
+  width: 100vw;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: -20px;
+  background: var(--color-bg-page);
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+}
+
+.nav-row1 {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-8);
+  height: 4rem;
+  padding: 0 var(--space-8);
+}
+
+.sticky-bar {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50;
+  width: 100%;
+  max-width: 1280px;
+  display: grid;
+  grid-template-columns: 1fr minmax(180px, 30rem) 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-2) var(--space-8);
+  box-sizing: border-box;
+  border-radius: var(--radius-full);
+  background: transparent;
+  box-shadow: none;
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+  pointer-events: none;
+}
+
+.sticky-bar.is-pinned {
+  background: rgba(255, 255, 255, 0.80);
+  box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.sticky-links {
+  justify-self: start;
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-16px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.sticky-links a {
+  position: relative;
+  font-size: 0.8125rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  transition: background-color .15s ease;
+}
+
+.sticky-links a:hover {
+  background-color: rgba(0,0,0,.05);
+}
+
+.sticky-cta {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-16px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.sticky-bar.is-pinned .sticky-links,
+.sticky-bar.is-pinned .sticky-cta {
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.signin-link {
+  font-size: 0.8125rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.flag-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex: none;
+  display: flex;
+}
+
+.flag-badge img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.nav-row1::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  border-bottom: 1px solid rgba(0,0,0,.07);
+}
+
+nav.topbar {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 3.5rem;
+  padding: 0 var(--space-8);
+}
+
+nav.topbar::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  border-bottom: 1px solid rgba(0,0,0,.07);
+}
+
+.nav-megamenu {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 50%;
+  width: 100vw;
+  box-sizing: border-box;
+  background: var(--color-bg-surface);
+  border-top: 1px solid rgba(0,0,0,.07);
+  border-bottom: 1px solid rgba(0,0,0,.07);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+
+nav.topbar:has(.nav-item-packaging:hover) .nav-megamenu,
+.nav-megamenu:hover {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.nav-megamenu-inner {
+  display: flex;
+  gap: var(--space-10);
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--space-8);
+  box-sizing: border-box;
+}
+
+.nav-megamenu-col {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.nav-megamenu-divider {
+  flex: 0 0 auto;
+  width: 1px;
+  align-self: stretch;
+  background: var(--gray-300);
+}
+
+.nav-megamenu-title {
+  margin: 0 0 var(--space-3);
+  font-size: 0.9375rem;
+  line-height: 1.16;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  color: var(--color-text-primary);
+}
+
+.nav-megamenu-group ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.nav-megamenu-group a {
+  font-size: 0.9375rem;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+}
+
+.nav-megamenu-group a:hover {
+  text-decoration: underline;
+}
+
+.nav-megamenu-group ul.nav-megamenu-sublist {
+  margin-top: var(--space-3);
+  padding-left: var(--space-4);
+}
+
+.nav-industries-menu {
+  position: absolute;
+  z-index: 20;
+  top: 100%;
+  left: 50%;
+  width: 100vw;
+  box-sizing: border-box;
+  background: var(--color-bg-surface);
+  border-top: 1px solid rgba(0,0,0,.07);
+  border-bottom: 1px solid rgba(0,0,0,.07);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateX(-50%) translateY(4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0s linear 0.15s;
+}
+
+.nav-item-industries:hover .nav-industries-menu {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.nav-industries-menu-inner {
+  max-width: var(--max-w);
+  margin: 0 auto;
+  padding: var(--space-8);
+  box-sizing: border-box;
+}
+
+.nav-industries-menu ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.nav-industries-menu a {
+  font-size: 0.9375rem;
+  line-height: 1.32;
+  letter-spacing: -0.02em;
+  color: var(--color-text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+  display: block;
+}
+
+.nav-industries-menu a:hover {
+  text-decoration: underline;
+}
+
+.logo {
+  height: 22px;
+  width: auto;
+  flex: none;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  font-size: 0.8125rem;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.nav-links a, .nav-links button {
+  position: relative;
+  background: none;
+  border: none;
+  font: inherit;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-decoration: none;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-full);
+  transition: background-color .15s ease;
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  white-space: nowrap;
+}
+
+.nav-links a:hover, .nav-links button:hover {
+  background-color: rgba(0,0,0,.05);
+}
+
+.nav-links button.btn-pill, .nav-links a.btn-pill {
+  background: var(--color-accent);
+  color: var(--color-text-on-accent);
+  border: none;
+}
+
+.nav-links button.btn-pill:hover, .nav-links a.btn-pill:hover {
+  background: var(--color-accent-hover);
+}
+
+.nav-links button.btn-pill.secondary, .nav-links a.btn-pill.secondary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border: 1px solid rgba(0,0,0,.15);
+}
+
+.nav-links button.btn-pill.secondary:hover, .nav-links a.btn-pill.secondary:hover {
+  background: rgba(0,0,0,.04);
+}
+
+.caret {
+  width: 10px;
+  height: 10px;
+  opacity: .6;
+}
+
+/* ---------- Top nav — simplified variant (centered logo, no links) ---------- */
+.quote-topbar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--space-16);
+  border-bottom: 1px solid var(--color-border-default);
+}
+
+/* .logo (height/width/flex) is the shared rule above — no override needed here */

@@ -1,0 +1,2017 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Apparel &amp; Fashion packaging — Packhelp</title>
+<link rel="stylesheet" href="../tokens.css">
+<link rel="stylesheet" href="../base.css">
+<link rel="stylesheet" href="../components.css">
+<style>
+  /* top nav (sticky bar + nav-wrapper) styles live in components.css */
+  /* .nav-wrapper's -20px margin-top assumes an .announcement-bar above it —
+     its extra 20px bottom padding compensates for the overlap, see below. */
+
+  /* ---------- ANNOUNCEMENT ---------- */
+  .announcement-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 0.75rem 2rem calc(0.75rem + 20px);
+    background: var(--color-bg-accent-subtle);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .announcement-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: rgba(255,255,255,.5);
+    color: var(--color-text-primary);
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .announcement-copy:hover {
+    background: rgba(255,255,255,.8);
+  }
+
+  .announcement-copy svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  .cta-avatars {
+    display: flex;
+    margin-right: var(--space-3);
+  }
+
+  .cta-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+    border: 2px solid var(--color-accent);
+    margin-left: -8px;
+  }
+
+  .cta-avatar:first-child {
+    margin-left: 0;
+  }
+
+  .cta-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .cta-avatars.sm {
+    margin-right: var(--space-2);
+  }
+
+  .cta-avatars.sm .cta-avatar {
+    width: 18px;
+    height: 18px;
+    border-width: 1.5px;
+  }
+
+  @media (max-width: 900px) {
+    .nav-links.desktop-only { display: none; }
+    .nav-megamenu { display: none; }
+    .sticky-bar { display: none; }
+  }
+
+  /* ---------- SCROLL REVEAL ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Full-bleed sections (.categories-section, .needmore-section) already set
+     their own transform:translateX(-50%) to recenter after `left:50%`. Since
+     .reveal.is-visible also sets `transform` on the same element, whichever
+     rule wins by specificity replaces the other's value outright (transforms
+     don't merge across separate rules) — so plain .reveal here would silently
+     drop the -50% recentring once revealed, shifting all full-bleed content
+     right by ~50vw. Compose both transforms explicitly, at higher specificity,
+     exactly like index.html's own .categories-section.reveal fix. */
+  .categories-section.reveal,
+  .needmore-section.reveal {
+    transform: translateX(-50%) translateY(-16px);
+  }
+
+  .categories-section.reveal.is-visible,
+  .needmore-section.reveal.is-visible {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ---------- BREADCRUMB (packaging.html pattern) ---------- */
+  .pkg-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-6) var(--space-8) 0;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .pkg-breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .pkg-breadcrumb a:hover {
+    text-decoration: underline;
+    color: var(--color-text-primary);
+  }
+
+  .pkg-breadcrumb .current {
+    color: var(--color-text-primary);
+  }
+
+  /* ---------- TITLE ROW (2-col: heading+CTA / description) ---------- */
+  .industry-title-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding: var(--space-20) var(--space-8) var(--space-12);
+  }
+
+  .industry-title-copy {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .industry-title {
+    margin: 0 0 var(--space-6);
+    font-weight: 500;
+    font-size: clamp(2.25rem, 3.6vw, 3.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+    max-width: 34rem;
+  }
+
+  .industry-title-ctas {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .industry-desc {
+    flex: 1 1 0;
+    min-width: 0;
+    max-width: 40rem;
+    margin: 0;
+    font-size: 1.5rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 900px) {
+    .industry-title-row { flex-direction: column; align-items: flex-start; gap: var(--space-6); }
+    .industry-desc { max-width: none; }
+  }
+
+  /* .industry-title-row's own `display:flex` is a class rule that otherwise
+     beats the UA stylesheet's `[hidden] { display:none }` at equal
+     specificity (author rule declared later wins) — pin it back down with an
+     ID-level override so the two title variants actually swap. */
+  #titleDefault[hidden],
+  #titleAlt[hidden] {
+    display: none;
+  }
+
+  /* ---------- TITLE ROW — ALT (packaging.html pattern: stacked, single column) ---------- */
+  .industry-title-row-alt {
+    padding: var(--space-8) var(--space-8) var(--space-12);
+  }
+
+  .industry-title-alt {
+    margin: 0 0 var(--space-2);
+    font-weight: 500;
+    font-size: clamp(2.25rem, 3.6vw, 3.5rem);
+    line-height: 1.04;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+  }
+
+  .industry-desc-alt {
+    margin: 0 0 var(--space-6);
+    max-width: 42rem;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- HEADER LAYOUT SETTINGS (bottom-right gear, packaging.html filter-settings pattern) ---------- */
+  .header-settings-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-bg-surface);
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .header-settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  }
+
+  .header-settings-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .header-settings-panel {
+    position: fixed;
+    bottom: 92px;
+    right: 24px;
+    z-index: 1000;
+    width: 280px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    padding: var(--space-5);
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .header-settings-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .header-settings-title {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .header-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .header-settings-label {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .header-settings-desc {
+    margin: var(--space-1) 0 0;
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- PHOTO MARQUEE (auto-scrolling left, slow loop) ---------- */
+  .photo-marquee-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow: hidden;
+    padding: 0 0 var(--space-16);
+  }
+
+  .photo-marquee-track {
+    display: flex;
+    gap: var(--space-4);
+    width: max-content;
+    padding-left: var(--space-4);
+    animation: photo-marquee-scroll 60s linear infinite;
+  }
+
+  .photo-marquee-section:hover .photo-marquee-track {
+    animation-play-state: paused;
+  }
+
+  .photo-marquee-content {
+    display: flex;
+    gap: var(--space-4);
+    flex-shrink: 0;
+  }
+
+  .photo-frame {
+    position: relative;
+    flex: none;
+    width: 388px;
+    height: 408px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  .photo-frame img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .photo-frame::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0,0,0,0) 60%, rgba(0,0,0,.5) 100%);
+  }
+
+  .photo-frame-badge {
+    position: absolute;
+    left: var(--space-4);
+    bottom: var(--space-4);
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    height: 32px;
+    padding: var(--space-3);
+    border-radius: var(--radius-sm);
+    background: rgba(255,255,255,.85);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    box-shadow: 0 8px 24px rgba(0,0,0,.04);
+  }
+
+  .photo-frame-badge img {
+    display: block;
+    height: 100%;
+    width: auto;
+    object-fit: contain;
+  }
+
+  @keyframes photo-marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ---------- HEADING (categories-section pattern) ---------- */
+  .categories-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-16) 0 var(--space-24);
+  }
+
+  /* Offsets the "Explore now" CTA's scroll-to target so the heading doesn't
+     land underneath the sticky nav bar. */
+  #needsDefault, #needsAlt {
+    scroll-margin-top: 100px;
+  }
+
+  .categories-heading {
+    margin: 0 0 var(--space-1);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .categories-subheading {
+    margin: 0 0 var(--space-6);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    padding-right: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  /* Toolbar row pairs the heading+subheading (left) with the "See all X"
+     button (right) as a single flex row, bottom-aligned, with one shared
+     margin-bottom — so the gap to the tiles below is the same whether you
+     measure from the subheading or from the button. */
+  .section-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    padding-right: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+  }
+
+  .section-toolbar .categories-heading-group {
+    min-width: 0;
+  }
+
+  .section-toolbar .categories-heading,
+  .section-toolbar .categories-subheading {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  .section-toolbar .categories-subheading {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 700px) {
+    .section-toolbar { flex-direction: column; align-items: flex-start; }
+    .section-toolbar > .btn-pill { width: 100%; justify-content: center; }
+  }
+
+  /* ---------- SCROLL CAROUSEL (shared mechanism for every carousel) ---------- */
+  .scroll-carousel {
+    position: relative;
+  }
+
+  .scroll-carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    z-index: 3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .scroll-carousel-nav.prev { left: var(--space-4); }
+  .scroll-carousel-nav.next { right: var(--space-4); }
+  .scroll-carousel-nav svg { width: 20px; height: 20px; }
+
+  .scroll-carousel-nav::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+
+  .scroll-carousel.has-overflow .scroll-carousel-nav { display: flex; }
+
+  .scroll-carousel.has-overflow .scroll-carousel-nav[disabled] {
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .needs-carousel .scroll-carousel-nav { top: 126px; }
+  .products-carousel .scroll-carousel-nav { top: 160px; }
+  .needs-thumb-carousel .scroll-carousel-nav { top: 64px; }
+
+  /* ---------- Fashion needs ALT: packaging.html's thumb-strip pattern verbatim ---------- */
+  .scroll-fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 140px;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .scroll-fade.left {
+    left: -8px;
+    background: linear-gradient(90deg, var(--color-bg-page) 0%, transparent 100%);
+  }
+
+  .scroll-fade.right {
+    right: -8px;
+    background: linear-gradient(270deg, var(--color-bg-page) 0%, transparent 100%);
+  }
+
+  .scroll-carousel.has-overflow .scroll-fade {
+    opacity: 1;
+  }
+
+  .scroll-carousel.has-overflow:has(.scroll-carousel-nav.prev[disabled]) .scroll-fade.left {
+    opacity: 0;
+  }
+
+  .scroll-carousel.has-overflow:has(.scroll-carousel-nav.next[disabled]) .scroll-fade.right {
+    opacity: 0;
+  }
+
+  .thumb-strip {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding: var(--space-2) 8px;
+    margin: 0 -8px;
+  }
+
+  .thumb-item {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    width: 112px;
+    text-decoration: none;
+  }
+
+  .thumb-photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+  }
+
+  .thumb-photo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--thumb-img);
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease;
+  }
+
+  .thumb-item:hover .thumb-photo::before {
+    transform: scale(1.08);
+  }
+
+  .thumb-caption {
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-align: center;
+  }
+
+  .thumb-item.active .thumb-photo {
+    outline: 2px solid var(--color-text-primary);
+    outline-offset: 3px;
+  }
+
+  .thumb-item.active .thumb-caption {
+    font-weight: 500;
+  }
+
+  /* .categories-section is full-bleed (100vw); align the thumb-strip's first/last
+     tile back to the same 1280px container edge the heading above it uses. The
+     extra 8px keeps the base rule's overflow-clipping margin trick intact. */
+  .needs-thumb-carousel .thumb-strip {
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem + 8px);
+    padding-right: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem + 8px);
+  }
+
+  .categories-grid {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    padding-right: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+  }
+
+  /* ---------- Fashion needs: paired-column tiles ---------- */
+  /* Width (253px) is derived so 5 needs-columns + gaps span the same total
+     width as 4 standard 320px .category-item tiles + gaps (1328px). */
+  .needs-column {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+    flex: none;
+  }
+
+  .need-tile {
+    display: flex;
+    align-items: center;
+    width: 253px;
+    background: var(--color-bg-muted);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    cursor: pointer;
+  }
+
+  .need-tile-photo {
+    flex: none;
+    width: 120px;
+    height: 120px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .need-tile-photo img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(0.85);
+    transition: transform 0.3s ease;
+  }
+
+  .need-tile:hover .need-tile-photo img {
+    transform: scale(1);
+  }
+
+  .need-tile-label {
+    padding: 0 var(--space-4);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  /* ---------- Product tiles — index.html .category-item pattern (square thumb) ---------- */
+  .category-item {
+    flex: 0 0 auto;
+    width: 320px;
+  }
+
+  .category-thumb {
+    position: relative;
+    height: 320px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+  }
+
+  .category-thumb::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--thumb-img);
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.4s ease;
+  }
+
+  .category-item:hover .category-thumb::before {
+    transform: scale(1.08);
+  }
+
+  .category-title {
+    margin: var(--space-4) 0 var(--space-1);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .category-desc {
+    margin: 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .category-thumb-badges {
+    position: absolute;
+    top: var(--space-4);
+    left: var(--space-4);
+    display: flex;
+    gap: var(--space-2);
+    z-index: 1;
+  }
+
+  .category-thumb-eco-badge {
+    padding: var(--space-1) var(--space-2);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-page);
+    font-size: 0.625rem;
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    color: var(--color-text-secondary);
+  }
+
+  /* ---------- NEED MORE (dark card, layout per Figma) ---------- */
+  .needmore-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-8) var(--space-3);
+    box-sizing: border-box;
+  }
+
+  .needmore-card {
+    border-radius: var(--radius-2xl);
+    background: var(--color-bg-inverse);
+  }
+
+  /* Inner content aligned to the same 1280px container + 32px side padding
+     used by every other section (industry-title-row, categories-heading,
+     etc.), even though the dark card itself runs the full section width. */
+  .needmore-inner {
+    display: flex;
+    gap: var(--space-4);
+    align-items: stretch;
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: var(--space-16) var(--space-8);
+  }
+
+  .needmore-content {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: var(--space-6);
+  }
+
+  .needmore-heading {
+    margin: 0;
+    max-width: 34rem;
+    font-weight: 500;
+    font-size: 3rem;
+    line-height: 1.08;
+    letter-spacing: -0.06em;
+    color: var(--color-text-on-accent);
+  }
+
+  .needmore-usps {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .needmore-usps li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 1.0625rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-on-accent);
+  }
+
+  .needmore-usp-check {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    color: rgba(255,255,255,.85);
+  }
+
+  .needmore-buttons {
+    display: flex;
+    gap: var(--space-2);
+  }
+
+  .needmore-visual {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  /* aspect-ratio 2/1, not a fixed height: this photo spans the full visual
+     column width while each square below spans half of it (minus the
+     row gap), so a photo twice as wide as it is tall renders at
+     (essentially) the same height as the 1/1 squares beneath it — and
+     stays matched as the column's responsive width changes, unlike a
+     hardcoded px height would. */
+  .needmore-photo-main {
+    aspect-ratio: 2 / 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  .needmore-photo-main img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Grid (not flex) so both columns get an identical, aspect-ratio-independent
+     width — flex-basis:0 + aspect-ratio on a flex item lets an intrinsic <img>
+     skew the two items' resolved widths apart even with equal flex-grow, so
+     the tiles ended up as different-sized rectangles instead of matching
+     squares. Equal 1fr grid tracks fix the width, then aspect-ratio 1/1
+     derives a matching height for both, guaranteeing identical squares. */
+  .needmore-photo-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: var(--space-2);
+  }
+
+  .needmore-photo-small {
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  .needmore-photo-small img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .needmore-stat-card {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: var(--space-8);
+    border-radius: var(--radius-md);
+    background: var(--color-accent);
+  }
+
+  .needmore-stat-number {
+    margin: 0;
+    font-weight: 500;
+    font-size: 4.5rem;
+    line-height: 1.04;
+    letter-spacing: -0.03em;
+    color: var(--color-text-on-accent);
+  }
+
+  .needmore-stat-desc {
+    margin: 0;
+    font-size: 1.0625rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,.7);
+  }
+
+  @media (max-width: 900px) {
+    .needmore-card { flex-direction: column; }
+    .needmore-heading { font-size: 2.25rem; }
+  }
+
+  /* ---------- Quick box builder banner (Figma: Listing mockup, "Already
+     got..." section, node 6941:7082) — same full-bleed-card-then-centered-
+     inner technique as .needmore-section above, just a light card instead
+     of the dark closer. ---------- */
+  .quickbox-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-8) var(--space-3);
+    box-sizing: border-box;
+  }
+
+  .quickbox-card {
+    border-radius: var(--radius-2xl);
+    background: var(--color-bg-accent-faint);
+  }
+
+  .quickbox-inner {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-8);
+    max-width: var(--max-w);
+    margin: 0 auto;
+    padding: var(--space-16) var(--space-8);
+    box-sizing: border-box;
+  }
+
+  .quickbox-heading {
+    margin: 0;
+    max-width: 44rem;
+    font-weight: 500;
+    font-size: 3rem;
+    line-height: 1.08;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+  }
+
+  .quickbox-fields {
+    display: flex;
+    align-items: flex-end;
+    gap: var(--space-2);
+    flex-wrap: wrap;
+  }
+
+  .quickbox-field {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    width: 114px;
+  }
+
+  .quickbox-label {
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .quickbox-input {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 48px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--gray-400);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-surface);
+    box-sizing: border-box;
+  }
+
+  .quickbox-input input {
+    flex: 1 1 0;
+    width: 100%;
+    min-width: 0;
+    border: none;
+    outline: none;
+    background: none;
+    font: inherit;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-align: left;
+    padding: 0;
+    -moz-appearance: textfield;
+  }
+
+  .quickbox-input input::-webkit-outer-spin-button,
+  .quickbox-input input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .quickbox-unit {
+    flex: none;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+    margin-left: var(--space-1);
+  }
+
+  .quickbox-btn {
+    position: relative;
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 48px;
+    padding: 0 var(--space-6);
+    border: none;
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font: inherit;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .quickbox-btn:hover {
+    background: var(--color-accent-hover);
+  }
+
+  @media (max-width: 900px) {
+    .quickbox-heading { font-size: 2.25rem; }
+  }
+
+  /* ---------- FAQ (index.html .faq-section pattern) ---------- */
+  .faq-section {
+    padding: 8rem var(--space-8);
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: var(--space-16);
+    max-width: 1216px;
+    margin: 0 auto;
+  }
+
+  .faq-heading {
+    margin: 0 0 var(--space-4);
+    font-weight: 450;
+    font-size: 3rem;
+    line-height: 1.08;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+  }
+
+  .faq-subheading {
+    margin: 0 0 var(--space-6);
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .faq-cta-row {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  .faq-accordions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .faq-item {
+    border-radius: var(--radius-md);
+    background: var(--color-bg-muted);
+    overflow: hidden;
+  }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    width: 100%;
+    padding: var(--space-5) var(--space-6);
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .faq-chevron {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.25s ease;
+  }
+
+  .faq-item.open .faq-chevron { transform: rotate(180deg); }
+
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s ease;
+  }
+
+  .faq-answer-inner { overflow: hidden; }
+
+  .faq-answer p {
+    margin: 0;
+    padding: 0 var(--space-6) var(--space-5);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-primary);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .faq-item.open .faq-answer { grid-template-rows: 1fr; }
+
+  .faq-item.open .faq-answer p {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.15s;
+  }
+
+  @media (max-width: 800px) {
+    .faq-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- FOOTER (packaging.html pattern — page-specific, not yet in components.css) ---------- */
+  .site-footer {
+    position: relative;
+    margin-top: var(--space-16);
+    padding: var(--space-16) 0 0;
+  }
+
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-inner {
+    padding: 0 var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12);
+    justify-content: space-between;
+  }
+
+  .footer-left {
+    flex: 0 1 420px;
+    max-width: 460px;
+  }
+
+  .footer-logo { display: inline-flex; }
+  .footer-logo img { height: 26px; width: auto; }
+
+  .footer-newsletter-copy {
+    margin: var(--space-5) 0 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .footer-newsletter {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .footer-newsletter-btn { flex: 0 0 auto; }
+
+  .footer-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+
+  .footer-badge {
+    display: flex;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border-hover);
+    border-radius: var(--radius-sm);
+  }
+
+  .footer-badge img { height: 44px; width: auto; }
+
+  .footer-links {
+    display: flex;
+    flex: 0 1 auto;
+    gap: var(--space-14);
+  }
+
+  .footer-col { width: 200px; flex: 0 0 auto; }
+
+  .footer-col-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .footer-col-title {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .footer-col a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  .footer-col a:hover { text-decoration: underline; }
+
+  .footer-bottom {
+    position: relative;
+    margin-top: var(--space-14);
+  }
+
+  .footer-bottom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-bottom-inner {
+    padding: var(--space-6) var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 700px) {
+    .site-footer { padding: 3rem 0 0; }
+    .footer-inner { padding: 0 1.5rem; }
+    .footer-bottom-inner { padding: 1.5rem; }
+    .footer-newsletter { flex-direction: column; align-items: stretch; }
+    .footer-links { flex-wrap: wrap; gap: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="announcement-bar">
+  <span>The more products you add, the more you save. Code: <strong>BUNDLEUP</strong></span>
+  <button class="announcement-copy" aria-label="Copy code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+</div>
+
+<div id="ph-sticky-bar"></div>
+
+<div class="container">
+  <div id="ph-nav-wrapper"></div>
+  <script src="../nav-header.js"></script>
+
+  <nav class="pkg-breadcrumb">
+    <a href="../index.html">Packhelp</a>
+    <span>/</span>
+    <span class="current">Apparel &amp; Fashion packaging</span>
+  </nav>
+
+  <section class="industry-title-row reveal" id="titleDefault" hidden>
+    <div class="industry-title-copy">
+      <h1 class="industry-title">Apparel &amp; Fashion packaging</h1>
+      <div class="industry-title-ctas">
+        <a href="#needsAlt" class="btn-pill lg explore-now-cta">Explore now<svg class="btn-arrow btn-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        <a href="../get-a-quote.html" class="btn-pill lg secondary">Get a quote<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      </div>
+    </div>
+    <p class="industry-desc">With a wide range of unique, state-of-the-art boxes, bags and wrappers, Packhelp is your single point of supply for packaging all things fashion.</p>
+  </section>
+
+  <section class="industry-title-row-alt reveal" id="titleAlt">
+    <h1 class="industry-title-alt">Apparel &amp; Fashion packaging</h1>
+    <p class="industry-desc-alt">With a wide range of unique, state-of-the-art boxes, bags and wrappers, Packhelp is your single point of supply for packaging all things fashion.</p>
+    <div class="industry-title-ctas">
+      <a href="#needsAlt" class="btn-pill lg explore-now-cta">Explore now<svg class="btn-arrow btn-arrow-down" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      <a href="../get-a-quote.html" class="btn-pill lg secondary">Get a quote<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+    </div>
+  </section>
+
+  <section class="photo-marquee-section">
+    <div class="photo-marquee-track">
+      <div class="photo-marquee-content">
+        <div class="photo-frame"><img src="figma-assets/marquee-1.jpg" alt="Knitwear in custom frosted ziplock bags"><span class="photo-frame-badge"><img src="figma-assets/marquee-1-badge.png" alt=""></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-2.jpg" alt="Highsnobiety custom mailer boxes"><span class="photo-frame-badge"><img src="figma-assets/marquee-2-badge.png" alt="Highsnobiety"></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-3.jpg" alt="Custom printed apparel box"><span class="photo-frame-badge"><img src="figma-assets/marquee-3-badge.png" alt="Treos"></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-4.jpg" alt="Tan Line custom paper carrier bag"><span class="photo-frame-badge"><img src="figma-assets/marquee-4-badge.png" alt="Tan Line"></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-5.jpg" alt="Kuyichi custom paper carrier bag"><span class="photo-frame-badge"><img src="figma-assets/marquee-5-badge.png" alt="Kuyichi"></span></div>
+      </div>
+      <div class="photo-marquee-content" aria-hidden="true">
+        <div class="photo-frame"><img src="figma-assets/marquee-1.jpg" alt=""><span class="photo-frame-badge"><img src="figma-assets/marquee-1-badge.png" alt=""></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-2.jpg" alt=""><span class="photo-frame-badge"><img src="figma-assets/marquee-2-badge.png" alt=""></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-3.jpg" alt=""><span class="photo-frame-badge"><img src="figma-assets/marquee-3-badge.png" alt=""></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-4.jpg" alt=""><span class="photo-frame-badge"><img src="figma-assets/marquee-4-badge.png" alt=""></span></div>
+        <div class="photo-frame"><img src="figma-assets/marquee-5.jpg" alt=""><span class="photo-frame-badge"><img src="figma-assets/marquee-5-badge.png" alt=""></span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Fashion needs: Figma layout (paired-column icon+label carousel), heading unified with Repo's H2+subheading pattern -->
+  <section class="categories-section reveal" id="needsDefault" hidden>
+    <h2 class="categories-heading">Fashion needs, sorted by product.</h2>
+    <p class="categories-subheading">Jump straight to the packaging your product needs, from tees to accessories.</p>
+
+    <div class="scroll-carousel needs-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="categories-grid">
+        <div class="needs-column">
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-tshirt.png" alt=""></div><span class="need-tile-label">T-shirt packaging</span></div>
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-shoes.png" alt=""></div><span class="need-tile-label">Shoes packaging</span></div>
+        </div>
+        <div class="needs-column">
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-hoodie.png" alt=""></div><span class="need-tile-label">Hoodie packaging</span></div>
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-scarf.png" alt=""></div><span class="need-tile-label">Scarf packaging</span></div>
+        </div>
+        <div class="needs-column">
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-socks.png" alt=""></div><span class="need-tile-label">Socks packaging</span></div>
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-underwear.png" alt=""></div><span class="need-tile-label">Underwear packaging</span></div>
+        </div>
+        <div class="needs-column">
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-wallet.png" alt=""></div><span class="need-tile-label">Wallet packaging</span></div>
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-lingerie.png" alt=""></div><span class="need-tile-label">Lingerie packaging</span></div>
+        </div>
+        <div class="needs-column">
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-hoodie.png" alt=""></div><span class="need-tile-label">Shirt packaging</span></div>
+          <div class="need-tile"><div class="need-tile-photo"><img src="figma-assets/need-glasses.png" alt=""></div><span class="need-tile-label">Glasses packaging</span></div>
+        </div>
+      </div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Fashion needs — ALT: packaging.html's compact thumb-strip layout, populated with the same data as #needsDefault -->
+  <section class="categories-section reveal" id="needsAlt">
+    <h2 class="categories-heading">Fashion needs, sorted by product.</h2>
+    <p class="categories-subheading">Jump straight to the packaging your product needs, from tees to accessories.</p>
+
+    <div class="scroll-carousel needs-thumb-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="scroll-fade left"></div>
+      <div class="thumb-strip">
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-tshirt.png')"></div>
+          <span class="thumb-caption">T-shirt packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-shoes.png')"></div>
+          <span class="thumb-caption">Shoes packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-hoodie.png')"></div>
+          <span class="thumb-caption">Hoodie packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-scarf.png')"></div>
+          <span class="thumb-caption">Scarf packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-socks.png')"></div>
+          <span class="thumb-caption">Socks packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-underwear.png')"></div>
+          <span class="thumb-caption">Underwear packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-wallet.png')"></div>
+          <span class="thumb-caption">Wallet packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-lingerie.png')"></div>
+          <span class="thumb-caption">Lingerie packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-hoodie.png')"></div>
+          <span class="thumb-caption">Shirt packaging</span>
+        </a>
+        <a class="thumb-item" href="https://packhelp.com/packaging/?industry=apparel-fashion&amp;use-case=shirt" target="_blank" rel="noopener noreferrer">
+          <div class="thumb-photo" style="--thumb-img:url('figma-assets/need-glasses.png')"></div>
+          <span class="thumb-caption">Glasses packaging</span>
+        </a>
+      </div>
+      <div class="scroll-fade right"></div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Product carousel 1/4: Shipping fashion products -->
+  <section class="categories-section reveal">
+    <div class="section-toolbar">
+      <div class="categories-heading-group">
+        <h2 class="categories-heading">Shipping fashion products</h2>
+        <p class="categories-subheading">for perfect delivery.</p>
+      </div>
+      <button class="btn-pill secondary sm">See all shipping<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+
+    <div class="scroll-carousel products-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="categories-grid">
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/shipping-1.png')"></div>
+          <h3 class="category-title">Custom Fashion Mailer Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/shipping-2.png')"></div>
+          <h3 class="category-title">Custom Fashion Recycled Poly Mailer</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/shipping-3.png')"></div>
+          <h3 class="category-title">Custom Fashion Paper Mailer Bag</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/shipping-4.png')"></div>
+          <h3 class="category-title">Plain Fashion Shipping Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/primary-1.png')"></div>
+          <h3 class="category-title">Custom Fashion Snap Lock Product Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/primary-2.png')"></div>
+          <h3 class="category-title">Custom Fashion Frosted Ziplock Bag</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+      </div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Product carousel 2/4: Primary apparel packaging -->
+  <section class="categories-section reveal">
+    <div class="section-toolbar">
+      <div class="categories-heading-group">
+        <h2 class="categories-heading">Primary apparel packaging</h2>
+        <p class="categories-subheading">designed to shine.</p>
+      </div>
+      <button class="btn-pill secondary sm">See all primary packaging<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+
+    <div class="scroll-carousel products-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="categories-grid">
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/primary-1.png')"></div>
+          <h3 class="category-title">Custom Fashion Snap Lock Product Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/primary-2.png')"></div>
+          <h3 class="category-title">Custom Fashion Frosted Ziplock Bag</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/primary-3.png')"></div>
+          <h3 class="category-title">Custom Fashion Rigid Economic Magnetic Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/primary-4.png')"></div>
+          <h3 class="category-title">Custom Fashion Rigid Box with Lid</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/accessories-1.png')"></div>
+          <h3 class="category-title">Custom Fashion Tissue Paper</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/accessories-2.png')"></div>
+          <h3 class="category-title">Custom Fashion Rectangle Labels on Roll</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+      </div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Already got a box in mind? — quick box builder banner (Figma: Listing
+       mockup, "Already got..." section). -->
+  <section class="quickbox-section">
+    <div class="quickbox-card">
+      <div class="quickbox-inner">
+        <h2 class="quickbox-heading">Already got your box size and type in mind? Skip the search and start building with a 3D preview.</h2>
+        <div class="quickbox-fields">
+          <label class="quickbox-field">
+            <span class="quickbox-label">Width</span>
+            <span class="quickbox-input"><input type="number" inputmode="decimal" aria-label="Width in centimeters"><span class="quickbox-unit">cm</span></span>
+          </label>
+          <label class="quickbox-field">
+            <span class="quickbox-label">Length</span>
+            <span class="quickbox-input"><input type="number" inputmode="decimal" aria-label="Length in centimeters"><span class="quickbox-unit">cm</span></span>
+          </label>
+          <label class="quickbox-field">
+            <span class="quickbox-label">Height</span>
+            <span class="quickbox-input"><input type="number" inputmode="decimal" aria-label="Height in centimeters"><span class="quickbox-unit">cm</span></span>
+          </label>
+          <a href="../Build_your_box/dist/index.html" class="quickbox-btn">Start now<span class="pulse-dot"></span></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Product carousel 3/4: Packaging accessories -->
+  <section class="categories-section reveal">
+    <div class="section-toolbar">
+      <div class="categories-heading-group">
+        <h2 class="categories-heading">Packaging accessories</h2>
+        <p class="categories-subheading">Complete your unboxing experience.</p>
+      </div>
+      <button class="btn-pill secondary sm">See all accessories<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+
+    <div class="scroll-carousel products-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="categories-grid">
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/accessories-1.png')"></div>
+          <h3 class="category-title">Custom Fashion Tissue Paper</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/accessories-2.png')"></div>
+          <h3 class="category-title">Custom Fashion Rectangle Labels on Roll</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/accessories-3.png')"></div>
+          <h3 class="category-title">Shredded Paper Filler</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/accessories-4.png')"></div>
+          <h3 class="category-title">Custom Fashion Tape</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/eco-1.png')">
+            <div class="category-thumb-badges"><span class="category-thumb-eco-badge">Recyclable</span><span class="category-thumb-eco-badge">Biodegradable</span></div>
+          </div>
+          <h3 class="category-title">Custom Plain Mailer Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/eco-2.png')">
+            <div class="category-thumb-badges"><span class="category-thumb-eco-badge">Reusable</span><span class="category-thumb-eco-badge">Biodegradable</span></div>
+          </div>
+          <h3 class="category-title">Custom Bio Poly Mailer</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+      </div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Product carousel 4/4: Eco choices -->
+  <section class="categories-section reveal">
+    <div class="section-toolbar">
+      <div class="categories-heading-group">
+        <h2 class="categories-heading">Eco choices</h2>
+        <p class="categories-subheading">for sustainable brands.</p>
+      </div>
+      <button class="btn-pill secondary sm">See all<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+
+    <div class="scroll-carousel products-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="categories-grid">
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/eco-1.png')">
+            <div class="category-thumb-badges"><span class="category-thumb-eco-badge">Recyclable</span><span class="category-thumb-eco-badge">Biodegradable</span></div>
+          </div>
+          <h3 class="category-title">Custom Plain Mailer Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/eco-2.png')">
+            <div class="category-thumb-badges"><span class="category-thumb-eco-badge">Reusable</span><span class="category-thumb-eco-badge">Biodegradable</span></div>
+          </div>
+          <h3 class="category-title">Custom Bio Poly Mailer</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/eco-3.png')">
+            <div class="category-thumb-badges"><span class="category-thumb-eco-badge">Reusable</span><span class="category-thumb-eco-badge">Biodegradable</span></div>
+          </div>
+          <h3 class="category-title">Custom Plain Ecommerce Shipping Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/eco-4.png')">
+            <div class="category-thumb-badges"><span class="category-thumb-eco-badge">Recyclable</span><span class="category-thumb-eco-badge">Recycled content</span></div>
+          </div>
+          <h3 class="category-title">Custom Plain Snap Lock Product Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/shipping-1.png')"></div>
+          <h3 class="category-title">Custom Fashion Mailer Box</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('figma-assets/shipping-2.png')"></div>
+          <h3 class="category-title">Custom Fashion Recycled Poly Mailer</h3>
+          <p class="category-desc">From €0.49 piece</p>
+        </div>
+      </div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- Need more? — dark closer section, laid out per Figma -->
+  <section class="needmore-section reveal">
+    <div class="needmore-card">
+      <div class="needmore-inner">
+        <div class="needmore-content">
+          <h2 class="needmore-heading">Need more?<br>Packaging that grows with your business</h2>
+          <ul class="needmore-usps">
+            <li><svg class="needmore-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Volume pricing tailored to your purchasing scale</li>
+            <li><svg class="needmore-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Custom sizing &amp; structural design</li>
+            <li><svg class="needmore-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Prototyping, inventory &amp; global logistics support</li>
+          </ul>
+          <div class="needmore-buttons">
+            <a href="../get-a-quote.html" class="btn-pill lg">Get a quote<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+            <a href="#" class="btn-pill lg outline-light">Learn more</a>
+          </div>
+        </div>
+        <div class="needmore-visual">
+          <div class="needmore-photo-main"><img src="figma-assets/asd.png" alt=""></div>
+          <div class="needmore-photo-row">
+            <div class="needmore-photo-small"><img src="figma-assets/needmore-person.jpg" alt=""></div>
+            <div class="needmore-stat-card">
+              <p class="needmore-stat-number">60000</p>
+              <p class="needmore-stat-desc">Successful businesses have chosen us as their packaging partner.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ — unified with index.html's faq-section pattern -->
+  <section class="faq-section reveal">
+    <div class="faq-grid">
+      <div class="faq-text">
+        <h2 class="faq-heading">Frequently asked questions</h2>
+        <p class="faq-subheading">Nie wyczerpaliśmy tematu? Have more questions?</p>
+        <div class="faq-cta-row">
+          <a href="#" class="btn-pill lg">Contact advisors<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        </div>
+      </div>
+
+      <div class="faq-accordions">
+        <div class="faq-item">
+          <button class="faq-question">What's the difference between biodegradable and compostable?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>Biodegradable materials break down naturally over time, while compostable materials break down into non-toxic components under specific composting conditions, leaving no harmful residue behind.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">Guide to Sustainable Packaging for Fashion?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>From recycled mailers to FSC-certified boxes, explore the materials and finishes that help apparel brands reduce their environmental footprint without compromising on presentation.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">Why choose Packhelp and sustainability?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>We give you clear, product-level impact data and a wide range of certified, responsible materials so your packaging choices back up your brand's sustainability claims.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">What's the difference between recyclable and reusable?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>Recyclable packaging can be processed back into raw material after use, while reusable packaging is designed to be used multiple times before it's recycled or discarded.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">How fast can custom fashion packaging be delivered?<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>Selected fashion packaging products can be printed with your branding and delivered in as little as 48 hours, with bulk orders scheduled around your launch dates.</p></div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="../index.html" class="footer-logo" aria-label="Packhelp"><img src="logo-packhelp.1iheyVke.svg" alt="Packhelp"></a>
+
+      <p class="footer-newsletter-copy">Don't miss out – get 15% off your first order when you join the newsletter.</p>
+
+      <form class="footer-newsletter">
+        <input type="email" class="footer-newsletter-input" placeholder="Your email" required>
+        <button type="submit" class="btn-pill md footer-newsletter-btn">Sign up</button>
+      </form>
+
+      <div class="footer-badges">
+        <span class="footer-badge"><img src="https://zapakuj.to/_astro/fsc-badge.CT_C2C6x.svg" alt="FSC certified"></span>
+        <span class="footer-badge"><img src="https://zapakuj.to/_astro/esg-badge-yellow-black.C3wtyeOu.svg" alt="ESG badge"></span>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col-group">
+        <div class="footer-col">
+          <p class="footer-col-title">Contact &amp; Help</p>
+          <ul>
+            <li><a href="#">Contact us</a></li>
+            <li><a href="#">Send us a brief</a></li>
+            <li><a href="#">Help</a></li>
+            <li><a href="#">Return policy</a></li>
+            <li><a href="#">Impressum</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title">Company</p>
+          <ul>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-col-group">
+        <div class="footer-col">
+          <p class="footer-col-title">Sustainability</p>
+          <ul>
+            <li><a href="#">Sustainability Hub</a></li>
+            <li><a href="#">Our Progress Reports</a></li>
+            <li><a href="#">Responsible Supply Chain</a></li>
+            <li><a href="#">Eco badge</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title">Resources</p>
+          <ul>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Terms of service</a></li>
+            <li><a href="#">Privacy policy</a></li>
+            <li><a href="#">Whistleblowing policy</a></li>
+            <li><a href="#">Sitemap</a></li>
+            <li><a href="#">Cookie settings</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col-title">Connect</p>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">X</a></li>
+          <li><a href="#">Pinterest</a></li>
+          <li><a href="#">Tiktok</a></li>
+          <li><a href="#">Linkedin</a></li>
+          <li><a href="#">Youtube</a></li>
+          <li><a href="#">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-inner">
+      <span>Copyright Packhelp 2025</span>
+      <span>Business Hours Monday - Friday 8:00-15:00</span>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<button id="headerSettingsBtn" class="header-settings-btn" aria-label="Header layout settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+</button>
+
+<div id="headerSettingsPanel" class="header-settings-panel">
+  <p class="header-settings-title">Layout settings</p>
+  <div class="header-settings-row">
+    <div>
+      <p class="header-settings-label">Original title layout</p>
+      <p class="header-settings-desc">Inline paragraph next to the heading, instead of packaging.html's stacked style</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleAltTitle">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+  <div class="header-settings-row" style="margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--color-border-default);">
+    <div>
+      <p class="header-settings-label">Original Fashion needs layout</p>
+      <p class="header-settings-desc">Paired icon rows, instead of packaging.html's square category tiles</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleAltNeeds">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var navRow1 = document.querySelector('.nav-row1');
+    var stickyBar = document.getElementById('stickyBar');
+    if (!navRow1 || !stickyBar) return;
+
+    function onScroll() {
+      var rect = navRow1.getBoundingClientRect();
+      var pinned = rect.bottom <= 0;
+      stickyBar.classList.toggle('is-pinned', pinned);
+
+      var minTop = 12;
+      var naturalTop = rect.top + rect.height / 2 - stickyBar.offsetHeight / 2;
+      stickyBar.style.top = Math.max(minTop, naturalTop) + 'px';
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+  })();
+
+  (function () {
+    var targets = document.querySelectorAll('.reveal');
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    targets.forEach(function (el) { observer.observe(el); });
+  })();
+
+  (function () {
+    var faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(function (item) {
+      item.querySelector('.faq-question').addEventListener('click', function () {
+        item.classList.toggle('open');
+      });
+    });
+  })();
+
+  (function () {
+    var carousels = document.querySelectorAll('.scroll-carousel');
+
+    Array.prototype.forEach.call(carousels, function (carousel) {
+      var prevBtn = carousel.querySelector('.scroll-carousel-nav.prev');
+      var nextBtn = carousel.querySelector('.scroll-carousel-nav.next');
+      var track = null;
+
+      for (var i = 0; i < carousel.children.length; i++) {
+        var child = carousel.children[i];
+        if (child !== prevBtn && child !== nextBtn && !child.classList.contains('scroll-fade')) {
+          track = child;
+          break;
+        }
+      }
+
+      if (!prevBtn || !nextBtn || !track) return;
+
+      function updateNavState() {
+        var maxScroll = track.scrollWidth - track.clientWidth;
+        prevBtn.disabled = track.scrollLeft <= 0;
+        nextBtn.disabled = track.scrollLeft >= maxScroll - 1;
+      }
+
+      function checkOverflow() {
+        var overflowing = track.scrollWidth > track.clientWidth + 1;
+        carousel.classList.toggle('has-overflow', overflowing);
+        updateNavState();
+      }
+
+      prevBtn.addEventListener('click', function () {
+        track.scrollBy({ left: -track.clientWidth * 0.8, behavior: 'smooth' });
+      });
+
+      nextBtn.addEventListener('click', function () {
+        track.scrollBy({ left: track.clientWidth * 0.8, behavior: 'smooth' });
+      });
+
+      track.addEventListener('scroll', updateNavState);
+      window.addEventListener('resize', checkOverflow);
+
+      if (window.ResizeObserver) {
+        new ResizeObserver(checkOverflow).observe(track);
+      } else {
+        checkOverflow();
+      }
+    });
+  })();
+
+  (function () {
+    var btn = document.getElementById('headerSettingsBtn');
+    var panel = document.getElementById('headerSettingsPanel');
+    var titleToggle = document.getElementById('toggleAltTitle');
+    var titleDefault = document.getElementById('titleDefault');
+    var titleAlt = document.getElementById('titleAlt');
+    var needsToggle = document.getElementById('toggleAltNeeds');
+    var needsDefault = document.getElementById('needsDefault');
+    var needsAlt = document.getElementById('needsAlt');
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!panel.contains(e.target) && e.target !== btn) {
+        panel.classList.remove('open');
+      }
+    });
+
+    function applyTitleVariant(useAlt) {
+      titleDefault.hidden = !useAlt;
+      titleAlt.hidden = useAlt;
+      titleToggle.checked = useAlt;
+    }
+
+    function applyNeedsVariant(useAlt) {
+      needsDefault.hidden = !useAlt;
+      needsAlt.hidden = useAlt;
+      needsToggle.checked = useAlt;
+    }
+
+    applyTitleVariant(localStorage.getItem('industryTitleAlt') === '1');
+    applyNeedsVariant(localStorage.getItem('industryNeedsAlt') === '1');
+
+    titleToggle.addEventListener('change', function () {
+      applyTitleVariant(titleToggle.checked);
+      localStorage.setItem('industryTitleAlt', titleToggle.checked ? '1' : '0');
+    });
+
+    needsToggle.addEventListener('change', function () {
+      applyNeedsVariant(needsToggle.checked);
+      localStorage.setItem('industryNeedsAlt', needsToggle.checked ? '1' : '0');
+    });
+  })();
+
+  (function () {
+    // Whichever Fashion needs variant is currently active (needsDefault vs
+    // needsAlt is a settings-panel toggle, see above) — always scroll to the
+    // one actually on screen, not a hardcoded id.
+    document.querySelectorAll('.explore-now-cta').forEach(function (link) {
+      link.addEventListener('click', function (e) {
+        e.preventDefault();
+        var target = document.querySelector('#needsDefault:not([hidden]), #needsAlt:not([hidden])');
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

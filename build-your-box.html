@@ -1,0 +1,3143 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Build your box — Packhelp</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* ---------- ANNOUNCEMENT ---------- */
+  .announcement-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 0.75rem 2rem calc(0.75rem + 20px);
+    background: var(--color-bg-accent-subtle);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .announcement-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: rgba(255,255,255,.5);
+    color: var(--color-text-primary);
+    padding: var(--space-1-5);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .announcement-copy:hover {
+    background: rgba(255,255,255,.8);
+  }
+
+  .announcement-copy svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* top nav (sticky bar + nav-wrapper) styles live in components.css */
+
+  @media (max-width: 900px) {
+    .nav-links.desktop-only { display: none; }
+    .nav-megamenu { display: none; }
+    .sticky-bar { display: none; }
+  }
+
+  .cta-avatars {
+    display: flex;
+    margin-right: var(--space-2-5);
+  }
+
+  .cta-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+    border: 2px solid var(--color-accent);
+    margin-left: -10px;
+  }
+
+  .cta-avatar:first-child {
+    margin-left: 0;
+  }
+
+  .cta-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .cta-avatars.sm {
+    margin-right: var(--space-2);
+  }
+
+  .cta-avatars.sm .cta-avatar {
+    width: 18px;
+    height: 18px;
+    border-width: 1.5px;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  .build-box-header {
+    max-width: calc(1400px + 480px + var(--space-6));
+    margin: 0 auto;
+    padding: var(--space-8) var(--space-6) 0;
+    box-sizing: border-box;
+  }
+
+  .build-box-page {
+    max-width: calc(1400px + 480px + var(--space-6));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: minmax(0, 1400px) 480px;
+    align-items: start;
+    gap: var(--space-6);
+    padding: var(--space-6);
+    box-sizing: border-box;
+  }
+
+  /* ---------- left: sticky visual tile ---------- */
+  .build-box-visual {
+    position: sticky;
+    top: var(--space-6);
+    height: calc(100vh - var(--space-6) * 2);
+    min-height: 420px;
+    display: flex;
+    flex-direction: column;
+    background: var(--color-bg-muted);
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+  }
+
+  .build-box-canvas {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-border-hover);
+  }
+
+  .build-box-canvas img {
+    width: 80%;
+    height: 80%;
+    max-width: 640px;
+    object-fit: contain;
+    transition: opacity .2s ease;
+  }
+
+  /* ---------- 2D view: a live dieline (flat unfolded net), not a static photo ---------- */
+  .build-box-dieline-stage {
+    flex: 1 1 auto;
+    align-self: stretch;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: var(--space-6);
+  }
+
+  #dielineSvg {
+    width: 100%;
+    height: 100%;
+    max-width: 560px;
+    max-height: 560px;
+  }
+
+  /* ---------- Real 3D box preview (CSS 3D transforms, no external libs) ---------- */
+  .build-box-3d-stage {
+    position: relative;
+    flex: 1 1 auto;
+    align-self: stretch;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    /* no `perspective`: an isometric view is a parallel (orthographic) projection,
+       which is also what makes the JS `project()` math below exact for any rotation/size. */
+    touch-action: none;
+  }
+
+  .build-box-3d-shadow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: calc((var(--w) + var(--d)) * .55);
+    height: calc((var(--w) + var(--d)) * .16);
+    margin-top: calc(var(--h) / 2 - (var(--w) + var(--d)) * .08);
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(0,0,0,.42) 0%, rgba(0,0,0,.22) 45%, rgba(0,0,0,0) 75%);
+    filter: blur(3px);
+    pointer-events: none;
+  }
+
+  /* ---------- dimension callouts: only shown while the Dimensions step is in view ---------- */
+  .build-box-dim-lines {
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
+
+  .build-box-3d-stage.show-dims .build-box-dim-lines { opacity: 1; }
+
+  .build-box-dim-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    height: 2px;
+    transform-origin: 0% 50%;
+    background: var(--dim-color, var(--color-border-hover));
+  }
+
+  /* whichever dimension input currently has focus gets the accent (blue) line + pill;
+     the other two stay in the neutral/gray default. */
+  .build-box-3d-stage[data-active-dim="width"] .build-box-dim-line.dim-width,
+  .build-box-3d-stage[data-active-dim="length"] .build-box-dim-line.dim-length,
+  .build-box-3d-stage[data-active-dim="height"] .build-box-dim-line.dim-height {
+    --dim-color: var(--color-accent);
+  }
+
+  .build-box-dim-pill {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    display: inline-flex;
+    align-items: center;
+    white-space: nowrap;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-full);
+    font-size: 0.6875rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    background: var(--color-bg-muted);
+    color: var(--color-text-primary);
+    box-shadow: 0 2px 6px 0 rgba(0,0,0,.08);
+    transform: translate(-50%, -50%) rotate(var(--pill-angle, 0deg));
+  }
+
+  /* pills sit at the edge's midpoint, nudged outward (away from the box) for legibility */
+  .dim-height .build-box-dim-pill  { transform: translate(calc(-50% + var(--space-3)), -50%) rotate(var(--pill-angle, 0deg)); }
+  .dim-width .build-box-dim-pill   { transform: translate(-50%, calc(-50% + var(--space-3))) rotate(var(--pill-angle, 0deg)); }
+  .dim-length .build-box-dim-pill  { transform: translate(-50%, calc(-50% + var(--space-3))) rotate(var(--pill-angle, 0deg)); }
+
+  .build-box-3d-stage[data-active-dim="width"] .dim-width .build-box-dim-pill,
+  .build-box-3d-stage[data-active-dim="length"] .dim-length .build-box-dim-pill,
+  .build-box-3d-stage[data-active-dim="height"] .dim-height .build-box-dim-pill {
+    background: var(--color-accent);
+    color: var(--color-text-on-accent);
+  }
+
+  .build-box-3d {
+    position: relative;
+    width: 1px;
+    height: 1px;
+    transform-style: preserve-3d;
+    cursor: grab;
+    will-change: transform;
+  }
+
+  .build-box-3d.is-dragging { cursor: grabbing; }
+
+  /* the static photo's job (2D view) is now done by the live dieline below */
+  .build-box-canvas > img { display: none; }
+  .build-box-visual.view-3d .build-box-dieline-stage { display: none; }
+  .build-box-visual.view-2d .build-box-3d-stage { display: none; }
+
+  .b3d-group {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-style: preserve-3d;
+  }
+
+  .b3d-face,
+  .b3d-lid-face,
+  .b3d-roof-panel,
+  .b3d-roof-end {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,.10);
+    background: var(--b3d-color, #C9A876);
+  }
+
+  #box3dModel[data-material="kraft"]         { --b3d-color: #C6A170; }
+  #box3dModel[data-material="white"]         { --b3d-color: #F2F0E9; }
+  #box3dModel[data-material="premium-white"] { --b3d-color: #FDFDFB; }
+
+  /* kraft gets a real paper texture instead of a flat fill — each face still gets its own
+     brightness filter for shading exactly as before, since filter:brightness() applies to
+     whatever is rendered underneath (image or solid color) the same way. Sourced from
+     brown-paper-texture-background.jpg, downsized 3000x3000->800x800 (7.7MB->~190KB) since
+     every face renders at most a few hundred px on screen — same look, much lighter to load. */
+  #box3dModel[data-material="kraft"] .b3d-face,
+  #box3dModel[data-material="kraft"] .b3d-lid-face,
+  #box3dModel[data-material="kraft"] .b3d-roof-panel,
+  #box3dModel[data-material="kraft"] .b3d-roof-end,
+  #box3dModel[data-material="kraft"] .b3d-flap,
+  #box3dModel[data-material="kraft"] .b3d-hang-tab {
+    background-image: url('build/kraft-texture.jpg');
+    background-size: cover;
+    background-position: center;
+  }
+
+  /* body (full-height cuboid, present for every construction) */
+  .b3d-front  { top: 50%; left: 50%; width: var(--w); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2); transform: translateZ(calc(var(--d) / 2)); filter: brightness(1.06); }
+  .b3d-back   { top: 50%; left: 50%; width: var(--w); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2); transform: rotateY(180deg) translateZ(calc(var(--d) / 2)); filter: brightness(.82); }
+  .b3d-right  { top: 50%; left: 50%; width: var(--d); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--d) / -2); transform: rotateY(90deg) translateZ(calc(var(--w) / 2)); filter: brightness(.92); }
+  .b3d-left   { top: 50%; left: 50%; width: var(--d); height: var(--h); margin: calc(var(--h) / -2) 0 0 calc(var(--d) / -2); transform: rotateY(-90deg) translateZ(calc(var(--w) / 2)); filter: brightness(.76); }
+  .b3d-top    { top: 50%; left: 50%; width: var(--w); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--w) / -2); transform: rotateX(90deg) translateZ(calc(var(--h) / 2)); filter: brightness(1.18); transition: opacity .15s ease; }
+  .b3d-bottom { top: 50%; left: 50%; width: var(--w); height: var(--d); margin: calc(var(--d) / -2) 0 0 calc(var(--w) / -2); transform: rotateX(-90deg) translateZ(calc(var(--h) / 2)); filter: brightness(.68); }
+
+  /* "Size of my product" mode: the W/L/H inputs become the *product* (inner) box, and the outer
+     (external) box auto-grows to product + a buffer added on every side. The inner box is a plain
+     gray cuboid — same 6-face geometry as the outer body, just built from --iw/--ih/--id instead of
+     --w/--h/--d, sharing the same center so it always sits correctly nested inside the outer box
+     regardless of proportions. Both custom-prop sets are computed together in updateSize() (JS). */
+  .b3d-inner-body { display: none; }
+  #box3dModel.product-size-mode .b3d-inner-body { display: block; }
+
+  .b3d-inner-face {
+    position: absolute;
+    box-sizing: border-box;
+    border: 1px solid rgba(0,0,0,.15);
+    background: #9A9A9A;
+  }
+  .b3d-inner-front  { top: 50%; left: 50%; width: var(--iw); height: var(--ih); margin: calc(var(--ih) / -2) 0 0 calc(var(--iw) / -2); transform: translateZ(calc(var(--id) / 2)); filter: brightness(1.12); }
+  .b3d-inner-back   { top: 50%; left: 50%; width: var(--iw); height: var(--ih); margin: calc(var(--ih) / -2) 0 0 calc(var(--iw) / -2); transform: rotateY(180deg) translateZ(calc(var(--id) / 2)); filter: brightness(.82); }
+  .b3d-inner-right  { top: 50%; left: 50%; width: var(--id); height: var(--ih); margin: calc(var(--ih) / -2) 0 0 calc(var(--id) / -2); transform: rotateY(90deg) translateZ(calc(var(--iw) / 2)); filter: brightness(.94); }
+  .b3d-inner-left   { top: 50%; left: 50%; width: var(--id); height: var(--ih); margin: calc(var(--ih) / -2) 0 0 calc(var(--id) / -2); transform: rotateY(-90deg) translateZ(calc(var(--iw) / 2)); filter: brightness(.74); }
+  .b3d-inner-top    { top: 50%; left: 50%; width: var(--iw); height: var(--id); margin: calc(var(--id) / -2) 0 0 calc(var(--iw) / -2); transform: rotateX(90deg) translateZ(calc(var(--ih) / 2)); filter: brightness(1.22); }
+  .b3d-inner-bottom { top: 50%; left: 50%; width: var(--iw); height: var(--id); margin: calc(var(--id) / -2) 0 0 calc(var(--iw) / -2); transform: rotateX(-90deg) translateZ(calc(var(--ih) / 2)); filter: brightness(.68); }
+
+  /* the outer (external) walls go translucent in this mode so the inner product box shows through */
+  #box3dModel.product-size-mode .b3d-front,
+  #box3dModel.product-size-mode .b3d-back,
+  #box3dModel.product-size-mode .b3d-left,
+  #box3dModel.product-size-mode .b3d-right,
+  #box3dModel.product-size-mode .b3d-top,
+  #box3dModel.product-size-mode .b3d-bottom {
+    opacity: .32;
+  }
+
+  #box3dModel[data-construction="gable"] .b3d-top { display: none; }
+  /* the 4 flaps below exist only to animate the open state; while closed, the flat .b3d-top above is
+     what's actually shown (see the .b3d-flap-hinge opacity rule) */
+  #box3dModel.box-open .b3d-top { opacity: 0; }
+
+  /* Top open animation: 4 independently-hinged tuck flaps (front/back/left/right) that swing out from
+     the box's real top edges when "Open" is toggled. They stay invisible (opacity:0) while closed and
+     only fade in as they rotate open — closed, all four are exactly coplanar and their footprints
+     overlap (front/back split the top by depth, left/right split it by width), which CSS's preserve-3d
+     can't resolve correctly (no true per-pixel z-buffer, just a single depth value per element for
+     paint order) and renders as a visibly broken/overlapping mess. Keeping `.b3d-top` as the one flat
+     plane for the closed look, and only bringing the flaps in once they're actually rotating away from
+     each other, sidesteps that limitation entirely.
+     Each hinge wrapper is translated so its own local origin sits ON the physical hinge line (the real
+     top edge of the corresponding wall), then rotates around that origin — front/back hinge lines run
+     along the width axis (rotateX), left/right hinge lines run along the depth axis (rotateZ). The flap
+     itself is positioned so its hinge-side edge is exactly at that wrapper origin (not centered), and its
+     own rotateX(90deg) tips it from the default vertical (XY) div into the horizontal (XZ) plane. */
+  .b3d-flap-hinge { position: absolute; top: 0; left: 0; transform-style: preserve-3d; opacity: 0; transition: transform .45s cubic-bezier(.4,0,.2,1), opacity .15s ease; }
+  #box3dModel.box-open .b3d-flap-hinge { opacity: 1; }
+  .b3d-flap { position: absolute; box-sizing: border-box; border: 1px solid rgba(0,0,0,.10); background: var(--b3d-color, #C9A876); }
+
+  .b3d-flap-hinge-front {
+    transform: translateY(calc(var(--h) / -2)) translateZ(calc(var(--d) / 2)) rotateX(var(--flap-open-front, 0deg));
+  }
+  .b3d-flap-front {
+    top: 50%; left: 50%;
+    width: var(--w); height: calc(var(--d) / 2);
+    margin: calc(var(--d) / -2) 0 0 calc(var(--w) / -2);
+    transform: rotateX(90deg);
+    filter: brightness(1.18);
+  }
+
+  .b3d-flap-hinge-back {
+    transform: translateY(calc(var(--h) / -2)) translateZ(calc(var(--d) / -2)) rotateX(var(--flap-open-back, 0deg));
+  }
+  .b3d-flap-back {
+    top: 50%; left: 50%;
+    width: var(--w); height: calc(var(--d) / 2);
+    margin: 0 0 0 calc(var(--w) / -2);
+    transform: rotateX(90deg);
+    filter: brightness(1.1);
+  }
+
+  /* left/right sit 1px below the front/back plane: since both pairs cover the *entire* top footprint
+     when closed (front/back split it by depth, left/right split it by width), they'd otherwise be
+     exactly coplanar wherever they overlap and z-fight. This mirrors how a real box's minor flaps close
+     first, underneath the major flaps — imperceptible once open, since 1px is negligible next to the
+     box itself. */
+  .b3d-flap-hinge-left {
+    transform: translateX(calc(var(--w) / -2)) translateY(calc(var(--h) / -2 + 1px)) rotateZ(var(--flap-open-left, 0deg));
+  }
+  .b3d-flap-left {
+    top: 50%; left: 50%;
+    width: calc(var(--w) / 2); height: var(--d);
+    margin: calc(var(--d) / -2) 0 0 0;
+    transform: rotateX(90deg);
+    filter: brightness(1.14);
+  }
+
+  .b3d-flap-hinge-right {
+    transform: translateX(calc(var(--w) / 2)) translateY(calc(var(--h) / -2 + 1px)) rotateZ(var(--flap-open-right, 0deg));
+  }
+  .b3d-flap-right {
+    top: 50%; left: 50%;
+    width: calc(var(--w) / 2); height: var(--d);
+    margin: calc(var(--d) / -2) 0 0 calc(var(--w) / -2);
+    transform: rotateX(90deg);
+    filter: brightness(1.14);
+  }
+
+  /* signs/angles verified visually against the reference photo: back tilts open-and-back, front folds
+     down-and-forward, left/right splay outward to their sides */
+  #box3dModel.box-open .b3d-flap-hinge-front { --flap-open-front: -110deg; }
+  #box3dModel.box-open .b3d-flap-hinge-back  { --flap-open-back: 100deg; }
+  #box3dModel.box-open .b3d-flap-hinge-left  { --flap-open-left: 100deg; }
+  #box3dModel.box-open .b3d-flap-hinge-right { --flap-open-right: -100deg; }
+
+  /* both open mechanisms are mutually exclusive per construction: gable's roof doesn't tuck-open at
+     all, and with-lid opens by lifting the separate .b3d-lid piece — its body underneath shouldn't
+     *also* show tuck flaps opening at the same time */
+  #box3dModel[data-construction="gable"] .b3d-flap-hinge,
+  #box3dModel[data-construction="with-lid"] .b3d-flap-hinge { display: none; }
+
+  /* windowing: translucent film patch on the front face */
+  .b3d-window {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: calc(var(--w) * .45);
+    height: calc(var(--h) * .4);
+    margin: calc(var(--h) * -.2) 0 0 calc(var(--w) * -.225);
+    transform: translateZ(calc(var(--d) / 2 + .5px));
+    background: rgba(255,255,255,.35);
+    border: 1px solid rgba(255,255,255,.65);
+    box-shadow: inset 0 0 12px rgba(255,255,255,.5);
+    display: none;
+  }
+  #box3dModel[data-windows="windowing"] .b3d-window { display: block; }
+
+  /* hanging: header tab (a full-width continuation of the back panel, opposite the Width wall, rising above
+     the top edge) with a euro-slot genuinely cut through it (SVG luminance mask, see #hangSlotMask below) —
+     not a dark sticker on top: the hole is real alpha transparency, so whatever's actually behind the tab in
+     the 3D scene (here, just the empty stage) shows through it. */
+  .b3d-hang-tab {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: var(--w);
+    height: calc(var(--h) * .42);
+    margin: calc(var(--h) * -.92) 0 0 calc(var(--w) * -.5);
+    border-radius: 10px 10px 0 0;
+    background: var(--b3d-color, #C9A876);
+    transform: rotateY(180deg) translateZ(calc(var(--d) / 2));
+    filter: brightness(.82);
+    mask: url(#hangSlotMask);
+    -webkit-mask: url(#hangSlotMask);
+    display: none;
+  }
+  #box3dModel[data-construction="hanging"] .b3d-hang-tab { display: block; }
+
+  /* with handle: die-cut slot on the top face */
+  .b3d-handle-hole {
+    position: absolute;
+    top: 50%; left: 50%;
+    width: calc(var(--w) * .34);
+    height: calc(var(--d) * .16);
+    margin-top: calc(var(--d) * -.08);
+    margin-left: calc(var(--w) * -.17);
+    border-radius: 999px;
+    background: rgba(0,0,0,.35);
+    transform: rotateX(90deg) translateZ(calc(var(--h) / 2 + .5px));
+    display: none;
+  }
+  #box3dModel[data-construction="handle"] .b3d-handle-hole { display: block; }
+
+  /* with lid: a shallower, slightly larger box sitting over the top of the body */
+  .b3d-lid {
+    display: none;
+    --lw: calc(var(--w) + 12px);
+    --ld: calc(var(--d) + 12px);
+    --lh: calc(var(--h) * .4);
+    transform: translateY(calc(-1 * var(--h) / 2 - var(--lh) * .15));
+    transition: transform .35s cubic-bezier(.4,0,.2,1);
+  }
+  #box3dModel[data-construction="with-lid"] .b3d-lid { display: block; }
+  /* Open lifts the separate lid piece further up and clear of the body, since it's a distinct part
+     rather than hinged flaps like Classic/Hanging/Handle */
+  #box3dModel.box-open[data-construction="with-lid"] .b3d-lid {
+    transform: translateY(calc(-1 * var(--h) - var(--lh)));
+  }
+
+  .b3d-lid-front  { top: 50%; left: 50%; width: var(--lw); height: var(--lh); margin: calc(var(--lh) / -2) 0 0 calc(var(--lw) / -2); transform: translateZ(calc(var(--ld) / 2)); filter: brightness(1.1); }
+  .b3d-lid-back   { top: 50%; left: 50%; width: var(--lw); height: var(--lh); margin: calc(var(--lh) / -2) 0 0 calc(var(--lw) / -2); transform: rotateY(180deg) translateZ(calc(var(--ld) / 2)); filter: brightness(.86); }
+  .b3d-lid-right  { top: 50%; left: 50%; width: var(--ld); height: var(--lh); margin: calc(var(--lh) / -2) 0 0 calc(var(--ld) / -2); transform: rotateY(90deg) translateZ(calc(var(--lw) / 2)); filter: brightness(.96); }
+  .b3d-lid-left   { top: 50%; left: 50%; width: var(--ld); height: var(--lh); margin: calc(var(--lh) / -2) 0 0 calc(var(--ld) / -2); transform: rotateY(-90deg) translateZ(calc(var(--lw) / 2)); filter: brightness(.8); }
+  .b3d-lid-top    { top: 50%; left: 50%; width: var(--lw); height: var(--ld); margin: calc(var(--ld) / -2) 0 0 calc(var(--lw) / -2); transform: rotateX(90deg) translateZ(calc(var(--lh) / 2)); filter: brightness(1.22); }
+
+  /* gable top: a peaked roof (ridge along the width axis) sitting on top of the body */
+  .b3d-roof {
+    display: none;
+    transform: translateY(calc(-1 * var(--h) / 2 - var(--rise)));
+  }
+  #box3dModel[data-construction="gable"] .b3d-roof { display: block; }
+
+  .b3d-roof-panel {
+    top: 0; left: 50%;
+    width: var(--w);
+    height: var(--slant);
+    margin-left: calc(var(--w) / -2);
+    transform-origin: 50% 0%;
+    filter: brightness(1.02);
+  }
+  .b3d-roof-front { transform: rotateX(var(--pitch-deg)); }
+  .b3d-roof-back  { transform: rotateX(calc(var(--pitch-deg) * -1)); filter: brightness(.84); }
+
+  .b3d-roof-end {
+    top: 0; left: 50%;
+    width: var(--d);
+    height: var(--rise);
+    margin-left: calc(var(--d) / -2);
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    filter: brightness(.9);
+  }
+  .b3d-roof-end-right { transform: rotateY(90deg) translateZ(calc(var(--w) / 2)); }
+  .b3d-roof-end-left  { transform: rotateY(-90deg) translateZ(calc(var(--w) / 2)); filter: brightness(.74); }
+
+  .build-box-visual-toolbar {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    flex-wrap: wrap;
+  }
+
+  /* three equal-width slots so the center control (zoom) is always truly centered regardless of
+     how wide the left/right controls are, rather than relying on justify-content:space-between
+     (which only centers the middle item when its neighbors happen to be the same width) */
+  .build-box-toolbar-slot {
+    flex: 1 1 0;
+    min-width: 0;
+    display: flex;
+  }
+  .build-box-toolbar-slot.start  { justify-content: flex-start; }
+  .build-box-toolbar-slot.center { justify-content: center; }
+  .build-box-toolbar-slot.end    { justify-content: flex-end; }
+
+  /* the toolbar's toggle-switch sits inline in a horizontal row, not stacked above other step
+     content like the base .toggle-switch usually is — so it alone opts out of the bottom margin.
+     Everything else (the segment-tab background, indicator, text) now lives on the base classes
+     directly, since it's shared by every toggle-switch/zoom control on the page, not just this one. */
+  .build-box-visual-toolbar .toggle-switch {
+    margin-bottom: 0;
+  }
+
+  .build-box-zoom {
+    display: flex;
+    align-items: center;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    background: rgba(0, 0, 0, .04);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    border-radius: var(--radius-full);
+  }
+
+  .build-box-zoom span {
+    padding: 0 8px;
+  }
+
+  .build-box-zoom .icon-btn {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    padding: var(--space-2);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border: none;
+    border-radius: var(--radius-full);
+    background: linear-gradient(180deg, var(--color-bg-surface) 50%, var(--color-bg-muted) 100%);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.08);
+  }
+
+  .build-box-zoom .icon-btn:hover {
+    filter: brightness(0.97);
+  }
+
+  .build-box-zoom .icon-btn svg { width: 16px; height: 16px; }
+
+  /* ---------- right: one step at a time ---------- */
+  .build-box-config-col {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .build-box-step {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 96px var(--space-8);
+  }
+
+  .build-box-step:first-child {
+    padding-top: var(--space-8);
+  }
+
+  .build-box-heading {
+    margin: 0 0 var(--space-1);
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-subheading {
+    margin: 0 0 var(--space-8);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .build-box-field-label {
+    margin: 0 0 var(--space-2);
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    line-height: 1.16;
+    font-weight: 450;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-field-desc {
+    margin: 0 0 var(--space-4);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .box-type-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .box-type-card {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+    box-sizing: border-box;
+    padding: var(--space-2) var(--space-6) var(--space-2) var(--space-2);
+    border: none;
+    border-radius: 12px;
+    background: var(--color-bg-muted);
+    text-align: left;
+    cursor: pointer;
+    transition: background-color .15s ease, box-shadow .15s ease;
+  }
+
+  .box-type-card.no-thumb {
+    padding: 16px;
+  }
+
+  .quantity-card {
+    justify-content: space-between;
+  }
+
+  .quantity-card-qty {
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .quantity-card-prices {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-6);
+  }
+
+  .quantity-card-unit {
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .quantity-card-total {
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  /* "Choose other value": one more row styled exactly like the quantity-card presets above it,
+     ending in a chevron instead of a price. Clicking it reveals a custom panel (not a native
+     <select>) built from the same components used elsewhere on the page: a dimension-input-style
+     text field to type a custom quantity, and a list of quantity-card rows — some priced, some
+     ending in a .btn-pill "Get a quote" badge instead, exactly like the main preset list above. */
+  .quantity-card-other-wrap {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .quantity-card-other-chevron {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--color-text-muted);
+    transition: transform .2s ease;
+  }
+
+  .quantity-card-other-wrap.is-open .quantity-card-other-chevron {
+    transform: rotate(180deg);
+  }
+
+  .quantity-other-panel {
+    display: none;
+    flex-direction: column;
+    margin-top: var(--space-2);
+    border-radius: 12px;
+    overflow: hidden;
+    background: var(--color-bg-surface);
+    /* same light-gray outline + soft shadow already used for .box-type-card.active elsewhere */
+    box-shadow: 0 0 0 1px var(--color-border-default), 0 4px 12px rgba(0,0,0,.05);
+  }
+
+  .quantity-card-other-wrap.is-open .quantity-other-panel {
+    display: flex;
+  }
+
+  /* the input is the one exception that keeps padding around it — everything below is flush,
+     edge to edge, with no gap between rows */
+  .quantity-other-panel .dimension-input-wrap {
+    margin: var(--space-4);
+  }
+
+  .quantity-other-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* .box-type-card.no-thumb (2 classes) otherwise beats a plain .quantity-other-option (1 class)
+     in specificity regardless of source order, so the override needs to match it */
+  .box-type-card.quantity-other-option {
+    /* same left/right inset as the "Type in your quantity" input (its own var(--space-4) margin) —
+       so the row's own box (and therefore its hover highlight) is exactly as wide as the input,
+       not full panel width. Rows still stack with zero *vertical* gap between them. */
+    width: calc(100% - var(--space-8));
+    margin: 0 var(--space-4);
+    border-radius: 0;
+    background: var(--color-bg-surface);
+    transition: background-color .15s ease, border-radius .15s ease;
+  }
+
+  .box-type-card.quantity-other-option:hover {
+    background: var(--color-bg-muted-hover);
+    border-radius: var(--radius-sm);
+  }
+
+  .quantity-quote-badge {
+    flex: none;
+  }
+
+  .build-box-bigger-needs {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: var(--space-4) 0 0;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .build-box-bigger-needs-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+  }
+
+  .build-box-bigger-needs svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  .build-box-bigger-needs a {
+    color: var(--color-text-primary);
+    text-decoration: underline;
+    text-decoration-color: var(--color-border-hover);
+    text-underline-offset: 2px;
+  }
+
+  .build-box-subfield {
+    margin-top: var(--space-6);
+  }
+
+  .build-box-subfield:first-of-type {
+    margin-top: var(--space-8);
+  }
+
+  .build-box-subfield-label {
+    margin: 0 0 var(--space-3);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .box-type-card-thumb {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: 88px;
+    height: 88px;
+  }
+
+  .box-type-card-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .box-type-card-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  .box-type-card-label {
+    color: var(--color-text-primary);
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: "ABC Favorit", sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  .box-type-card-desc {
+    margin: 0;
+    font-size: 13px;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .box-type-card.active {
+    background: var(--color-bg-surface);
+    box-shadow: 0 0 0 1px var(--color-border-default), 0 4px 12px rgba(0,0,0,.05);
+  }
+
+  .material-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--space-4);
+    max-width: 660px;
+  }
+
+  .material-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border: none;
+    border-radius: 12px;
+    background: var(--color-bg-muted);
+    text-align: left;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background-color .15s ease, box-shadow .15s ease;
+  }
+
+  .material-card-image {
+    display: block;
+    width: 100%;
+    aspect-ratio: 162 / 104;
+  }
+
+  .material-card-image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .material-card-text {
+    padding: 0 16px 16px;
+  }
+
+  .material-card-label {
+    display: block;
+    color: var(--color-text-primary);
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: "ABC Favorit", sans-serif;
+    font-size: 15px;
+    font-style: normal;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  .material-card-desc {
+    display: block;
+    margin-top: var(--space-2);
+    font-size: 13px;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .material-card.active {
+    background: var(--color-bg-surface);
+    box-shadow: 0 0 0 1px var(--color-border-default), 0 4px 12px rgba(0,0,0,.05);
+  }
+
+  .construction-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .construction-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    flex: 0 0 auto;
+    width: 100px;
+    padding: var(--space-4) var(--space-2);
+    border-radius: 12px;
+    background: var(--color-bg-muted);
+    border: 1.5px solid transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+  }
+
+  .construction-card-preview {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    left: 50%;
+    transform: translateX(-50%);
+    width: 280px;
+    height: 160px;
+    border-radius: 16px;
+    border: 1px solid var(--color-border-default);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.08);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+    z-index: 1000;
+    pointer-events: none;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .15s ease;
+  }
+
+  .construction-card:hover .construction-card-preview {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .construction-card-preview video {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .construction-card img { width: 56px; height: 56px; }
+
+  .construction-card span {
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    text-align: center;
+    line-height: 1.32;
+  }
+
+  .construction-card:hover { background: var(--color-bg-muted-hover); }
+
+  .construction-card.active {
+    background: var(--color-bg-surface);
+    border-color: var(--color-text-primary);
+    color: var(--color-text-primary);
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    margin-bottom: var(--space-6);
+    border-radius: var(--radius-full);
+    background: rgba(0, 0, 0, .04);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+
+  .toggle-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    border-radius: var(--radius-full);
+    background: linear-gradient(180deg, var(--color-bg-surface) 50%, var(--color-bg-muted) 100%);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.08);
+    transition: transform 0.3s ease, width 0.3s ease;
+  }
+
+  .toggle-option {
+    /* "hug" width (a button with no explicit width already sizes to its content) with a tight
+       8px padding, active and inactive alike — plus the Body/Body 13 text style */
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    padding: 8px;
+    border-radius: var(--radius-full);
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-feature-settings: 'liga' off, 'clig' off;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+
+  .toggle-option.active {
+    color: var(--color-text-primary);
+  }
+
+  .build-box-step .toggle-switch {
+    align-self: flex-start;
+  }
+
+  /* .dimension-grid/.dimension-field/.dimension-input-wrap/.dimension-input/.dimension-unit
+     now live in components.css — shared with packaging.html's quick-box banner */
+
+  .dimension-buffer-note {
+    max-height: 0;
+    margin-top: 0;
+    padding: 0 var(--space-4);
+    border-radius: 12px;
+    background: var(--color-bg-notice);
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease, margin-top .4s cubic-bezier(.4,0,.2,1), padding-top .4s cubic-bezier(.4,0,.2,1), padding-bottom .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .dimension-buffer-note.visible {
+    max-height: 220px;
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    padding-bottom: var(--space-4);
+    opacity: 1;
+    transition: max-height .4s cubic-bezier(.4,0,.2,1), opacity .3s ease .1s, margin-top .4s cubic-bezier(.4,0,.2,1), padding-top .4s cubic-bezier(.4,0,.2,1), padding-bottom .4s cubic-bezier(.4,0,.2,1);
+  }
+
+  .dimension-buffer-text {
+    margin: 0 0 var(--space-3);
+    font-size: 13px;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-primary);
+  }
+
+  .dimension-buffer-control {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .dimension-buffer-label {
+    font-size: 13px;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-zoom.sm {
+    height: 32px;
+    padding: var(--space-1);
+    font-size: 13px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .build-box-zoom.sm .icon-btn {
+    width: 24px;
+    height: 24px;
+    padding: var(--space-1);
+  }
+
+  .build-box-zoom.sm .icon-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  /* ---------- step progress dots ---------- */
+  .build-box-dots {
+    position: fixed;
+    top: 50%;
+    right: var(--space-6);
+    transform: translateY(-50%);
+    z-index: 15;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .build-box-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-border-hover);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: height 0.35s cubic-bezier(.4,0,.2,1), background-color 0.35s ease;
+  }
+
+  .build-box-dot.active {
+    height: 18px;
+    background: var(--color-text-primary);
+  }
+
+  /* ---------- SITE SETTINGS (gear) ---------- */
+  .site-settings-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-bg-surface);
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .site-settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  }
+
+  .site-settings-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .site-settings-panel {
+    position: fixed;
+    bottom: 92px;
+    right: 24px;
+    z-index: 1000;
+    width: 280px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    padding: var(--space-5);
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .site-settings-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .site-settings-title {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .site-settings-label {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-desc {
+    margin: var(--space-0-5) 0 0;
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- Compact mode: accordion list ---------- */
+  .build-box-accordion-header {
+    display: none;
+    width: 100%;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) 0;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .build-box-accordion-badge {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+    color: var(--color-text-primary);
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+  }
+
+  .build-box-accordion-badge svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .build-box-accordion-badge.done {
+    background: var(--color-bg-accent-subtle);
+    color: var(--color-text-primary);
+  }
+
+  .build-box-accordion-title {
+    flex: 1;
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-accordion-value {
+    font-weight: 400;
+  }
+
+  .build-box-accordion-chevron {
+    flex: none;
+    width: 18px;
+    height: 18px;
+    color: var(--color-text-primary);
+    transition: transform .2s ease;
+  }
+
+  .build-box-step.expanded .build-box-accordion-chevron {
+    transform: rotate(180deg);
+  }
+
+  body.compact-mode .build-box-step {
+    padding: 0 var(--space-8);
+  }
+
+  /* a normal-flow block (not a border) so it's inset by the step's own padding — i.e. it
+     starts exactly where the badge starts and ends exactly where the chevron ends, matching
+     the accordion header's content width instead of bleeding to the section's full width */
+  body.compact-mode .build-box-step::after {
+    content: '';
+    display: block;
+    height: 1px;
+    background: var(--color-border-default);
+  }
+
+  body.compact-mode .build-box-step:first-child {
+    padding-top: 0;
+  }
+
+  body.compact-mode .build-box-accordion-header {
+    display: flex;
+  }
+
+  /* the accordion header row already shows the step title, so the step's own header/subheader
+     (shown at the top of every step's content in the normal, non-compact view) would be
+     redundant once expanded in compact mode */
+  body.compact-mode .build-box-step-content > .build-box-field-label,
+  body.compact-mode .build-box-step-content > .build-box-field-desc {
+    display: none;
+  }
+
+  body.compact-mode .build-box-step-content {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height .35s cubic-bezier(.4,0,.2,1), opacity .25s ease;
+  }
+
+  body.compact-mode .build-box-step.expanded .build-box-step-content {
+    max-height: 3000px;
+    opacity: 1;
+    padding-bottom: var(--space-8);
+  }
+
+  body.compact-mode .build-box-subfield:first-of-type {
+    margin-top: 0;
+  }
+
+  /* ---------- mini sticky price summary, pinned like the homepage sticky nav ---------- */
+  .build-box-sticky-summary {
+    position: fixed;
+    bottom: 0;
+    z-index: 60;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) var(--space-6);
+    background: rgba(255, 255, 255, 0.80);
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+    transition: opacity .3s ease, transform .3s ease;
+  }
+
+  .build-box-sticky-summary.visible {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .build-box-sticky-summary-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .build-box-sticky-summary-label {
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .build-box-sticky-summary-value {
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-sticky-summary-value.underline {
+    text-decoration: underline;
+    text-decoration-color: var(--color-border-hover);
+    text-underline-offset: 3px;
+  }
+
+  .build-box-sticky-summary-price {
+    font-size: 1.0625rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-sticky-summary-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-6);
+  }
+
+  .build-box-sticky-summary-price-group {
+    text-align: right;
+  }
+
+  @media (max-width: 900px) {
+    .build-box-sticky-summary { display: none; }
+  }
+
+  /* ---------- final checkout card ---------- */
+  .build-box-checkout {
+    padding: 96px var(--space-8) var(--space-16);
+  }
+
+  .build-box-checkout-card {
+    width: 100%;
+  }
+
+  .build-box-checkout-top {
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-8);
+  }
+
+  .build-box-checkout-delivery-label {
+    margin: 0 0 var(--space-3);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-checkout-location {
+    text-decoration: underline;
+    text-decoration-color: var(--color-border-hover);
+    text-underline-offset: 3px;
+  }
+
+  .build-box-checkout-dates {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  .build-box-checkout-dates li {
+    position: relative;
+    padding-left: var(--space-4);
+    color: var(--color-text-primary);
+  }
+
+  .build-box-checkout-dates li::before {
+    content: "";
+    position: absolute;
+    left: 2px;
+    top: 0.5em;
+    width: 4px;
+    height: 4px;
+    border-radius: var(--radius-full);
+    background: var(--color-text-primary);
+  }
+
+  .build-box-checkout-date-price {
+    color: var(--color-text-muted);
+  }
+
+  .build-box-checkout-price {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  .build-box-checkout-price-label {
+    margin: 0 0 var(--space-1);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .build-box-checkout-price-value {
+    margin: 0;
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .build-box-checkout-card .btn-pill {
+    width: 100%;
+    margin-bottom: var(--space-3);
+  }
+
+  .build-box-checkout-card .btn-pill:last-child {
+    margin-bottom: 0;
+  }
+
+  .build-box-checkout-card .btn-pill.muted {
+    background: var(--color-bg-muted);
+    color: var(--color-text-primary);
+    border: none;
+  }
+
+  .build-box-checkout-card .btn-pill.muted:hover {
+    background: var(--color-bg-muted-hover);
+  }
+
+  /* ---------- tablet: margins shrink before the full stack breakpoint; the 1400px/480px column sizing already flexes down gracefully ---------- */
+  @media (max-width: 1200px) {
+    .build-box-page { gap: var(--space-4); padding: var(--space-4); }
+    .build-box-header { padding: var(--space-6) var(--space-4) 0; }
+    .build-box-step { padding-left: var(--space-6); padding-right: var(--space-6); }
+    .construction-card { width: 84px; }
+  }
+
+  @media (max-width: 900px) {
+    .build-box-header { padding: var(--space-6) var(--space-4) 0; }
+    .build-box-page { grid-template-columns: 1fr; padding: var(--space-4); gap: var(--space-4); }
+    .build-box-visual { position: static; height: 60vh; min-height: 360px; top: 0; }
+    .build-box-step { min-height: 0; padding: var(--space-8) var(--space-2); }
+    .build-box-config-col { gap: var(--space-8); }
+    .build-box-dots { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="announcement-bar">
+  <span>The more products you add, the more you save. Code: <strong>BUNDLEUP</strong></span>
+  <button class="announcement-copy" aria-label="Copy code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+</div>
+
+<div id="ph-sticky-bar"></div>
+
+<div class="container">
+  <div id="ph-nav-wrapper"></div>
+  <script src="nav-header.js"></script>
+</div>
+
+  <nav class="build-box-dots" id="stepDots" aria-label="Configuration steps">
+    <button class="build-box-dot active" data-target="stepBoxType" aria-label="Box type"></button>
+    <button class="build-box-dot" data-target="stepConstruction" aria-label="Construction"></button>
+    <button class="build-box-dot" data-target="stepSize" aria-label="Size"></button>
+    <button class="build-box-dot" data-target="stepClosure" aria-label="Closure"></button>
+    <button class="build-box-dot" data-target="stepWindows" aria-label="Windows and cutouts"></button>
+    <button class="build-box-dot" data-target="stepMaterial" aria-label="Material color"></button>
+    <button class="build-box-dot" data-target="stepCustomization" aria-label="Customization"></button>
+    <button class="build-box-dot" data-target="stepAdditional" aria-label="Additional options"></button>
+    <button class="build-box-dot" data-target="stepQuantity" aria-label="Quantity"></button>
+  </nav>
+
+  <div class="build-box-header">
+    <h2 class="build-box-heading">Build your box</h2>
+    <p class="build-box-subheading">Quickly configure the exact box type you need</p>
+  </div>
+
+  <div class="build-box-sticky-summary" id="stickySummaryBar">
+    <div class="build-box-sticky-summary-group">
+      <span class="build-box-sticky-summary-label">Delivery</span>
+      <span class="build-box-sticky-summary-value underline">20-28 April</span>
+    </div>
+    <div class="build-box-sticky-summary-right">
+      <div class="build-box-sticky-summary-group build-box-sticky-summary-price-group">
+        <span class="build-box-sticky-summary-label">Netto / 30 pieces</span>
+        <span class="build-box-sticky-summary-price">€45.00</span>
+      </div>
+      <a href="#" class="btn-pill lg">Add to cart</a>
+    </div>
+  </div>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+    <defs>
+      <!-- Real cut-out for the hanging tab's euro-slot: white = visible tab material, black = punched
+           through (fully transparent). The base rect uses objectBoundingBox fractions (0/0/1/1 always
+           covers the whole tab, whatever its size). The bar/thumb shapes' x/y/width/height/rx/ry/d are
+           instead recomputed in JS every time the box's size changes (see updateHangSlotMask() in the
+           box3d script) as fixedPx / currentTabPx — this keeps their *rendered* pixel size constant
+           regardless of box dimensions, rather than the fractions scaling with the tab like the base
+           rect does. -->
+      <mask id="hangSlotMask" maskContentUnits="objectBoundingBox">
+        <rect x="0" y="0" width="1" height="1" fill="#fff"/>
+        <rect id="hangSlotBar" fill="#000"/>
+        <path id="hangSlotThumb" fill="#000"/>
+      </mask>
+    </defs>
+  </svg>
+
+  <div class="build-box-page">
+    <div class="build-box-visual">
+      <div class="build-box-canvas">
+        <img id="canvasImage" src="build/folding-box.png" alt="">
+        <div class="build-box-dieline-stage" id="dielineStage">
+          <svg id="dielineSvg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid meet"></svg>
+        </div>
+        <div class="build-box-3d-stage" id="box3dStage">
+          <div class="build-box-3d-shadow"></div>
+          <div class="build-box-dim-lines">
+            <div class="build-box-dim-line dim-height"><span class="build-box-dim-pill" id="dimPillHeight">Height: 12 cm</span></div>
+            <div class="build-box-dim-line dim-width"><span class="build-box-dim-pill" id="dimPillWidth">Width: 8 cm</span></div>
+            <div class="build-box-dim-line dim-length"><span class="build-box-dim-pill" id="dimPillLength">Length: 8 cm</span></div>
+          </div>
+          <div class="build-box-3d" id="box3dModel" data-construction="classic" data-material="kraft" data-windows="no">
+            <div class="b3d-group b3d-body">
+              <div class="b3d-face b3d-front"></div>
+              <div class="b3d-face b3d-back"></div>
+              <div class="b3d-face b3d-left"></div>
+              <div class="b3d-face b3d-right"></div>
+              <div class="b3d-face b3d-top"></div>
+              <div class="b3d-flap-hinge b3d-flap-hinge-front"><div class="b3d-flap b3d-flap-front"></div></div>
+              <div class="b3d-flap-hinge b3d-flap-hinge-back"><div class="b3d-flap b3d-flap-back"></div></div>
+              <div class="b3d-flap-hinge b3d-flap-hinge-left"><div class="b3d-flap b3d-flap-left"></div></div>
+              <div class="b3d-flap-hinge b3d-flap-hinge-right"><div class="b3d-flap b3d-flap-right"></div></div>
+              <div class="b3d-face b3d-bottom"></div>
+              <div class="b3d-window"></div>
+              <div class="b3d-hang-tab"></div>
+              <div class="b3d-handle-hole"></div>
+            </div>
+            <div class="b3d-group b3d-lid">
+              <div class="b3d-lid-face b3d-lid-front"></div>
+              <div class="b3d-lid-face b3d-lid-back"></div>
+              <div class="b3d-lid-face b3d-lid-left"></div>
+              <div class="b3d-lid-face b3d-lid-right"></div>
+              <div class="b3d-lid-face b3d-lid-top"></div>
+            </div>
+            <div class="b3d-group b3d-roof">
+              <div class="b3d-roof-panel b3d-roof-front"></div>
+              <div class="b3d-roof-panel b3d-roof-back"></div>
+              <div class="b3d-roof-end b3d-roof-end-left"></div>
+              <div class="b3d-roof-end b3d-roof-end-right"></div>
+            </div>
+            <div class="b3d-group b3d-inner-body">
+              <div class="b3d-inner-face b3d-inner-front"></div>
+              <div class="b3d-inner-face b3d-inner-back"></div>
+              <div class="b3d-inner-face b3d-inner-left"></div>
+              <div class="b3d-inner-face b3d-inner-right"></div>
+              <div class="b3d-inner-face b3d-inner-top"></div>
+              <div class="b3d-inner-face b3d-inner-bottom"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="build-box-visual-toolbar">
+        <div class="build-box-toolbar-slot start">
+          <div class="toggle-switch" id="viewToggleSwitch">
+            <div class="toggle-indicator" id="viewToggleIndicator"></div>
+            <button class="toggle-option active">3D view</button>
+            <button class="toggle-option">2D view</button>
+          </div>
+        </div>
+        <div class="build-box-toolbar-slot center">
+          <div class="build-box-zoom sm" id="previewZoom">
+            <button class="icon-btn" id="zoomOutBtn" aria-label="Zoom out"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+            <span id="zoomValue">100%</span>
+            <button class="icon-btn" id="zoomInBtn" aria-label="Zoom in"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+          </div>
+        </div>
+        <div class="build-box-toolbar-slot end">
+          <div class="toggle-switch" id="openToggleSwitch">
+            <div class="toggle-indicator" id="openToggleIndicator"></div>
+            <button class="toggle-option active">Close</button>
+            <button class="toggle-option">Open</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="build-box-config-col">
+
+      <section class="build-box-step" id="stepBoxType">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">1</span>
+          <span class="build-box-accordion-title">Box Type<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Box Type</h3>
+        <p class="build-box-field-desc">Choose the base format that fits your product</p>
+        <div class="box-type-grid">
+          <button class="box-type-card active" data-box-type="folding">
+            <span class="box-type-card-thumb"><img src="build/folding-box.png" alt=""></span>
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">Folding Box</span>
+              <span class="box-type-card-desc">Flat-packed box that folds from one die-cut sheet.</span>
+            </span>
+          </button>
+          <button class="box-type-card">
+            <span class="box-type-card-thumb"><img src="build/rigid-box.png" alt=""></span>
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">Rigid Box</span>
+              <span class="box-type-card-desc">Sturdy, non-collapsible box for premium packaging.</span>
+            </span>
+          </button>
+          <button class="box-type-card">
+            <span class="box-type-card-thumb"><img src="build/mialer-box.png" alt=""></span>
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">Mailer Box</span>
+              <span class="box-type-card-desc">Self-locking box with an attached lid for shipping.</span>
+            </span>
+          </button>
+          <button class="box-type-card">
+            <span class="box-type-card-thumb"><img src="build/shipping-box.png" alt=""></span>
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">Shipping Box</span>
+              <span class="box-type-card-desc">Corrugated box built for transport and storage.</span>
+            </span>
+          </button>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepConstruction">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">2</span>
+          <span class="build-box-accordion-title">Construction<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Construction</h3>
+        <p class="build-box-field-desc">Decide how the box will open and close</p>
+        <div class="construction-grid">
+          <button class="construction-card active" data-construction="classic">
+            <img src="build/classic.svg" alt="">
+            <span>Classic</span>
+          </button>
+          <button class="construction-card" data-construction="hanging">
+            <img src="build/hanging.svg" alt="">
+            <span>Hanging</span>
+          </button>
+          <button class="construction-card" data-construction="with-lid">
+            <img src="build/with-lid.svg" alt="">
+            <span>With Lid</span>
+          </button>
+          <button class="construction-card" data-construction="handle">
+            <img src="build/handle.svg" alt="">
+            <span>With Handle</span>
+          </button>
+          <button class="construction-card" data-construction="gable">
+            <img src="build/gable.svg" alt="">
+            <span>Gable Top</span>
+          </button>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepSize">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">3</span>
+          <span class="build-box-accordion-title">Dimensions<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Dimensions</h3>
+        <p class="build-box-field-desc">Enter external size or your product's size — we'll calculate the rest</p>
+        <div class="toggle-switch" id="sizeToggleSwitch">
+          <div class="toggle-indicator" id="sizeToggleIndicator"></div>
+          <button class="toggle-option active">External size</button>
+          <button class="toggle-option">Size of my product</button>
+        </div>
+        <div class="dimension-grid">
+          <label class="dimension-field">
+            <span class="dimension-field-label">Width</span>
+            <span class="dimension-input-wrap"><input type="number" class="dimension-input" id="dimWidth" value="8"><span class="dimension-unit">cm</span></span>
+          </label>
+          <label class="dimension-field">
+            <span class="dimension-field-label">Length</span>
+            <span class="dimension-input-wrap"><input type="number" class="dimension-input" id="dimLength" value="8"><span class="dimension-unit">cm</span></span>
+          </label>
+          <label class="dimension-field">
+            <span class="dimension-field-label">Height</span>
+            <span class="dimension-input-wrap"><input type="number" class="dimension-input" id="dimHeight" value="12"><span class="dimension-unit">cm</span></span>
+          </label>
+        </div>
+
+        <div class="dimension-buffer-note" id="dimensionBufferNote">
+          <p class="dimension-buffer-text">We automatically add a <span id="bufferMmText">5</span> mm buffer on all sides to ensure your product fits. External size of the box: W <span id="extW">8.5</span> cm x L <span id="extL">8.5</span> cm x h <span id="extH">12.5</span> cm</p>
+          <div class="dimension-buffer-control">
+            <span class="dimension-buffer-label">Buffer size:</span>
+            <div class="build-box-zoom sm" id="bufferStepper">
+              <button class="icon-btn" id="bufferMinus" aria-label="Decrease buffer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+              <span id="bufferValue">5 mm</span>
+              <button class="icon-btn" id="bufferPlus" aria-label="Increase buffer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+            </div>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepClosure">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">4</span>
+          <span class="build-box-accordion-title">Closure<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Closure</h3>
+        <p class="build-box-field-desc">Choose how the box bottom locks together</p>
+        <div class="construction-grid">
+          <button class="construction-card active">
+            <img src="build/auto-lock.svg" alt="">
+            <span>Auto Lock</span>
+          </button>
+          <button class="construction-card">
+            <img src="build/reverse-tuck.svg" alt="">
+            <span>Reverse Tuck</span>
+          </button>
+          <button class="construction-card">
+            <img src="build/snap-lock.svg" alt="">
+            <span>Snap Lock</span>
+            <span class="construction-card-preview">
+              <video src="build/snaplock.mp4" autoplay muted loop playsinline></video>
+            </span>
+          </button>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepWindows">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">5</span>
+          <span class="build-box-accordion-title">Windows &amp; Cutouts<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Windows &amp; Cutouts</h3>
+        <p class="build-box-field-desc">Add a transparent window or lines that make opening easier</p>
+        <div class="box-type-grid">
+          <button class="box-type-card active" data-windows="no">
+            <span class="box-type-card-thumb"><img src="build/folding-box.png" alt=""></span>
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">No</span>
+              <span class="box-type-card-desc">No additional cutouts or lines; a fully closed, standard box.</span>
+            </span>
+          </button>
+          <button class="box-type-card" data-windows="windowing">
+            <span class="box-type-card-thumb"><img src="build/windowing.png" alt=""></span>
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">Windowing</span>
+              <span class="box-type-card-desc">A cut-out window in the box wall, usually filled with film, to display the product inside.</span>
+            </span>
+          </button>
+          <button class="box-type-card" data-windows="perforation">
+            <span class="box-type-card-thumb"><img src="build/perforation.png" alt=""></span>
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">Perforation</span>
+              <span class="box-type-card-desc">A perforated line that lets part of the box be easily torn off.</span>
+            </span>
+          </button>
+          <button class="box-type-card no-thumb" data-windows="crease">
+            <span class="box-type-card-text">
+              <span class="box-type-card-label">Crease line</span>
+              <span class="box-type-card-desc">An extra scoring line for precise, controlled folding at a specific spot.</span>
+            </span>
+          </button>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepMaterial">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">6</span>
+          <span class="build-box-accordion-title">Material Color<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Material Color</h3>
+        <p class="build-box-field-desc">Pick the base cardboard color — it affects the look and production cost</p>
+        <div class="material-card-grid">
+          <button class="material-card active" data-material="kraft">
+            <span class="material-card-image"><img src="build/material-kraft.png" alt=""></span>
+            <span class="material-card-text">
+              <span class="material-card-label">Kraft</span>
+              <span class="material-card-desc">Natural brown board with a rustic look and sturdy strength.</span>
+            </span>
+          </button>
+          <button class="material-card" data-material="white">
+            <span class="material-card-image"><img src="build/material-white.png" alt=""></span>
+            <span class="material-card-text">
+              <span class="material-card-label">White</span>
+              <span class="material-card-desc">A white surface for clean, crisp printing at an accessible price.</span>
+            </span>
+          </button>
+          <button class="material-card" data-material="premium-white">
+            <span class="material-card-image"><img src="build/material-white-premium.png" alt=""></span>
+            <span class="material-card-text">
+              <span class="material-card-label">Premium white</span>
+              <span class="material-card-desc">Fully bleached, premium white finish delivering the highest print quality and a luxury feel.</span>
+            </span>
+          </button>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepCustomization">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">7</span>
+          <span class="build-box-accordion-title">Customization<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Customization</h3>
+        <p class="build-box-field-desc">Choose whether to print your design on the box</p>
+        <div class="material-card-grid">
+          <button class="material-card active" data-customization="plain">
+            <span class="material-card-image"><img id="plainCardImage" src="build/material-kraft.png" alt=""></span>
+            <span class="material-card-text">
+              <span class="material-card-label">Plain</span>
+              <span class="material-card-desc">No print, left in its natural material finish.</span>
+            </span>
+          </button>
+          <button class="material-card" data-customization="custom">
+            <span class="material-card-image"><img id="customCardImage" src="build/custom-kraft.png" alt=""></span>
+            <span class="material-card-text">
+              <span class="material-card-label">Custom</span>
+              <span class="material-card-desc">Fully personalize the print to match your brand.</span>
+            </span>
+          </button>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepAdditional">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">8</span>
+          <span class="build-box-accordion-title">Additional options<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Additional options</h3>
+        <p class="build-box-field-desc">Fine-tune the print and finish to match your brand.</p>
+
+        <div class="build-box-subfield">
+          <h4 class="build-box-subfield-label">Print coverage</h4>
+          <div class="box-type-grid">
+            <button class="box-type-card no-thumb active" data-print="outside">
+              <span class="box-type-card-text">
+                <span class="box-type-card-label">Outside</span>
+                <span class="box-type-card-desc">Print applied only to the outer surface of the box.</span>
+              </span>
+            </button>
+            <button class="box-type-card no-thumb" data-print="outside-inside">
+              <span class="box-type-card-text">
+                <span class="box-type-card-label">Outside + Inside</span>
+                <span class="box-type-card-desc">Print applied both outside and inside for a fully branded look.</span>
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <div class="build-box-subfield">
+          <h4 class="build-box-subfield-label">Finish</h4>
+          <div class="box-type-grid">
+            <button class="box-type-card no-thumb active" data-finish="gloss">
+              <span class="box-type-card-text">
+                <span class="box-type-card-label">Gloss</span>
+                <span class="box-type-card-desc">A shiny finish that makes colors pop and print stand out.</span>
+              </span>
+            </button>
+            <button class="box-type-card no-thumb" data-finish="matt">
+              <span class="box-type-card-text">
+                <span class="box-type-card-label">Matt</span>
+                <span class="box-type-card-desc">A soft, non-reflective finish for a subtle, premium look.</span>
+              </span>
+            </button>
+          </div>
+        </div>
+        </div>
+      </section>
+
+      <section class="build-box-step" id="stepQuantity">
+        <button class="build-box-accordion-header" type="button">
+          <span class="build-box-accordion-badge">9</span>
+          <span class="build-box-accordion-title">Quantity<span class="build-box-accordion-value"></span></span>
+          <svg class="build-box-accordion-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="build-box-step-content">
+        <h3 class="build-box-field-label">Quantity</h3>
+        <p class="build-box-field-desc">Choose your order size; larger quantities lower the price per piece.</p>
+        <div class="box-type-grid">
+          <button class="box-type-card no-thumb quantity-card">
+            <span class="quantity-card-qty">1</span>
+            <span class="quantity-card-prices">
+              <span class="quantity-card-unit">£38.78/piece</span>
+              <span class="quantity-card-total">£38.78</span>
+            </span>
+          </button>
+          <button class="box-type-card no-thumb quantity-card active">
+            <span class="quantity-card-qty">30</span>
+            <span class="quantity-card-prices">
+              <span class="quantity-card-unit">£1.50/piece</span>
+              <span class="quantity-card-total">£45.00</span>
+            </span>
+          </button>
+          <button class="box-type-card no-thumb quantity-card">
+            <span class="quantity-card-qty">120</span>
+            <span class="quantity-card-prices">
+              <span class="quantity-card-unit">£0.72/piece</span>
+              <span class="quantity-card-total">£86.40</span>
+            </span>
+          </button>
+          <button class="box-type-card no-thumb quantity-card">
+            <span class="quantity-card-qty">500</span>
+            <span class="quantity-card-prices">
+              <span class="quantity-card-unit">£0.38/piece</span>
+              <span class="quantity-card-total">£192.00</span>
+            </span>
+          </button>
+          <button class="box-type-card no-thumb quantity-card">
+            <span class="quantity-card-qty">2000</span>
+            <span class="quantity-card-prices">
+              <span class="quantity-card-unit">£0.32/piece</span>
+              <span class="quantity-card-total">£648.00</span>
+            </span>
+          </button>
+          <div class="quantity-card-other-wrap" id="quantityOtherWrap">
+            <button type="button" class="box-type-card no-thumb quantity-card quantity-card-other" id="quantityOtherToggle" aria-expanded="false" aria-controls="quantityOtherPanel">
+              <span class="quantity-card-qty" id="quantityOtherLabel">Choose other value</span>
+              <svg class="quantity-card-other-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+            </button>
+            <div class="quantity-other-panel" id="quantityOtherPanel">
+              <div class="dimension-input-wrap">
+                <input type="number" min="1" class="dimension-input" id="quantityOtherInput" placeholder="Type in your quantity">
+              </div>
+              <div class="quantity-other-list">
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="10">
+                  <span class="quantity-card-qty">10</span>
+                  <span class="quantity-card-prices">
+                    <span class="quantity-card-unit">£4.20/piece</span>
+                    <span class="quantity-card-total">£42.00</span>
+                  </span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="50">
+                  <span class="quantity-card-qty">50</span>
+                  <span class="quantity-card-prices">
+                    <span class="quantity-card-unit">£1.05/piece</span>
+                    <span class="quantity-card-total">£52.50</span>
+                  </span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="75">
+                  <span class="quantity-card-qty">75</span>
+                  <span class="quantity-card-prices">
+                    <span class="quantity-card-unit">£0.85/piece</span>
+                    <span class="quantity-card-total">£63.75</span>
+                  </span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="250">
+                  <span class="quantity-card-qty">250</span>
+                  <span class="quantity-card-prices">
+                    <span class="quantity-card-unit">£0.45/piece</span>
+                    <span class="quantity-card-total">£112.50</span>
+                  </span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="1000">
+                  <span class="quantity-card-qty">1000</span>
+                  <span class="quantity-card-prices">
+                    <span class="quantity-card-unit">£0.34/piece</span>
+                    <span class="quantity-card-total">£340.00</span>
+                  </span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="3000">
+                  <span class="quantity-card-qty">3000</span>
+                  <span class="nav-badge-new quantity-quote-badge">Get a quote</span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="5000">
+                  <span class="quantity-card-qty">5000</span>
+                  <span class="nav-badge-new quantity-quote-badge">Get a quote</span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="7500">
+                  <span class="quantity-card-qty">7500</span>
+                  <span class="nav-badge-new quantity-quote-badge">Get a quote</span>
+                </button>
+                <button type="button" class="box-type-card no-thumb quantity-card quantity-other-option" data-qty="10000">
+                  <span class="quantity-card-qty">10000</span>
+                  <span class="nav-badge-new quantity-quote-badge">Get a quote</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <p class="build-box-bigger-needs">
+          Bigger needs?
+          <span class="build-box-bigger-needs-link">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+            <a href="#">Let's talk</a>
+          </span>.
+        </p>
+        </div>
+      </section>
+
+      <div class="build-box-checkout" id="stepCheckout">
+        <div class="build-box-checkout-card">
+          <div class="build-box-checkout-top">
+            <div class="build-box-checkout-delivery">
+              <p class="build-box-checkout-delivery-label">Delivery to: <span class="build-box-checkout-location">Norway, 05-800</span></p>
+              <ul class="build-box-checkout-dates">
+                <li>20 April <span class="build-box-checkout-date-price">Free</span></li>
+                <li>24 April <span class="build-box-checkout-date-price">+ €12.80</span></li>
+                <li>28 April <span class="build-box-checkout-date-price">+ €32.50</span></li>
+              </ul>
+            </div>
+            <div class="build-box-checkout-price">
+              <p class="build-box-checkout-price-label">Netto / 30 pieces</p>
+              <p class="build-box-checkout-price-value">€45.00</p>
+            </div>
+          </div>
+          <a href="#" class="btn-pill lg">Customize design</a>
+          <button class="btn-pill lg muted">Skip design for now</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<button id="siteSettingsBtn" class="site-settings-btn" aria-label="Site settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+</button>
+
+<div id="siteSettingsPanel" class="site-settings-panel">
+  <p class="site-settings-title">Page customization</p>
+  <div class="site-settings-row">
+    <div>
+      <p class="site-settings-label">Compact</p>
+      <p class="site-settings-desc">Collapse steps into a tight accordion list</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleCompact">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+</div>
+
+<script>
+  function initToggleSwitch(switchId, indicatorId) {
+    var switchEl = document.getElementById(switchId);
+    var indicator = document.getElementById(indicatorId);
+    var options = switchEl.querySelectorAll('.toggle-option');
+
+    function moveIndicator(el) {
+      indicator.style.width = el.offsetWidth + 'px';
+      indicator.style.transform = 'translateX(' + el.offsetLeft + 'px)';
+    }
+
+    options.forEach(function (option) {
+      option.addEventListener('click', function () {
+        options.forEach(function (o) { o.classList.remove('active'); });
+        option.classList.add('active');
+        moveIndicator(option);
+      });
+    });
+
+    moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    window.addEventListener('resize', function () {
+      moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    });
+  }
+
+  initToggleSwitch('viewToggleSwitch', 'viewToggleIndicator');
+  initToggleSwitch('sizeToggleSwitch', 'sizeToggleIndicator');
+  initToggleSwitch('openToggleSwitch', 'openToggleIndicator');
+
+  (function () {
+    var openSwitch = document.getElementById('openToggleSwitch');
+    var model = document.getElementById('box3dModel');
+    if (!openSwitch || !model) { return; }
+
+    openSwitch.querySelectorAll('.toggle-option').forEach(function (option, index) {
+      // index 0 = "Close", index 1 = "Open" (matches the two buttons' markup order)
+      option.addEventListener('click', function () {
+        model.classList.toggle('box-open', index === 1);
+      });
+    });
+  })();
+
+  (function () {
+    var sizeToggle = document.getElementById('sizeToggleSwitch');
+    var note = document.getElementById('dimensionBufferNote');
+    var widthInput = document.getElementById('dimWidth');
+    var lengthInput = document.getElementById('dimLength');
+    var heightInput = document.getElementById('dimHeight');
+    var bufferValueEl = document.getElementById('bufferValue');
+    var bufferMmText = document.getElementById('bufferMmText');
+    var extW = document.getElementById('extW');
+    var extL = document.getElementById('extL');
+    var extH = document.getElementById('extH');
+    var bufferMinus = document.getElementById('bufferMinus');
+    var bufferPlus = document.getElementById('bufferPlus');
+    if (!sizeToggle || !note || !widthInput || !lengthInput || !heightInput || !bufferMinus || !bufferPlus) { return; }
+
+    var bufferMm = 5;
+
+    function isProductSize() {
+      var options = sizeToggle.querySelectorAll('.toggle-option');
+      return !!(options[1] && options[1].classList.contains('active'));
+    }
+
+    // Tells the box3d IIFE (a separate script block) whether the inputs are currently product size
+    // or external size, and the current buffer — same decoupled-via-custom-event pattern as zoom.
+    function dispatchProductSize() {
+      document.dispatchEvent(new CustomEvent('box3d:productsize', {
+        detail: { active: isProductSize(), bufferCm: bufferMm / 10 }
+      }));
+    }
+
+    function recalc() {
+      // buffer is added on *every* side, so each dimension grows by 2x the buffer, not 1x
+      var bufferCm2 = (bufferMm / 10) * 2;
+      var w = parseFloat(widthInput.value) || 0;
+      var l = parseFloat(lengthInput.value) || 0;
+      var h = parseFloat(heightInput.value) || 0;
+      extW.textContent = (w + bufferCm2).toFixed(1);
+      extL.textContent = (l + bufferCm2).toFixed(1);
+      extH.textContent = (h + bufferCm2).toFixed(1);
+      bufferValueEl.textContent = bufferMm + ' mm';
+      bufferMmText.textContent = bufferMm;
+      dispatchProductSize();
+    }
+
+    function updateVisibility() {
+      note.classList.toggle('visible', isProductSize());
+      dispatchProductSize();
+    }
+
+    sizeToggle.querySelectorAll('.toggle-option').forEach(function (opt) {
+      opt.addEventListener('click', updateVisibility);
+    });
+
+    [widthInput, lengthInput, heightInput].forEach(function (input) {
+      input.addEventListener('input', recalc);
+    });
+
+    bufferMinus.addEventListener('click', function () {
+      bufferMm = Math.max(0, bufferMm - 1);
+      recalc();
+    });
+    bufferPlus.addEventListener('click', function () {
+      bufferMm = Math.min(20, bufferMm + 1);
+      recalc();
+    });
+
+    recalc();
+    updateVisibility();
+  })();
+
+  (function () {
+    var navRow1 = document.querySelector('.nav-row1');
+    var stickyBar = document.getElementById('stickyBar');
+    if (!navRow1 || !stickyBar) { return; }
+
+    function onScroll() {
+      var rect = navRow1.getBoundingClientRect();
+      var pinned = rect.bottom <= 0;
+      stickyBar.classList.toggle('is-pinned', pinned);
+
+      var minTop = 12;
+      var naturalTop = rect.top + rect.height / 2 - stickyBar.offsetHeight / 2;
+      stickyBar.style.top = Math.max(minTop, naturalTop) + 'px';
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+  })();
+
+  (function () {
+    var header = document.querySelector('.build-box-header');
+    var summaryBar = document.getElementById('stickySummaryBar');
+    var configCol = document.querySelector('.build-box-config-col');
+    var checkout = document.getElementById('stepCheckout');
+    if (!header || !summaryBar || !configCol) { return; }
+
+    function positionBar() {
+      var rect = configCol.getBoundingClientRect();
+      summaryBar.style.left = rect.left + 'px';
+      summaryBar.style.width = rect.width + 'px';
+    }
+
+    function onScroll() {
+      var headerRect = header.getBoundingClientRect();
+      var pastHeader = headerRect.bottom <= 0;
+      var checkoutReached = checkout && checkout.getBoundingClientRect().top <= window.innerHeight;
+      summaryBar.classList.toggle('visible', pastHeader && !checkoutReached);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', function () {
+      positionBar();
+      onScroll();
+    });
+
+    positionBar();
+    onScroll();
+  })();
+
+  (function () {
+    var visual = document.querySelector('.build-box-visual');
+    var page = document.querySelector('.build-box-page');
+    if (!visual || !page) { return; }
+
+    var BOTTOM_PAD = 24;
+    var isDesktop = window.matchMedia('(min-width: 901px)');
+
+    function updateVisualHeight() {
+      if (!isDesktop.matches) { visual.style.height = ''; return; }
+      var rect = visual.getBoundingClientRect();
+      var height = window.innerHeight - rect.top - BOTTOM_PAD;
+      visual.style.height = Math.max(420, height) + 'px';
+    }
+
+    window.addEventListener('scroll', updateVisualHeight, { passive: true });
+    window.addEventListener('resize', updateVisualHeight);
+
+    updateVisualHeight();
+  })();
+
+  function slowScrollToCenter(el, duration) {
+    var startY = window.scrollY;
+    var rect = el.getBoundingClientRect();
+    var targetY = startY + rect.top - (window.innerHeight - rect.height) / 2;
+    var diff = targetY - startY;
+    var startTime = null;
+
+    function easeInOutQuad(t) {
+      return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+    }
+
+    function step(timestamp) {
+      if (!startTime) { startTime = timestamp; }
+      var progress = Math.min((timestamp - startTime) / duration, 1);
+      window.scrollTo(0, startY + diff * easeInOutQuad(progress));
+      if (progress < 1) { requestAnimationFrame(step); }
+    }
+
+    requestAnimationFrame(step);
+  }
+
+  (function () {
+    var steps = Array.prototype.slice.call(document.querySelectorAll('.build-box-step'));
+
+    function scrollToNextStep(fromStep) {
+      var idx = steps.indexOf(fromStep);
+      if (idx > -1 && idx < steps.length - 1) {
+        slowScrollToCenter(steps[idx + 1], 1100);
+      }
+    }
+
+    function initSelectableGroup(selector, advanceOnSelect) {
+      document.querySelectorAll(selector).forEach(function (group) {
+        var cards = group.querySelectorAll(':scope > button');
+        cards.forEach(function (card) {
+          card.addEventListener('click', function () {
+            var wasActive = card.classList.contains('active');
+            cards.forEach(function (c) { c.classList.remove('active'); });
+            card.classList.add('active');
+
+            if (advanceOnSelect && !wasActive) {
+              var step = card.closest('.build-box-step');
+              if (step) {
+                setTimeout(function () { scrollToNextStep(step); }, 300);
+              }
+            }
+          });
+        });
+      });
+    }
+
+    initSelectableGroup('.box-type-grid', true);
+    initSelectableGroup('.construction-grid', true);
+    initSelectableGroup('.material-card-grid', true);
+  })();
+
+  (function () {
+    // "Choose other value" (.quantity-card-other) and its panel's own rows (.quantity-other-option)
+    // share the .quantity-card class purely for visual consistency; they're handled separately
+    // below (the panel rows don't all have a .quantity-card-total to read — the "Get a quote" ones
+    // don't have a price at all).
+    var quantityCards = document.querySelectorAll('#stepQuantity .quantity-card:not(.quantity-card-other):not(.quantity-other-option)');
+    if (!quantityCards.length) { return; }
+
+    function applyQuantity(card) {
+      var qty = card.querySelector('.quantity-card-qty').textContent.trim();
+      var total = card.querySelector('.quantity-card-total').textContent.replace(/[^0-9.]/g, '');
+      var priceText = '€' + total;
+      var labelText = 'Netto / ' + qty + ' pieces';
+
+      var checkoutLabel = document.querySelector('.build-box-checkout-price-label');
+      var checkoutValue = document.querySelector('.build-box-checkout-price-value');
+      if (checkoutLabel) { checkoutLabel.textContent = labelText; }
+      if (checkoutValue) { checkoutValue.textContent = priceText; }
+
+      var stickyLabel = document.querySelector('.build-box-sticky-summary-price-group .build-box-sticky-summary-label');
+      var stickyPrice = document.querySelector('.build-box-sticky-summary-price');
+      if (stickyLabel) { stickyLabel.textContent = labelText; }
+      if (stickyPrice) { stickyPrice.textContent = priceText; }
+    }
+
+    quantityCards.forEach(function (card) {
+      card.addEventListener('click', function () {
+        quantityCards.forEach(function (c) { c.classList.remove('active'); });
+        card.classList.add('active');
+        var otherToggle = document.getElementById('quantityOtherToggle');
+        var otherWrap = document.getElementById('quantityOtherWrap');
+        if (otherToggle) { otherToggle.classList.remove('active'); }
+        if (otherWrap) { otherWrap.classList.remove('is-open'); }
+        applyQuantity(card);
+      });
+    });
+
+    var initialActive = document.querySelector('#stepQuantity .quantity-card.active');
+    if (initialActive) { applyQuantity(initialActive); }
+
+    // ---- "Choose other value" panel ----
+    var wrap = document.getElementById('quantityOtherWrap');
+    var toggleBtn = document.getElementById('quantityOtherToggle');
+    var panel = document.getElementById('quantityOtherPanel');
+    var label = document.getElementById('quantityOtherLabel');
+    var input = document.getElementById('quantityOtherInput');
+    var defaultLabelText = label ? label.textContent : '';
+    if (!wrap || !toggleBtn || !panel || !label || !input) { return; }
+
+    function closePanel() {
+      wrap.classList.remove('is-open');
+      toggleBtn.setAttribute('aria-expanded', 'false');
+    }
+
+    function choose(qty, priceText, labelText) {
+      quantityCards.forEach(function (c) { c.classList.remove('active'); });
+      label.textContent = qty;
+      toggleBtn.classList.add('active');
+      closePanel();
+
+      var valueEl = document.querySelector('#stepQuantity .build-box-accordion-value');
+      if (valueEl) { valueEl.textContent = ' : ' + qty; }
+
+      // priced custom quantities update the checkout/sticky summary the same way a preset does;
+      // "Get a quote" ones (and freehand-typed values, which have no known price) leave it as is
+      if (priceText) {
+        var checkoutLabel = document.querySelector('.build-box-checkout-price-label');
+        var checkoutValue = document.querySelector('.build-box-checkout-price-value');
+        if (checkoutLabel) { checkoutLabel.textContent = labelText; }
+        if (checkoutValue) { checkoutValue.textContent = priceText; }
+
+        var stickyLabel = document.querySelector('.build-box-sticky-summary-price-group .build-box-sticky-summary-label');
+        var stickyPrice = document.querySelector('.build-box-sticky-summary-price');
+        if (stickyLabel) { stickyLabel.textContent = labelText; }
+        if (stickyPrice) { stickyPrice.textContent = priceText; }
+      }
+    }
+
+    toggleBtn.addEventListener('click', function () {
+      var isOpen = wrap.classList.contains('is-open');
+      if (isOpen) { closePanel(); return; }
+      quantityCards.forEach(function (c) { c.classList.remove('active'); });
+      wrap.classList.add('is-open');
+      toggleBtn.setAttribute('aria-expanded', 'true');
+      input.focus();
+    });
+
+    panel.querySelectorAll('.quantity-other-option').forEach(function (option) {
+      option.addEventListener('click', function () {
+        var qty = option.getAttribute('data-qty');
+        var totalEl = option.querySelector('.quantity-card-total');
+        if (totalEl) {
+          var total = totalEl.textContent.replace(/[^0-9.]/g, '');
+          choose(qty, '€' + total, 'Netto / ' + qty + ' pieces');
+        } else {
+          choose(qty, null, null);
+        }
+      });
+    });
+
+    input.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') { return; }
+      e.preventDefault();
+      if (!input.value || Number(input.value) < 1) { return; }
+      choose(input.value, null, null);
+      input.value = '';
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!wrap.contains(e.target)) { closePanel(); }
+    });
+  })();
+
+  (function () {
+    var toggle = document.getElementById('viewToggleSwitch');
+    var visual = document.querySelector('.build-box-visual');
+    if (!toggle || !visual) { return; }
+
+    function updateMode() {
+      var options = toggle.querySelectorAll('.toggle-option');
+      var is2D = options[1] && options[1].classList.contains('active');
+      visual.classList.toggle('view-2d', !!is2D);
+      visual.classList.toggle('view-3d', !is2D);
+    }
+
+    toggle.querySelectorAll('.toggle-option').forEach(function (opt) {
+      opt.addEventListener('click', updateMode);
+    });
+
+    updateMode();
+  })();
+
+  (function () {
+    var stage = document.getElementById('box3dStage');
+    var model = document.getElementById('box3dModel');
+    var widthInput = document.getElementById('dimWidth');
+    var lengthInput = document.getElementById('dimLength');
+    var heightInput = document.getElementById('dimHeight');
+    var pillWidth = document.getElementById('dimPillWidth');
+    var pillLength = document.getElementById('dimPillLength');
+    var pillHeight = document.getElementById('dimPillHeight');
+    var lineHeight = document.querySelector('.build-box-dim-line.dim-height');
+    var lineWidth = document.querySelector('.build-box-dim-line.dim-width');
+    var lineLength = document.querySelector('.build-box-dim-line.dim-length');
+    if (!stage || !model || !widthInput || !lengthInput || !heightInput) { return; }
+
+    var FIT = 200;
+    var ROOF_RISE_RATIO = .35;
+    // True isometric angles (rotateY(-45deg) then rotateX(-35.264deg), i.e. atan(1/sqrt(2))):
+    // with no `perspective` on the stage this makes the box a genuine isometric projection
+    // at rest, while still allowing free drag-rotation away from it.
+    var DEFAULT_ROT_X = -35.264;
+    var DEFAULT_ROT_Y = -45;
+
+    var wPx = 100, hPx = 100, dPx = 100;
+    var rotX = DEFAULT_ROT_X;
+    var rotY = DEFAULT_ROT_Y;
+    var dragging = false;
+    var lastX, lastY;
+    var zoomPct = 100;
+    var productSizeMode = false;
+    var bufferCm = 0.5;
+
+    // The zoom toolbar control lives in its own IIFE (it's shared UI, not box-3d-specific state) and
+    // reaches this one via a custom event rather than a direct function reference, so the two stay
+    // decoupled regardless of script order.
+    document.addEventListener('box3d:zoom', function (e) {
+      zoomPct = e.detail.pct;
+      updateSize();
+    });
+
+    // Same decoupling pattern for the "External size"/"Size of my product" toggle + Buffer size
+    // stepper, which live in the size-toggle IIFE further down the page.
+    document.addEventListener('box3d:productsize', function (e) {
+      productSizeMode = e.detail.active;
+      bufferCm = e.detail.bufferCm;
+      model.classList.toggle('product-size-mode', productSizeMode);
+      updateSize();
+    });
+
+    // Replicates CSS `transform: rotateX(rotX) rotateY(rotY)` point-for-point: matrix
+    // composition applies rotateY first, then rotateX, to every point (this must match
+    // that order exactly, or dimension lines drift off their edges as rotX/rotY change).
+    // The stage has no `perspective`, so dropping the resulting depth (z2) below is a true
+    // orthographic projection, not an approximation of one.
+    function project(x, y, z) {
+      var rx = rotX * Math.PI / 180;
+      var ry = rotY * Math.PI / 180;
+      var x1 = x * Math.cos(ry) + z * Math.sin(ry);
+      var y1 = y;
+      var z1 = -x * Math.sin(ry) + z * Math.cos(ry);
+
+      var x2 = x1;
+      var y2 = y1 * Math.cos(rx) - z1 * Math.sin(rx);
+      return { x: x2, y: y2 };
+    }
+
+    var DIM_LINE_OFFSET = 12; // px, screen-space gap kept between the width/length lines and the box
+
+    function setLine(el, p1, p2, offsetPx) {
+      if (!el) { return; }
+      var a = project(p1[0], p1[1], p1[2]);
+      var b = project(p2[0], p2[1], p2[2]);
+      var dx = b.x - a.x;
+      var dy = b.y - a.y;
+      var len = Math.sqrt(dx * dx + dy * dy);
+      var angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      if (offsetPx) {
+        // Shift both endpoints by `offsetPx` along the edge's own screen-space perpendicular
+        // (derived from the projected dx/dy, not a hardcoded axis), so the line stays exactly
+        // parallel to the real edge — just offset — under any rotation/proportions. The two
+        // perpendicular candidates point to either side; picking the one with the larger (more
+        // downward) y-component always points away from the box, since width/length are both
+        // bottom edges with the box body sitting above them on screen.
+        var nx = -dy / len, ny = dx / len;
+        if (ny < 0) { nx = -nx; ny = -ny; }
+        a = { x: a.x + nx * offsetPx, y: a.y + ny * offsetPx };
+        b = { x: b.x + nx * offsetPx, y: b.y + ny * offsetPx };
+      }
+
+      el.style.width = len + 'px';
+      el.style.transform = 'translate(' + a.x + 'px, ' + a.y + 'px) rotate(' + angle + 'deg)';
+      var pill = el.querySelector('.build-box-dim-pill');
+      if (pill) { pill.style.setProperty('--pill-angle', (-angle) + 'deg'); }
+    }
+
+    function updateDimLines() {
+      var hw = wPx / 2, hh = hPx / 2, hd = dPx / 2;
+      // Each line is anchored to the box's own two corners, so it always lies exactly on
+      // that edge (projected through the same rotX/rotY as the model) for any w/l/h and
+      // any rotation — never a hardcoded position.
+      //   height: the near vertical edge shared by the front-left and front-right faces
+      setLine(lineHeight, [hw, hh, hd], [hw, -hh, hd]);
+      //   width:  bottom edge of the front-left face (b3d-front), its two bottom corners —
+      //   kept a constant 12px off the actual edge (see DIM_LINE_OFFSET above)
+      setLine(lineWidth, [-hw, hh, hd], [hw, hh, hd], DIM_LINE_OFFSET);
+      //   length: bottom edge of the front-right face (b3d-right), its two bottom corners —
+      //   same 12px parallel offset
+      setLine(lineLength, [hw, hh, hd], [hw, hh, -hd], DIM_LINE_OFFSET);
+    }
+
+    function apply() {
+      model.style.transform = 'rotateX(' + rotX + 'deg) rotateY(' + rotY + 'deg)';
+      updateDimLines();
+    }
+
+    var TAB_HEIGHT_RATIO = .42; // matches .b3d-hang-tab { height: calc(var(--h) * .42) } in CSS
+
+    // Euro-slot hole (bar + thumb): fixed real pixel size, independent of box dimensions/zoom.
+    // The mask's base rect uses objectBoundingBox fractions (always 0/0/1/1, so it covers the whole
+    // tab regardless of size) — but for the hole shapes themselves, a fixed *fraction* would scale
+    // right along with the tab. Instead we recompute fraction = fixedPx / currentTabPx every time the
+    // tab's actual pixel size changes, which keeps the *rendered* hole size constant. rx/ry (and the
+    // thumb's arc radius) are computed from tabWpx and tabHpx separately, since objectBoundingBox
+    // applies a non-uniform scale — using one shared fraction for both axes would otherwise stretch
+    // a circular thumb-cap into an ellipse whenever the tab's aspect ratio isn't 1:1.
+    var HANG_SLOT_DOME_R = 8.5;
+    var HANG_SLOT_POST_H = 12;
+    var HANG_SLOT_OVERLAP = 2;   // how far the thumb's post sinks into the bar (guarantees a seamless union)
+    var HANG_SLOT_BAR_W = 100;
+    var HANG_SLOT_BAR_H = 19;
+    var HANG_SLOT_MARGIN_TOP = 18; // gap from the tab's own top edge to the peak of the thumb's dome
+
+    function updateHangSlotMask() {
+      var bar = document.getElementById('hangSlotBar');
+      var thumb = document.getElementById('hangSlotThumb');
+      if (!bar || !thumb) { return; }
+
+      var tabWpx = wPx;
+      var tabHpx = hPx * TAB_HEIGHT_RATIO;
+      if (tabWpx <= 0 || tabHpx <= 0) { return; }
+
+      var domeTopY = HANG_SLOT_MARGIN_TOP;
+      var diameterY = domeTopY + HANG_SLOT_DOME_R;
+      var postBottomY = diameterY + HANG_SLOT_POST_H;
+      var barTopY = postBottomY - HANG_SLOT_OVERLAP;
+
+      var fx = function (localX) { return 0.5 + localX / tabWpx; };
+      var fy = function (localY) { return localY / tabHpx; };
+      var rxFrac = HANG_SLOT_BAR_H / 2 / tabWpx;
+      var ryFrac = HANG_SLOT_BAR_H / 2 / tabHpx;
+
+      bar.setAttribute('x', fx(-HANG_SLOT_BAR_W / 2));
+      bar.setAttribute('y', fy(barTopY));
+      bar.setAttribute('width', HANG_SLOT_BAR_W / tabWpx);
+      bar.setAttribute('height', HANG_SLOT_BAR_H / tabHpx);
+      bar.setAttribute('rx', rxFrac);
+      bar.setAttribute('ry', ryFrac);
+
+      var x1 = fx(-HANG_SLOT_DOME_R), x2 = fx(HANG_SLOT_DOME_R);
+      var yDiameter = fy(diameterY), yPostBottom = fy(postBottomY);
+      var domeRx = HANG_SLOT_DOME_R / tabWpx, domeRy = HANG_SLOT_DOME_R / tabHpx;
+      thumb.setAttribute('d',
+        'M ' + x1 + ' ' + yDiameter +
+        ' A ' + domeRx + ' ' + domeRy + ' 0 0 1 ' + x2 + ' ' + yDiameter +
+        ' L ' + x2 + ' ' + yPostBottom +
+        ' L ' + x1 + ' ' + yPostBottom + ' Z');
+    }
+
+    function updateSize() {
+      var w = parseFloat(widthInput.value) || 1;
+      var l = parseFloat(lengthInput.value) || 1;
+      var h = parseFloat(heightInput.value) || 1;
+
+      // In "Size of my product" mode the inputs are the *product* (inner box); the real/external
+      // box is the product plus a buffer added on every side (2x per dimension: once on each side).
+      var outerW = w, outerL = l, outerH = h;
+      if (productSizeMode) {
+        outerW = w + bufferCm * 2;
+        outerL = l + bufferCm * 2;
+        outerH = h + bufferCm * 2;
+      }
+
+      var scale = (FIT / Math.max(outerW, outerL, outerH)) * (zoomPct / 100);
+      wPx = outerW * scale;
+      dPx = outerL * scale;
+      hPx = outerH * scale;
+
+      stage.style.setProperty('--w', wPx + 'px');
+      stage.style.setProperty('--d', dPx + 'px');
+      stage.style.setProperty('--h', hPx + 'px');
+
+      stage.style.setProperty('--iw', (w * scale) + 'px');
+      stage.style.setProperty('--id', (l * scale) + 'px');
+      stage.style.setProperty('--ih', (h * scale) + 'px');
+
+      var rise = wPx * ROOF_RISE_RATIO;
+      var halfD = dPx / 2;
+      var slant = Math.sqrt(rise * rise + halfD * halfD);
+      var pitchDeg = Math.atan2(halfD, rise) * 180 / Math.PI;
+
+      stage.style.setProperty('--rise', rise + 'px');
+      stage.style.setProperty('--slant', slant + 'px');
+      stage.style.setProperty('--pitch-deg', pitchDeg.toFixed(2) + 'deg');
+
+      if (pillWidth) { pillWidth.textContent = 'Width: ' + w + ' cm'; }
+      if (pillLength) { pillLength.textContent = 'Length: ' + l + ' cm'; }
+      if (pillHeight) { pillHeight.textContent = 'Height: ' + h + ' cm'; }
+
+      updateHangSlotMask();
+      updateDimLines();
+      updateDieline(w, l, h);
+    }
+
+    // 2D view: a generic flat unfolded net (dieline), recomputed live from the same width/length/height
+    // — the same simplified layout for every construction, not a per-construction accurate cut file.
+    // Standard 4-panel strip (Front/Right/Back/Left) with a top+bottom flap row and one glue tab, all
+    // drawn as a single solid "cut" outline plus dashed "fold" score lines.
+    function updateDieline(w, l, h) {
+      var svg = document.getElementById('dielineSvg');
+      if (!svg) { return; }
+
+      var flapH = Math.min(w, l) * 0.5;
+      var glueW = Math.min(w, l) * 0.25;
+      var bodyW = 2 * w + 2 * l;
+      var bodyH = h + 2 * flapH;
+      var pad = Math.max(w, l, h) * 0.12;
+
+      var viewW = bodyW + glueW + pad * 2;
+      var viewH = bodyH + pad * 2;
+      svg.setAttribute('viewBox', '0 0 ' + viewW + ' ' + viewH);
+
+      var ox = pad, oy = pad;
+      var pt = function (x, y) { return (x + ox) + ',' + (y + oy); };
+
+      var outline = 'M ' + [
+        pt(0, 0), pt(bodyW, 0), pt(bodyW, flapH),
+        pt(bodyW + glueW, flapH), pt(bodyW + glueW, flapH + h), pt(bodyW, flapH + h),
+        pt(bodyW, bodyH), pt(0, bodyH)
+      ].join(' L ') + ' Z';
+
+      var foldSegments = [
+        [w, 0, w, bodyH],
+        [w + l, 0, w + l, bodyH],
+        [2 * w + l, 0, 2 * w + l, bodyH],
+        [0, flapH, bodyW, flapH],
+        [0, flapH + h, bodyW, flapH + h],
+        [bodyW, flapH, bodyW, flapH + h]
+      ];
+      var foldLines = foldSegments.map(function (s) {
+        return '<line x1="' + (s[0] + ox) + '" y1="' + (s[1] + oy) + '" x2="' + (s[2] + ox) + '" y2="' + (s[3] + oy) + '" />';
+      }).join('');
+
+      // proportional to viewW only — the SVG's viewBox units are arbitrary (it's scaled to fill its
+      // container via CSS width/height regardless), so an absolute-unit minimum here would make the
+      // text huge relative to the drawing whenever viewW happens to be small (e.g. a compact box)
+      var fontSize = viewW * 0.022;
+      var labels = [
+        { x: w / 2, panelW: w, text: 'Front' },
+        { x: w + l / 2, panelW: l, text: 'Right' },
+        { x: w + l + w / 2, panelW: w, text: 'Back' },
+        { x: 2 * w + l + l / 2, panelW: l, text: 'Left' },
+        { x: bodyW + glueW / 2, panelW: glueW, text: 'Glue' }
+      ];
+      // skip a label rather than let it collide with its neighbors when the panel is too narrow to fit it
+      var labelEls = labels.filter(function (lb) {
+        return lb.panelW > fontSize * (lb.text.length * 0.62 + 1);
+      }).map(function (lb) {
+        return '<text x="' + (lb.x + ox) + '" y="' + (flapH + h / 2 + oy) + '" font-size="' + fontSize +
+          '" text-anchor="middle" dominant-baseline="middle" fill="rgba(0,0,0,.4)">' + lb.text + '</text>';
+      }).join('');
+
+      svg.innerHTML =
+        '<path d="' + outline + '" fill="#fff" stroke="#2a2a2a" stroke-width="' + (viewW * 0.004) + '"/>' +
+        '<g stroke="#8a8a8a" stroke-width="' + (viewW * 0.0022) + '" stroke-dasharray="' + (viewW * 0.012) + ' ' + (viewW * 0.008) + '">' + foldLines + '</g>' +
+        labelEls;
+    }
+
+    [
+      { input: widthInput, dim: 'width' },
+      { input: lengthInput, dim: 'length' },
+      { input: heightInput, dim: 'height' }
+    ].forEach(function (entry) {
+      var input = entry.input;
+      input.addEventListener('input', updateSize);
+
+      input.addEventListener('focus', function () {
+        stage.classList.add('show-dims');
+        stage.setAttribute('data-active-dim', entry.dim);
+        if (!dragging) {
+          rotX = DEFAULT_ROT_X;
+          rotY = DEFAULT_ROT_Y;
+          apply();
+        }
+      });
+
+      input.addEventListener('blur', function () {
+        stage.classList.remove('show-dims');
+        stage.removeAttribute('data-active-dim');
+      });
+    });
+
+    stage.addEventListener('pointerdown', function (e) {
+      dragging = true;
+      model.classList.add('is-dragging');
+      lastX = e.clientX;
+      lastY = e.clientY;
+      stage.setPointerCapture(e.pointerId);
+    });
+
+    stage.addEventListener('pointermove', function (e) {
+      if (!dragging) { return; }
+      var dx = e.clientX - lastX;
+      var dy = e.clientY - lastY;
+      lastX = e.clientX;
+      lastY = e.clientY;
+      rotY += dx * 0.4;
+      rotX = Math.max(-80, Math.min(80, rotX - dy * 0.4));
+      apply();
+    });
+
+    function stopDrag() {
+      dragging = false;
+      model.classList.remove('is-dragging');
+    }
+
+    stage.addEventListener('pointerup', stopDrag);
+    stage.addEventListener('pointerleave', stopDrag);
+    stage.addEventListener('pointercancel', stopDrag);
+
+    updateSize();
+    apply();
+  })();
+
+  (function () {
+    var model = document.getElementById('box3dModel');
+    if (!model) { return; }
+
+    function setFromActive(scope, attr, fallback) {
+      var active = document.querySelector(scope + ' .active');
+      var value = active ? active.getAttribute(attr) : null;
+      model.setAttribute(attr, value || fallback);
+    }
+
+    function refresh() {
+      setFromActive('#stepConstruction', 'data-construction', 'classic');
+      setFromActive('#stepMaterial', 'data-material', 'kraft');
+      setFromActive('#stepWindows', 'data-windows', 'no');
+    }
+
+    document.querySelectorAll('#stepConstruction .construction-card').forEach(function (c) { c.addEventListener('click', refresh); });
+    document.querySelectorAll('#stepMaterial .material-card').forEach(function (c) { c.addEventListener('click', refresh); });
+    document.querySelectorAll('#stepWindows .box-type-card').forEach(function (c) { c.addEventListener('click', refresh); });
+
+    refresh();
+  })();
+
+  (function () {
+    var canvasImage = document.getElementById('canvasImage');
+    var boxTypeCards = document.querySelectorAll('#stepBoxType .box-type-card');
+    var constructionCards = document.querySelectorAll('#stepConstruction .construction-card');
+    var windowsCards = document.querySelectorAll('#stepWindows .box-type-card');
+    var materialCards = document.querySelectorAll('#stepMaterial .material-card');
+    if (!canvasImage) { return; }
+
+    var COMBO_IMAGE_BY_MATERIAL = {
+      'white': 'build/windowing-white.png',
+      'premium-white': 'build/windowing-white-premium.png'
+    };
+    var CONSTRUCTION_COMBO_IMAGE = {
+      'hanging': 'build/folding-box-hanging.png'
+    };
+    var baseImage = canvasImage.getAttribute('src');
+
+    function setCanvasImage(src) {
+      if (canvasImage.getAttribute('src') === src) { return; }
+      canvasImage.style.opacity = '0';
+      setTimeout(function () {
+        canvasImage.setAttribute('src', src);
+        canvasImage.style.opacity = '1';
+      }, 150);
+    }
+
+    function activeDataValue(scope, attr) {
+      var active = document.querySelector(scope + ' .active[' + attr + ']');
+      return active ? active.getAttribute(attr) : null;
+    }
+
+    function refreshCanvas() {
+      var boxType = activeDataValue('#stepBoxType', 'data-box-type');
+      var construction = activeDataValue('#stepConstruction', 'data-construction');
+      var windows = activeDataValue('#stepWindows', 'data-windows');
+      var material = activeDataValue('#stepMaterial', 'data-material');
+
+      var comboImage = null;
+      if (boxType === 'folding' && CONSTRUCTION_COMBO_IMAGE[construction]) {
+        comboImage = CONSTRUCTION_COMBO_IMAGE[construction];
+      } else if (boxType === 'folding' && windows === 'windowing') {
+        comboImage = COMBO_IMAGE_BY_MATERIAL[material];
+      }
+      setCanvasImage(comboImage || baseImage);
+    }
+
+    boxTypeCards.forEach(function (card) {
+      card.addEventListener('click', function () {
+        var thumb = card.querySelector('.box-type-card-thumb img');
+        if (thumb) { baseImage = thumb.getAttribute('src'); }
+        refreshCanvas();
+      });
+    });
+
+    constructionCards.forEach(function (card) {
+      card.addEventListener('click', refreshCanvas);
+    });
+
+    windowsCards.forEach(function (card) {
+      card.addEventListener('click', function () {
+        var thumb = card.querySelector('.box-type-card-thumb img');
+        if (thumb) { baseImage = thumb.getAttribute('src'); }
+        refreshCanvas();
+      });
+    });
+
+    materialCards.forEach(function (card) {
+      card.addEventListener('click', refreshCanvas);
+    });
+  })();
+
+  (function () {
+    var plainCardImage = document.getElementById('plainCardImage');
+    var customCardImage = document.getElementById('customCardImage');
+    var materialCards = document.querySelectorAll('#stepMaterial .material-card');
+    if (!plainCardImage || !customCardImage || !materialCards.length) { return; }
+
+    var CUSTOM_IMAGE_BY_MATERIAL = {
+      'kraft': 'build/custom-kraft.png',
+      'white': 'build/custom-white.png',
+      'premium-white': 'build/custom-white.png'
+    };
+
+    function syncCustomizationImages() {
+      var activeMaterial = document.querySelector('#stepMaterial .material-card.active');
+      if (!activeMaterial) { return; }
+      var materialKey = activeMaterial.getAttribute('data-material') || 'kraft';
+      var materialThumb = activeMaterial.querySelector('.material-card-image img');
+
+      if (materialThumb) { plainCardImage.setAttribute('src', materialThumb.getAttribute('src')); }
+      customCardImage.setAttribute('src', CUSTOM_IMAGE_BY_MATERIAL[materialKey] || CUSTOM_IMAGE_BY_MATERIAL.kraft);
+    }
+
+    materialCards.forEach(function (card) {
+      card.addEventListener('click', syncCustomizationImages);
+    });
+
+    syncCustomizationImages();
+  })();
+
+  (function () {
+    var zoomValue = document.getElementById('zoomValue');
+    var zoomOutBtn = document.getElementById('zoomOutBtn');
+    var zoomInBtn = document.getElementById('zoomInBtn');
+    var zoom = 100;
+
+    function render() {
+      zoomValue.textContent = zoom + '%';
+      document.dispatchEvent(new CustomEvent('box3d:zoom', { detail: { pct: zoom } }));
+    }
+
+    zoomOutBtn.addEventListener('click', function () {
+      zoom = Math.max(50, zoom - 10);
+      render();
+    });
+    zoomInBtn.addEventListener('click', function () {
+      zoom = Math.min(200, zoom + 10);
+      render();
+    });
+  })();
+
+  (function () {
+    var steps = document.querySelectorAll('.build-box-step');
+    var dots = document.querySelectorAll('.build-box-dot');
+    if (!steps.length || !dots.length) { return; }
+
+    var dotByTarget = {};
+    dots.forEach(function (dot) {
+      dotByTarget[dot.getAttribute('data-target')] = dot;
+      dot.addEventListener('click', function () {
+        var target = document.getElementById(dot.getAttribute('data-target'));
+        if (target) { slowScrollToCenter(target, 1100); }
+      });
+    });
+
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          dots.forEach(function (d) { d.classList.remove('active'); });
+          var dot = dotByTarget[entry.target.id];
+          if (dot) { dot.classList.add('active'); }
+        }
+      });
+    }, { threshold: 0.01, rootMargin: '-45% 0px -45% 0px' });
+
+    steps.forEach(function (step) { observer.observe(step); });
+  })();
+
+  (function () {
+    var btn = document.getElementById('siteSettingsBtn');
+    var panel = document.getElementById('siteSettingsPanel');
+    var compactToggle = document.getElementById('toggleCompact');
+    if (!btn || !panel || !compactToggle) { return; }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!panel.contains(e.target) && e.target !== btn) {
+        panel.classList.remove('open');
+      }
+    });
+
+    compactToggle.addEventListener('change', function () {
+      document.body.classList.toggle('compact-mode', compactToggle.checked);
+    });
+  })();
+
+  (function () {
+    var steps = Array.prototype.slice.call(document.querySelectorAll('.build-box-step'));
+    var visited = {};
+
+    function getStepValue(step) {
+      if (step.id === 'stepSize') {
+        var w = document.getElementById('dimWidth');
+        var l = document.getElementById('dimLength');
+        var h = document.getElementById('dimHeight');
+        if (w && l && h) { return w.value + ' x ' + l.value + ' x ' + h.value + ' cm'; }
+        return '';
+      }
+      if (step.id === 'stepAdditional') {
+        var parts = [];
+        step.querySelectorAll('.build-box-subfield').forEach(function (sub) {
+          var active = sub.querySelector('.box-type-card.active .box-type-card-label');
+          if (active) { parts.push(active.textContent.trim()); }
+        });
+        return parts.join(', ');
+      }
+      var activeCard = step.querySelector('.box-type-card.active, .construction-card.active, .material-card.active');
+      if (!activeCard) { return ''; }
+      var labelEl = activeCard.querySelector('.box-type-card-label, .material-card-label, span');
+      return labelEl ? labelEl.textContent.trim() : '';
+    }
+
+    function updateHeader(step, index) {
+      var header = step.querySelector('.build-box-accordion-header');
+      if (!header) { return; }
+
+      var valueEl = header.querySelector('.build-box-accordion-value');
+      var value = getStepValue(step);
+      valueEl.textContent = value ? ' : ' + value : '';
+
+      var badge = header.querySelector('.build-box-accordion-badge');
+      if (visited[step.id]) {
+        badge.classList.add('done');
+        badge.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>';
+      } else {
+        badge.classList.remove('done');
+        badge.textContent = index + 1;
+      }
+    }
+
+    function updateAllHeaders() {
+      steps.forEach(updateHeader);
+    }
+
+    steps.forEach(function (step, index) {
+      var header = step.querySelector('.build-box-accordion-header');
+      if (!header) { return; }
+
+      header.addEventListener('click', function () {
+        var wasExpanded = step.classList.contains('expanded');
+        steps.forEach(function (s) { s.classList.remove('expanded'); });
+        if (!wasExpanded) {
+          step.classList.add('expanded');
+          visited[step.id] = true;
+        }
+        updateAllHeaders();
+      });
+
+      step.addEventListener('click', function (e) {
+        if (header.contains(e.target)) { return; }
+        updateAllHeaders();
+      });
+    });
+
+    ['dimWidth', 'dimLength', 'dimHeight'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) { el.addEventListener('input', updateAllHeaders); }
+    });
+
+    updateAllHeaders();
+  })();
+
+  // Pre-fills Width/Length/Height from ?width=&length=&height= (set by the packaging page's
+  // "Build any box type" quick-CTA banner) and replays a real `input` event on each so every
+  // listener already bound above (buffer recalc, 3D preview, accordion header) picks it up.
+  (function () {
+    var params = new URLSearchParams(window.location.search);
+    var ids = { dimWidth: 'width', dimLength: 'length', dimHeight: 'height' };
+
+    Object.keys(ids).forEach(function (id) {
+      var num = parseFloat(params.get(ids[id]));
+      if (!num || num <= 0) { return; }
+
+      var el = document.getElementById(id);
+      if (!el) { return; }
+
+      el.value = num;
+      el.dispatchEvent(new Event('input', { bubbles: true }));
+    });
+  })();
+</script>
+
+</body>
+</html>

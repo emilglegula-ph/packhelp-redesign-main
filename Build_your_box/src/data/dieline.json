@@ -1,0 +1,66 @@
+{
+  "_meta": {
+    "generator": "Dieline Studio",
+    "exportedAt": "2026-07-03T20:07:32.548Z",
+    "version": 1
+  },
+  "template": {
+    "id": "16.2.Auto bottom-Hang tag",
+    "name": "16.2.Auto bottom-Hang tag",
+    "category": "custom",
+    "version": 3,
+    "fefcoCode": null
+  },
+  "inputs": {
+    "L": 97,
+    "W": 125,
+    "H": 168,
+    "thickness": 1.5
+  },
+  "resolvedParams": {
+    "L": 97,
+    "W": 125,
+    "H": 168,
+    "thickness": 1.5,
+    "t": 1.5,
+    "JK": 15,
+    "h1": -168,
+    "k1": 123,
+    "k2": 48.5,
+    "k3": 16,
+    "a1": 14,
+    "r": 8,
+    "s": 25,
+    "h2": -166.5
+  },
+  "sizes": {
+    "outer": {
+      "W": 125,
+      "L": 97,
+      "H": 168
+    },
+    "inner": {
+      "W": 125,
+      "L": 97,
+      "H": 168
+    },
+    "canvas": {
+      "width": 527.5,
+      "height": 453.5
+    }
+  },
+  "holes": [
+    {
+      "name": "hole_1",
+      "points": [
+        { "x": 48.5, "y": -187.5 },
+        { "x": 33.5, "y": -187.5 },
+        { "x": 33.5, "y": -192.5 },
+        { "x": 44.5, "y": -192.5 },
+        { "x": 52.5, "y": -192.5 },
+        { "x": 63.5, "y": -192.5 },
+        { "x": 63.5, "y": -187.5 }
+      ]
+    }
+  ]
+}

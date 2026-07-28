@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Get a Quote — Packhelp</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<style>
+
+  html, body { height: 100%; }
+
+  .quote-page {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* top nav (simplified variant) styles live in components.css */
+
+  /* ---------- body split ---------- */
+  .quote-body {
+    flex: 1;
+    display: flex;
+    min-height: 0;
+  }
+
+  .quote-left {
+    flex: 1 1 50%;
+    min-width: 0;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .quote-left-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--space-16) var(--space-16) var(--space-24);
+  }
+
+  .quote-step[hidden] { display: none; }
+
+  .quote-heading {
+    max-width: 32rem;
+    margin: 0 0 var(--space-3);
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .quote-subheading {
+    max-width: 32rem;
+    margin: 0 0 var(--space-8);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- step 1: brief textarea + upload ---------- */
+  .quote-textarea-wrap {
+    position: relative;
+    margin-bottom: var(--space-4);
+  }
+
+  .quote-textarea {
+    display: block;
+    width: 100%;
+    min-height: 340px;
+    padding: var(--space-5);
+    padding-bottom: var(--space-14);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    box-sizing: border-box;
+    resize: vertical;
+    font: inherit;
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .quote-textarea::placeholder { color: var(--color-text-muted); }
+
+  .quote-textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+
+  .quote-mic-btn {
+    position: absolute;
+    right: var(--space-4);
+    bottom: var(--space-4);
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-muted);
+  }
+
+  .quote-mic-btn:hover { background: var(--color-bg-muted-hover); }
+  .quote-mic-btn svg { width: 18px; height: 18px; }
+
+  .quote-upload {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    width: 170px;
+    height: 130px;
+    border: 1px dashed var(--color-border-hover);
+    border-radius: var(--radius-md);
+    color: var(--color-text-secondary);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .quote-upload:hover {
+    border-color: var(--color-accent);
+    background: var(--color-bg-muted);
+  }
+
+  .quote-upload svg { width: 20px; height: 20px; color: var(--color-text-muted); }
+
+  /* ---------- step 2: project detail fields ---------- */
+  .quote-field { margin-bottom: var(--space-6); }
+
+  .quote-label {
+    display: block;
+    margin-bottom: var(--space-2);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .quote-required { color: var(--color-danger); }
+
+  .quote-input {
+    display: block;
+    width: 100%;
+    height: 48px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    box-sizing: border-box;
+    font: inherit;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    background: var(--color-bg-surface);
+    transition: border-color .15s ease, box-shadow .15s ease;
+  }
+
+  .quote-input::placeholder { color: var(--color-text-muted); }
+
+  .quote-input:hover { border-color: var(--color-border-hover); }
+
+  .quote-input:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+
+  .quote-select {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    text-align: left;
+    cursor: pointer;
+    color: var(--color-text-muted);
+  }
+
+  .quote-select svg { width: 16px; height: 16px; flex: none; color: var(--color-text-muted); }
+
+  .quote-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .quote-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 48px;
+    padding: 0 var(--space-4);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-surface);
+    font-size: 0.875rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .quote-chip:hover { border-color: var(--color-border-hover); background: var(--color-bg-muted); }
+  .quote-chip svg { width: 15px; height: 15px; color: var(--color-text-muted); }
+
+  /* ---------- footer nav bar ---------- */
+  /* Styled like the homepage sticky-bar (pinned state): translucent white,
+     blurred, pill-shaped, same subtle shadow — the standard look for any
+     floating pill-bar element, not just this page's footer. */
+  .quote-footer-bar {
+    position: absolute;
+    left: var(--space-8);
+    right: var(--space-8);
+    bottom: var(--space-6);
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-2);
+    background: rgba(255, 255, 255, .80);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-radius: var(--radius-full);
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+  }
+
+  .quote-btn-back {
+    background: var(--color-bg-muted);
+    color: var(--color-text-primary);
+  }
+
+  .quote-btn-back:hover { background: var(--color-bg-muted-hover); }
+
+  .quote-btn-back svg, .quote-btn-continue svg { width: 16px; height: 16px; }
+  .quote-btn-back svg { margin-right: var(--space-2); }
+  .quote-btn-continue svg { margin-left: var(--space-2); }
+
+  .quote-dots {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .quote-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: var(--color-border-default);
+    transition: width .3s ease, background-color .3s ease;
+  }
+
+  .quote-dot.active {
+    width: 20px;
+    background: var(--color-text-primary);
+  }
+
+  /* ---------- right visual panel ---------- */
+  .quote-visual {
+    flex: 1 1 50%;
+    min-width: 0;
+    padding: var(--space-6);
+  }
+
+  .quote-visual-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+  }
+
+  .quote-visual-placeholder {
+    position: absolute;
+    inset: 0;
+    background: var(--gray-400);
+  }
+
+  .quote-visual-gradient {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,.78) 0%, rgba(0,0,0,.45) 30%, rgba(0,0,0,0) 62%);
+  }
+
+  .quote-trust-card {
+    position: absolute;
+    left: var(--space-8);
+    right: var(--space-8);
+    bottom: var(--space-8);
+    color: var(--white);
+  }
+
+  .quote-rating-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 32px;
+    padding: 0 var(--space-3);
+    margin-bottom: var(--space-5);
+    background: var(--white);
+    border-radius: var(--radius-full);
+    color: var(--color-text-primary);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .quote-stars { position: relative; display: inline-block; line-height: 1; font-size: 13px; letter-spacing: 1px; }
+  .quote-stars-base { color: var(--gray-300); }
+  .quote-stars-fill {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    width: 92%;
+    color: #F5A623;
+    white-space: nowrap;
+  }
+
+  .quote-rating-badge svg { width: 16px; height: 16px; flex: none; }
+
+  .quote-trust-heading {
+    max-width: 26rem;
+    margin: 0 0 var(--space-2);
+    font-weight: 500;
+    font-size: 1.75rem;
+    line-height: 1.16;
+    letter-spacing: -0.03em;
+  }
+
+  .quote-trust-sub {
+    max-width: 26rem;
+    margin: 0 0 var(--space-5);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,.8);
+  }
+
+  .quote-trust-list {
+    list-style: none;
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .quote-trust-list li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.875rem;
+    letter-spacing: -0.02em;
+    color: rgba(255,255,255,.92);
+  }
+
+  .quote-trust-list svg {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    color: #4ADE80;
+  }
+
+  .quote-trust-divider {
+    height: 1px;
+    margin-bottom: var(--space-5);
+    background: rgba(255,255,255,.2);
+  }
+
+  .quote-trusted-by-label {
+    display: block;
+    margin-bottom: var(--space-4);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,.55);
+  }
+
+  .quote-logos {
+    display: flex;
+    align-items: center;
+    gap: var(--space-8);
+  }
+
+  .quote-logos img {
+    height: 20px;
+    width: auto;
+    filter: brightness(0) invert(1);
+    opacity: .9;
+  }
+
+  .quote-logo-text {
+    font-size: 1.0625rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    opacity: .9;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 900px) {
+    .quote-visual { display: none; }
+    .quote-left { flex: 1 1 100%; }
+    .quote-left-scroll { padding: var(--space-8) var(--space-5) var(--space-24); }
+    .quote-footer-bar { left: var(--space-5); right: var(--space-5); bottom: var(--space-5); }
+  }
+</style>
+</head>
+<body>
+
+<div class="quote-page">
+
+  <div id="ph-nav-simple"></div>
+  <script src="nav-header.js"></script>
+
+  <div class="quote-body">
+
+    <main class="quote-left">
+      <div class="quote-left-scroll">
+
+        <section class="quote-step" id="quoteStep1" data-step="1">
+          <h1 class="quote-heading">Tell us what you'd like to make</h1>
+          <p class="quote-subheading">Upload a brief, sketch, or reference photo. We'll take it from here and guide you through the next steps – no packaging jargon required.</p>
+
+          <div class="quote-textarea-wrap">
+            <textarea class="quote-textarea" placeholder="e.g. A custom mailer box for our skincare line — kraft brown, matte finish, one-colour logo print..."></textarea>
+            <button class="icon-btn quote-mic-btn" type="button" aria-label="Voice input">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+            </button>
+          </div>
+
+          <label class="quote-upload">
+            <input type="file" hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/></svg>
+            <span>Upload reference</span>
+          </label>
+        </section>
+
+        <section class="quote-step" id="quoteStep2" data-step="2" hidden>
+          <h1 class="quote-heading">A few details about your project</h1>
+          <p class="quote-subheading">Quantity, deadline, budget and any samples you'd like – so we can recommend the right setup.</p>
+
+          <div class="quote-field">
+            <label class="quote-label" for="qFirstOrder">First order volume <span class="quote-required">*</span></label>
+            <input class="quote-input" id="qFirstOrder" type="text" placeholder="e.g. 1000">
+          </div>
+
+          <div class="quote-field">
+            <label class="quote-label" for="qAnnual">Annual volume</label>
+            <input class="quote-input" id="qAnnual" type="text" placeholder="e.g. 12000">
+          </div>
+
+          <div class="quote-field">
+            <label class="quote-label" for="qNeeded">Needed by <span class="quote-required">*</span></label>
+            <input class="quote-input" id="qNeeded" type="text" placeholder="ASAP, 4 weeks, 2025-09-30...">
+          </div>
+
+          <div class="quote-field">
+            <label class="quote-label" for="qCountry">Delivery country <span class="quote-required">*</span></label>
+            <button class="quote-input quote-select" id="qCountry" type="button">
+              <span>Select a country…</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </button>
+          </div>
+
+          <div class="quote-field">
+            <label class="quote-label" for="qBudget">Project budget (EUR)</label>
+            <input class="quote-input" id="qBudget" type="text" placeholder="e.g. 8000 EUR">
+          </div>
+
+          <div class="quote-field">
+            <span class="quote-label">Samples &amp; prototyping</span>
+            <div class="quote-chip-row">
+              <button class="quote-chip" type="button">
+                Print &amp; material swatches
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </button>
+              <button class="quote-chip" type="button">
+                Print samples
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </button>
+              <button class="quote-chip" type="button">
+                Size samples
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </button>
+              <button class="quote-chip" type="button">
+                Custom prototype
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+              </button>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <div class="quote-footer-bar">
+        <button class="btn-pill lg quote-btn-back" id="quoteBackBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+          Back
+        </button>
+
+        <div class="quote-dots" id="quoteDots">
+          <span class="quote-dot active" data-step="1"></span>
+          <span class="quote-dot" data-step="2"></span>
+          <span class="quote-dot" data-step="3"></span>
+          <span class="quote-dot" data-step="4"></span>
+        </div>
+
+        <button class="btn-pill lg quote-btn-continue" id="quoteContinueBtn" type="button">
+          Continue
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+        </button>
+      </div>
+    </main>
+
+    <aside class="quote-visual">
+      <div class="quote-visual-inner">
+        <div class="quote-visual-placeholder"></div>
+        <div class="quote-visual-gradient"></div>
+
+        <div class="quote-trust-card">
+          <span class="quote-rating-badge">
+            <span class="quote-stars">
+              <span class="quote-stars-base">★★★★★</span>
+              <span class="quote-stars-fill">★★★★★</span>
+            </span>
+            4.6
+            <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M23.49 12.27c0-.79-.07-1.54-.2-2.27H12v4.51h6.47c-.28 1.48-1.13 2.73-2.4 3.58v3h3.86c2.26-2.09 3.56-5.17 3.56-8.82z"/><path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.86-3c-1.08.72-2.45 1.15-4.07 1.15-3.13 0-5.78-2.11-6.73-4.96H1.29v3.09C3.26 21.3 7.31 24 12 24z"/><path fill="#FBBC05" d="M5.27 14.28A7.2 7.2 0 0 1 4.89 12c0-.79.14-1.56.38-2.28V6.63H1.29A11.98 11.98 0 0 0 0 12c0 1.94.46 3.77 1.29 5.37l3.98-3.09z"/><path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.94 1.19 15.24 0 12 0 7.31 0 3.26 2.7 1.29 6.63l3.98 3.09C6.22 6.86 8.87 4.75 12 4.75z"/></svg>
+          </span>
+
+          <h2 class="quote-trust-heading">Custom packaging, delivered end-to-end.</h2>
+          <p class="quote-trust-sub">One brief. One project manager. Quote in 24h.</p>
+
+          <ul class="quote-trust-list">
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Packaging quote in 24 hours
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Vetted European supplier network
+            </li>
+            <li>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              One PM owns specs, samples &amp; delivery
+            </li>
+          </ul>
+
+          <div class="quote-trust-divider"></div>
+
+          <span class="quote-trusted-by-label">Trusted by</span>
+          <div class="quote-logos">
+            <img src="logotypes/logo-hims.svg" alt="hims">
+            <span class="quote-logo-text">RAYLO.</span>
+            <span class="quote-logo-text">Tropicfeel</span>
+            <span class="quote-logo-text">KUYICHI</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<script>
+  (function () {
+    var TOTAL_STEPS = 2;
+    var current = 1;
+
+    var steps = document.querySelectorAll('.quote-step');
+    var dots = document.querySelectorAll('.quote-dot');
+    var backBtn = document.getElementById('quoteBackBtn');
+    var continueBtn = document.getElementById('quoteContinueBtn');
+    var scrollArea = document.querySelector('.quote-left-scroll');
+
+    function render() {
+      steps.forEach(function (step) {
+        step.hidden = Number(step.dataset.step) !== current;
+      });
+      dots.forEach(function (dot) {
+        dot.classList.toggle('active', Number(dot.dataset.step) === current);
+      });
+      scrollArea.scrollTop = 0;
+    }
+
+    backBtn.addEventListener('click', function () {
+      if (current > 1) {
+        current -= 1;
+        render();
+      } else {
+        window.location.href = 'index.html';
+      }
+    });
+
+    continueBtn.addEventListener('click', function () {
+      if (current < TOTAL_STEPS) {
+        current += 1;
+        render();
+      }
+    });
+
+    render();
+  })();
+</script>
+
+</body>
+</html>

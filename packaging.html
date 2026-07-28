@@ -1,0 +1,2360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Packaging — Packhelp</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* ---------- ANNOUNCEMENT ---------- */
+  .announcement-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 0.75rem 2rem calc(0.75rem + 20px);
+    background: var(--color-bg-accent-subtle);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .announcement-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: rgba(255,255,255,.5);
+    color: var(--color-text-primary);
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .announcement-copy:hover {
+    background: rgba(255,255,255,.8);
+  }
+
+  .announcement-copy svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* top nav (sticky bar + nav-wrapper) styles live in components.css */
+
+  .cta-avatars {
+    display: flex;
+    margin-right: var(--space-3);
+  }
+
+  .cta-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+    border: 2px solid var(--color-accent);
+    margin-left: -8px;
+  }
+
+  .cta-avatar:first-child {
+    margin-left: 0;
+  }
+
+  .cta-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .cta-avatars.sm {
+    margin-right: var(--space-2);
+  }
+
+  .cta-avatars.sm .cta-avatar {
+    width: 18px;
+    height: 18px;
+    border-width: 1.5px;
+  }
+
+  @media (max-width: 900px) {
+    .nav-links.desktop-only { display: none; }
+    .nav-megamenu { display: none; }
+    .sticky-bar { display: none; }
+  }
+
+  /* ---------- SCROLL REVEAL ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ---------- BREADCRUMB ---------- */
+  .pkg-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-8) var(--space-8) 0;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .pkg-breadcrumb a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .pkg-breadcrumb a:hover {
+    text-decoration: underline;
+    color: var(--color-text-primary);
+  }
+
+  .pkg-breadcrumb .current {
+    color: var(--color-text-primary);
+  }
+
+  /* ---------- PAGE TITLE ---------- */
+  .pkg-title-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding: var(--space-4) var(--space-8) var(--space-10);
+  }
+
+  .pkg-title-copy {
+    min-width: 0;
+  }
+
+  .pkg-title {
+    margin: 0 0 var(--space-2);
+    font-weight: 500;
+    font-size: clamp(2rem, 3.2vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .pkg-desc-row {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
+  }
+
+  .pkg-desc-row.expanded {
+    display: block;
+  }
+
+  .pkg-desc-row.expanded .pkg-desc-toggle {
+    margin-left: var(--space-2);
+  }
+
+  .pkg-subtitle {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0;
+    max-width: 42rem;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .pkg-subtitle.clamped {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .pkg-desc-toggle {
+    flex: none;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  @media (max-width: 700px) {
+    .pkg-title-row { flex-direction: column; align-items: flex-start; }
+  }
+
+  /* ---------- FILTER & SORT PILLS ---------- */
+  .pkg-filters-bar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: 0 var(--space-8) var(--space-8);
+  }
+
+  .filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .filter-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 2rem;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-full);
+    border: 1px solid var(--color-border-default);
+    background: var(--color-bg-page);
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease, color .15s ease;
+  }
+
+  .filter-pill:hover {
+    border-color: var(--color-border-hover);
+  }
+
+  .filter-pill svg {
+    width: 14px;
+    height: 14px;
+    flex: none;
+    opacity: .6;
+  }
+
+  .filter-pill[aria-expanded="true"] {
+    background: var(--color-bg-surface);
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+
+  .filter-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex: none;
+    box-sizing: border-box;
+    border-radius: 50%;
+    background: var(--color-text-primary);
+    color: var(--color-text-on-accent);
+    font-size: 0.6875rem;
+    font-weight: 500;
+    line-height: 1;
+    cursor: pointer;
+  }
+
+  .filter-count[hidden] {
+    display: none;
+  }
+
+  .filter-count .filter-count-num {
+    display: inline-flex;
+  }
+
+  .filter-count .filter-count-clear {
+    display: none;
+    width: 9px;
+    height: 9px;
+    flex: none;
+    opacity: 1;
+    stroke: var(--white);
+  }
+
+  .filter-pill:hover .filter-count-num {
+    display: none;
+  }
+
+  .filter-pill:hover .filter-count-clear {
+    display: inline-flex;
+  }
+
+  .filter-pill-wrap {
+    position: relative;
+  }
+
+  .active-filter-pills {
+    display: none;
+    flex: 1 0 100%;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  .pkg-filters-bar.show-active-pills .active-filter-pills:not(:empty) {
+    display: flex;
+  }
+
+  .active-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    height: 1.75rem;
+    padding: 0 var(--space-3);
+    border-radius: var(--radius-full);
+    border: none;
+    background: var(--color-bg-accent-subtle);
+    color: var(--color-text-primary);
+    font: inherit;
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .active-filter-chip:hover {
+    background: rgba(39, 87, 255, .18);
+  }
+
+  .active-filter-chip svg {
+    width: 11px;
+    height: 11px;
+    flex: none;
+    opacity: .6;
+  }
+
+  /* ---------- FILTER SETTINGS GEAR ---------- */
+  .filter-settings-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-bg-surface);
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .filter-settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  }
+
+  .filter-settings-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .filter-settings-panel {
+    position: fixed;
+    bottom: 92px;
+    right: 24px;
+    z-index: 1000;
+    width: 280px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    padding: var(--space-5);
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .filter-settings-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .filter-settings-title {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .filter-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .filter-settings-label {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .filter-settings-desc {
+    margin: var(--space-1) 0 0;
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .filter-panel {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    left: 0;
+    z-index: 10;
+    min-width: 240px;
+    padding: var(--space-5);
+    box-sizing: border-box;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-default);
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s;
+  }
+
+  .filter-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity .15s ease, transform .15s ease;
+  }
+
+  .filter-panel-title {
+    margin: 0 0 var(--space-4);
+    font-weight: 500;
+    font-size: 1.0625rem;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+  }
+
+  .filter-panel-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  .filter-panel-scroll .filter-panel-options {
+    max-height: 320px;
+    overflow-y: auto;
+    padding-right: var(--space-2);
+  }
+
+  .filter-preview {
+    position: absolute;
+    top: 0;
+    left: calc(100% + 16px);
+    width: 160px;
+    height: 160px;
+    flex: none;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity .15s ease, visibility 0s linear .15s;
+    pointer-events: none;
+  }
+
+  .filter-panel:has(.filter-radio:hover) .filter-preview,
+  .filter-panel:has(.filter-checkbox:hover) .filter-preview {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .15s ease;
+  }
+
+  .filter-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .filter-radio,
+  .filter-checkbox {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-2);
+    margin: 0 calc(-1 * var(--space-2));
+    border-radius: var(--radius-sm);
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background-color .15s ease;
+  }
+
+  .filter-radio:hover,
+  .filter-checkbox:hover {
+    background: var(--color-bg-muted);
+  }
+
+  .filter-radio input,
+  .filter-checkbox input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+
+  .radio-dot {
+    position: relative;
+    width: 20px;
+    height: 20px;
+    flex: none;
+    border-radius: 50%;
+    border: 2px solid var(--color-border-hover);
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .filter-radio input:checked + .radio-dot {
+    border-color: var(--color-text-primary);
+    background: var(--color-text-primary);
+  }
+
+  .filter-radio input:checked + .radio-dot::after {
+    content: "";
+    position: absolute;
+    inset: 5px;
+    border-radius: 50%;
+    background: var(--color-bg-surface);
+  }
+
+  .filter-radio input:focus-visible + .radio-dot,
+  .filter-checkbox input:focus-visible + .checkbox-box {
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+
+  .checkbox-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex: none;
+    border-radius: 6px;
+    border: 2px solid var(--color-border-hover);
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .filter-checkbox input:checked + .checkbox-box {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+
+  .filter-checkbox input:checked + .checkbox-box::after {
+    content: "";
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: solid var(--color-bg-surface);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  .sort-pill-wrap {
+    position: relative;
+    flex: none;
+  }
+
+  .sort-menu {
+    position: absolute;
+    top: calc(100% + var(--space-2));
+    right: 0;
+    z-index: 10;
+    min-width: 200px;
+    padding: var(--space-2);
+    box-sizing: border-box;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-surface);
+    border: 1px solid var(--color-border-default);
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-8px);
+    transition: opacity .15s ease, transform .15s ease, visibility 0s linear .15s;
+  }
+
+  .sort-menu.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    transition: opacity .15s ease, transform .15s ease;
+  }
+
+  .sort-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    padding: var(--space-2) var(--space-3);
+    border: none;
+    background: none;
+    border-radius: var(--radius-sm);
+    font: inherit;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .sort-option:hover {
+    background: var(--color-bg-muted);
+  }
+
+  .sort-option.active {
+    color: var(--color-text-primary);
+    font-weight: 500;
+  }
+
+  /* ---------- CATEGORY TILES ---------- */
+  .pkg-tiles-section {
+    padding: 0 var(--space-8) var(--space-12);
+  }
+
+  .scroll-carousel {
+    position: relative;
+  }
+
+  .scroll-carousel-nav {
+    position: absolute;
+    top: 64px;
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    z-index: 3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .scroll-carousel-nav.prev {
+    left: var(--space-4);
+  }
+
+  .scroll-carousel-nav.next {
+    right: var(--space-4);
+  }
+
+  .scroll-carousel-nav svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .scroll-carousel-nav::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+
+  .scroll-carousel.has-overflow .scroll-carousel-nav {
+    display: flex;
+  }
+
+  .scroll-carousel.has-overflow .scroll-carousel-nav[disabled] {
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .scroll-fade {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 140px;
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .scroll-fade.left {
+    left: -8px;
+    background: linear-gradient(90deg, var(--color-bg-page) 0%, transparent 100%);
+  }
+
+  .scroll-fade.right {
+    right: -8px;
+    background: linear-gradient(270deg, var(--color-bg-page) 0%, transparent 100%);
+  }
+
+  .scroll-carousel.has-overflow .scroll-fade {
+    opacity: 1;
+  }
+
+  .scroll-carousel.has-overflow:has(.scroll-carousel-nav.prev[disabled]) .scroll-fade.left {
+    opacity: 0;
+  }
+
+  .scroll-carousel.has-overflow:has(.scroll-carousel-nav.next[disabled]) .scroll-fade.right {
+    opacity: 0;
+  }
+
+  .thumb-strip {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding: var(--space-2) 8px;
+    margin: 0 -8px;
+  }
+
+  .thumb-item {
+    flex: 0 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    width: 112px;
+    text-decoration: none;
+  }
+
+  .thumb-photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+  }
+
+  .thumb-photo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--thumb-img);
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease;
+  }
+
+  .thumb-item:hover .thumb-photo::before {
+    transform: scale(1.08);
+  }
+
+  .thumb-caption {
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-align: center;
+  }
+
+  .thumb-item.active .thumb-photo {
+    outline: 2px solid var(--color-text-primary);
+    outline-offset: 3px;
+  }
+
+  .thumb-item.active .thumb-caption {
+    font-weight: 500;
+  }
+
+  /* ---------- PRODUCT GRID ---------- */
+  .pkg-products {
+    padding: var(--space-4) var(--space-8) var(--space-16);
+  }
+
+  /* ---------- SEO ACCORDIONS ---------- */
+  .pkg-seo {
+    padding: 0 var(--space-8) var(--space-16);
+  }
+
+  .pkg-seo-inner {
+    max-width: calc(50% - 0.625rem);
+    margin: 0 auto;
+  }
+
+  .pkg-seo-text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .pkg-seo-heading {
+    margin: 0 0 var(--space-1);
+    font-size: 0.8125rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .pkg-seo-paragraph {
+    margin: 0;
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-6) var(--space-5);
+  }
+
+  @media (max-width: 1100px) {
+    .product-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  @media (max-width: 700px) {
+    .product-grid { grid-template-columns: repeat(2, 1fr); gap: var(--space-4); }
+  }
+
+  .product-card {
+    display: block;
+    color: inherit;
+  }
+
+  .product-card-media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+    margin-bottom: var(--space-3);
+  }
+
+  .product-card-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-card-img {
+    transform: scale(1.08);
+  }
+
+  .product-card-moq {
+    position: absolute;
+    left: var(--space-4);
+    bottom: var(--space-4);
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .product-card-name {
+    margin: 0 0 2px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .product-card-customisation {
+    margin: 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .product-card-btn {
+    position: absolute;
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: var(--space-3);
+    opacity: 0;
+    transform: translateY(100%);
+    pointer-events: none;
+    transition: opacity .15s ease, transform .15s ease;
+  }
+
+  .product-card:hover .product-card-btn {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  /* ---------- PROMO CARD ---------- */
+  .promo-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: var(--space-5);
+    box-sizing: border-box;
+    border-radius: var(--radius-md);
+    background: var(--color-bg-muted);
+  }
+
+  .promo-card-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .promo-card-text {
+    margin: 0 0 var(--space-4);
+    font-size: 1.25rem;
+    font-weight: 450;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  /* ---------- QUICK BOX BANNER (build-any-box CTA, inline row in product grid) ---------- */
+  .quick-box-banner {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-8);
+    padding: var(--space-8);
+    border-radius: var(--radius-xl);
+    background: var(--color-bg-accent-subtle);
+    box-sizing: border-box;
+  }
+
+  .quick-box-banner-eyebrow {
+    margin: 0 0 var(--space-2);
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .quick-box-banner-heading {
+    margin: 0;
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .quick-box-banner-form {
+    display: flex;
+    flex: none;
+    align-items: flex-end;
+    gap: var(--space-3);
+  }
+
+  .quick-box-banner-form .dimension-field {
+    width: 6.5rem;
+  }
+
+  @media (max-width: 900px) {
+    .quick-box-banner {
+      flex-direction: column;
+      align-items: stretch;
+    }
+
+    .quick-box-banner-form {
+      flex-wrap: wrap;
+    }
+
+    .quick-box-banner-form .dimension-field {
+      width: auto;
+      flex: 1 1 6rem;
+    }
+  }
+
+
+  /* ---------- FOOTER ---------- */
+  .site-footer {
+    position: relative;
+    padding: var(--space-16) 0 0;
+  }
+
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-inner {
+    padding: 0 var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12);
+    justify-content: space-between;
+  }
+
+  .footer-left {
+    flex: 0 1 420px;
+    max-width: 460px;
+  }
+
+  .footer-logo {
+    display: inline-flex;
+  }
+
+  .footer-logo img {
+    height: 26px;
+    width: auto;
+  }
+
+  .footer-newsletter-copy {
+    margin: var(--space-5) 0 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .footer-newsletter {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  .footer-newsletter-btn {
+    flex: 0 0 auto;
+  }
+
+  .footer-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+
+  .footer-badge {
+    display: flex;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border-hover);
+    border-radius: var(--radius-sm);
+  }
+
+  .footer-badge img {
+    height: 44px;
+    width: auto;
+  }
+
+  .footer-links {
+    display: flex;
+    flex: 0 1 auto;
+    gap: var(--space-14);
+  }
+
+  .footer-col {
+    width: 200px;
+    flex: 0 0 auto;
+  }
+
+  .footer-col-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .footer-col-title {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .footer-col a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  .footer-col a:hover {
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    position: relative;
+    margin-top: var(--space-14);
+  }
+
+  .footer-bottom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-bottom-inner {
+    padding: var(--space-6) var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 700px) {
+    .site-footer { padding: 3rem 0 0; }
+    .footer-inner { padding: 0 1.5rem; }
+    .footer-bottom-inner { padding: 1.5rem; }
+    .footer-newsletter { flex-direction: column; align-items: stretch; }
+    .footer-links { flex-wrap: wrap; gap: 2rem 1.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="announcement-bar">
+  <span>The more products you add, the more you save. Code: <strong>BUNDLEUP</strong></span>
+  <button class="announcement-copy" aria-label="Copy code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+</div>
+
+<div id="ph-sticky-bar"></div>
+
+<div class="container">
+  <div id="ph-nav-wrapper"></div>
+  <script src="nav-header.js"></script>
+
+  <nav class="pkg-breadcrumb" id="pkgBreadcrumb">
+    <a href="index.html">Packhelp</a>
+    <span>/</span>
+    <a href="#" data-key="root">Packaging</a>
+  </nav>
+
+  <section class="pkg-title-row reveal">
+    <div class="pkg-title-copy">
+      <h1 class="pkg-title" id="pkgTitle">Packaging</h1>
+      <div class="pkg-desc-row" id="pkgDescRow">
+        <p class="pkg-subtitle clamped" id="pkgSubtitle"><span id="pkgSubtitleText">150+ packaging products across boxes, bags, tubes and more — printed with your brand, in days.</span></p>
+        <button class="pkg-desc-toggle" id="pkgDescToggle" hidden>Show more</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="pkg-tiles-section reveal" id="pkgTilesSection">
+    <div class="scroll-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="scroll-fade left"></div>
+    <div class="thumb-strip" id="pkgThumbStrip">
+      <a class="thumb-item" href="#" data-key="boxes">
+        <div class="thumb-photo" style="--thumb-img:url('793725-pre-printed-mailer-box.avif')"></div>
+        <span class="thumb-caption">Boxes</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('507697-packhelp-28291.avif')"></div>
+        <span class="thumb-caption">Packaging Tubes</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('208230-paper-bag-01.avif')"></div>
+        <span class="thumb-caption">Mailing Bags</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('2948760-ziplock-bag-0.avif')"></div>
+        <span class="thumb-caption">Product Bags</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('https://cdn-pim.packhelp.com/assets/578699a4-615c-48de-8991-c30e0eee26fd/432173-bags?w=1112&h=800&fit=min&auto=format')"></div>
+        <span class="thumb-caption">Carrier Bags</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('404068-export.avif')"></div>
+        <span class="thumb-caption">Accessories</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('193249-stand-up-pouch-brown 1.png')"></div>
+        <span class="thumb-caption">Pouches</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('240486-padded-envelope.avif')"></div>
+        <span class="thumb-caption">Envelopes</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('225638-pp-single-walled-cup-custom-200-ml.avif')"></div>
+        <span class="thumb-caption">Food Packaging</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('https://cdn-pim.packhelp.com/assets/95ea6469-d772-4b06-a2bb-d60a3fdd390a/312546-containers?w=1112&h=800&fit=min&auto=format')"></div>
+        <span class="thumb-caption">Containers</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo" style="--thumb-img:url('https://cdn-pim.packhelp.com/assets/10cdb256-3433-490f-a59b-6e0820ba985a/488281-sample?w=1112&h=800&fit=min&auto=format')"></div>
+        <span class="thumb-caption">Samples</span>
+      </a>
+      <a class="thumb-item" href="#">
+        <div class="thumb-photo"></div>
+        <span class="thumb-caption">Bundles</span>
+      </a>
+    </div>
+      <div class="scroll-fade right"></div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <section class="pkg-filters-bar reveal">
+    <div class="filter-pills">
+      <div class="filter-pill-wrap">
+        <button class="filter-pill" aria-expanded="false">
+          Customisation
+          <span class="filter-count" hidden>
+            <span class="filter-count-num">0</span>
+            <svg class="filter-count-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filter-panel">
+          <p class="filter-panel-title">Customisation</p>
+          <div class="filter-panel-options">
+            <label class="filter-radio"><input type="radio" name="customisation" data-any checked><span class="radio-dot"></span>Any</label>
+            <label class="filter-radio"><input type="radio" name="customisation"><span class="radio-dot"></span>Custom</label>
+            <label class="filter-radio"><input type="radio" name="customisation"><span class="radio-dot"></span>Plain</label>
+            <label class="filter-radio"><input type="radio" name="customisation"><span class="radio-dot"></span>Pre-printed</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-pill-wrap">
+        <button class="filter-pill" aria-expanded="false">
+          Industry
+          <span class="filter-count" hidden>
+            <span class="filter-count-num">0</span>
+            <svg class="filter-count-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filter-panel">
+          <p class="filter-panel-title">Industry</p>
+          <div class="filter-panel-options">
+            <label class="filter-radio"><input type="radio" name="industry" data-any checked><span class="radio-dot"></span>Any</label>
+            <label class="filter-radio" data-preview-img="industies-fashion.png"><input type="radio" name="industry"><span class="radio-dot"></span>Apparel &amp; Fashion</label>
+            <label class="filter-radio" data-preview-img="industies-beauty.png"><input type="radio" name="industry"><span class="radio-dot"></span>Health &amp; Beauty</label>
+            <label class="filter-radio" data-preview-img="industies-ecommerce.png"><input type="radio" name="industry"><span class="radio-dot"></span>E-commerce</label>
+            <label class="filter-radio" data-preview-img="04917e61ae687fdcb83a00a4edd3d6e7.jpg"><input type="radio" name="industry"><span class="radio-dot"></span>Marketing &amp; Events</label>
+            <label class="filter-radio" data-preview-img="industies-electronic.png"><input type="radio" name="industry"><span class="radio-dot"></span>Electronics</label>
+            <label class="filter-radio" data-preview-img="industies-food.png"><input type="radio" name="industry"><span class="radio-dot"></span>Gifts</label>
+            <label class="filter-radio" data-preview-img="industies-home.png"><input type="radio" name="industry"><span class="radio-dot"></span>Home &amp; Deco</label>
+            <label class="filter-radio" data-preview-img="industies-health.png"><input type="radio" name="industry"><span class="radio-dot"></span>Logistics &amp; Fulfilment</label>
+          </div>
+          <div class="filter-preview"><img src="https://cdn-pim.packhelp.com/assets/2d1711ec-c078-4ed1-8dae-f4689e0dbc52/181212-b-6-c-9359-f-e-4-c-4-4-a-23-a-928-e-1-af-6410-a-4-cc-png?w=640&amp;fit=min&amp;auto=format" alt=""></div>
+        </div>
+      </div>
+
+      <div class="filter-pill-wrap">
+        <button class="filter-pill" aria-expanded="false">
+          Size
+          <span class="filter-count" hidden>
+            <span class="filter-count-num">0</span>
+            <svg class="filter-count-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filter-panel">
+          <p class="filter-panel-title">Size</p>
+          <div class="filter-panel-options">
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Small</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Medium</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Large</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-pill-wrap">
+        <button class="filter-pill" aria-expanded="false">
+          Use case
+          <span class="filter-count" hidden>
+            <span class="filter-count-num">0</span>
+            <svg class="filter-count-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filter-panel filter-panel-scroll">
+          <p class="filter-panel-title">Use case</p>
+          <div class="filter-panel-options">
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Christmas</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Underwear</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Lingerie</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Shoes</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Hoodie</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>T-shirt</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Return friendly</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Shirt</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Scarf</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Socks</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Wallet</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Glasses</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Cap</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Pants</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Clothes</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Jewellery</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Candle</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Postal Boxes</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Watch</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Marketing &amp; Events</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Cosmetic and beauty</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Computer</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Ship large items</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Unboxing accessories</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Smartphone</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Subscription box</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Wine packaging</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Luxury</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Perfume</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Alcohol</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Gifts</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-pill-wrap">
+        <button class="filter-pill" aria-expanded="false">
+          Type
+          <span class="filter-count" hidden>
+            <span class="filter-count-num">0</span>
+            <svg class="filter-count-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filter-panel">
+          <p class="filter-panel-title">Type</p>
+          <div class="filter-panel-options">
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/0df7f906-e452-4388-a8d8-1b90d109de53/89199-718-caa-93-5442-48-c-4-9990-27-f-41-f-66-b-385-png?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Magnetic</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/dc14c468-7b84-4b7c-b8cd-b16d6c34902b/70080-28-f-0-c-1-fe-3092-42-d-7-a-95-d-2-ea-83-f-27-ebaf-png?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>With Lid</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/2d1711ec-c078-4ed1-8dae-f4689e0dbc52/181212-b-6-c-9359-f-e-4-c-4-4-a-23-a-928-e-1-af-6410-a-4-cc-png?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Flap</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/d0f438f9-26bc-4854-9ac4-6317cd338d14/852084-sleeved-mailer?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Roll End Tuck Front</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/81a0b72d-d139-4ec4-bd19-3c177bebf3ea/757229-product-box-hanger-2-v-2-copy-1-1?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Reverse Tuck End</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/91098e54-1142-4d70-9fee-c31612285218/1798981-pp-box-1-1?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Snap Lock</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/b21d6aa5-a26e-4336-a1be-abbb927a5327/1501122-bottle-box?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Auto Bottom</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/4f7aaf1c-c382-468c-b74b-5c32435ff775/1047110-book-box-2-1?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Wrap</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/02daa8ae-af4e-4619-a260-6522fbc6900a/134367-pp-custom-pillow-box-1?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Pillow</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/9c3ecce4-dd6b-4b60-9706-7e786980a995/473766-pp-kv-cardboard-drawer-box-1?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>Drawer</label>
+            <label class="filter-checkbox" data-preview-img="https://cdn-pim.packhelp.com/assets/a0e98036-3664-4d14-82be-146aa0b1a31c/603891-om-packaging-1?w=640&amp;fit=min&amp;auto=format"><input type="checkbox"><span class="checkbox-box"></span>With Window</label>
+          </div>
+          <div class="filter-preview"><img src="https://cdn-pim.packhelp.com/assets/2d1711ec-c078-4ed1-8dae-f4689e0dbc52/181212-b-6-c-9359-f-e-4-c-4-4-a-23-a-928-e-1-af-6410-a-4-cc-png?w=640&amp;fit=min&amp;auto=format" alt=""></div>
+        </div>
+      </div>
+
+      <div class="filter-pill-wrap">
+        <button class="filter-pill" aria-expanded="false">
+          Sustainability
+          <span class="filter-count" hidden>
+            <span class="filter-count-num">0</span>
+            <svg class="filter-count-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filter-panel">
+          <p class="filter-panel-title">Sustainability</p>
+          <div class="filter-panel-options">
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Eco Choice</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>FSC&reg; available</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Biodegradable material</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Reusable</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Recycled content</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Recyclable</label>
+          </div>
+        </div>
+      </div>
+
+      <div class="filter-pill-wrap">
+        <button class="filter-pill" aria-expanded="false">
+          Collections
+          <span class="filter-count" hidden>
+            <span class="filter-count-num">0</span>
+            <svg class="filter-count-clear" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></svg>
+          </span>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+        </button>
+        <div class="filter-panel">
+          <p class="filter-panel-title">Collections</p>
+          <div class="filter-panel-options">
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Bestsellers</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>New Arrivals</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Custom sizes</label>
+            <label class="filter-checkbox"><input type="checkbox"><span class="checkbox-box"></span>Custom promo</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sort-pill-wrap">
+      <button class="filter-pill sort-pill" id="sortBtn" aria-expanded="false">
+        <span id="sortLabel">Most popular</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+      <div class="sort-menu" id="sortMenu">
+        <button class="sort-option active" data-sort="popular">Most popular</button>
+        <button class="sort-option" data-sort="az">Alphabetically A–Z</button>
+        <button class="sort-option" data-sort="za">Alphabetically Z–A</button>
+      </div>
+    </div>
+
+    <div class="active-filter-pills" id="activeFilterPills"></div>
+  </section>
+
+  <section class="pkg-products reveal">
+    <div class="product-grid" id="pkgProductGrid">
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">25 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Mailer Box</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">50 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Shipping Box</h3>
+          <p class="product-card-customisation">Plain</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">100 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Folding Carton</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">50 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Rigid Box</h3>
+          <p class="product-card-customisation">Pre-printed</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">25 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">E-commerce Box Set</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">50 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Paper Mailing Bag</h3>
+          <p class="product-card-customisation">Plain</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">100 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Zip Lock Bag</h3>
+          <p class="product-card-customisation">Plain</p>
+        </div>
+      </div>
+      <div class="promo-card">
+        <p class="promo-card-eyebrow">Save up to 20% with Packhelp Wallet</p>
+        <p class="promo-card-text">Earn cashback with every order and pay less on your next purchases.</p>
+        <a href="#" class="btn-pill sm secondary">Learn more</a>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">100 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Stand-up Pouch</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">100 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Poly Mailer</h3>
+          <p class="product-card-customisation">Plain</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">50 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Cotton Carrier Bag</h3>
+          <p class="product-card-customisation">Pre-printed</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">50 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Padded Envelope</h3>
+          <p class="product-card-customisation">Plain</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">25 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Mailing Tube</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">100 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Cardboard Envelope</h3>
+          <p class="product-card-customisation">Plain</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">25 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Tube Box</h3>
+          <p class="product-card-customisation">Pre-printed</p>
+        </div>
+      </div>
+      <div class="promo-card">
+        <p class="promo-card-eyebrow">Try before you buy</p>
+        <p class="promo-card-text">Get a sample pack for just £15 and check our products.</p>
+        <a href="#" class="btn-pill sm secondary">Order now</a>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">50 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Rigid Tube</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">500 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Custom Cup</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">100 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Pizza Box</h3>
+          <p class="product-card-customisation">Plain</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">250 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Tissue Paper</h3>
+          <p class="product-card-customisation">Pre-printed</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">100 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Custom Sticker Sheet</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-card-media"><span class="product-card-moq">250 minimum</span><a href="#" class="btn-pill sm product-card-btn">More info</a></div>
+        <div class="product-card-info">
+          <h3 class="product-card-name">Custom Label Roll</h3>
+          <p class="product-card-customisation">Custom</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="pkg-seo reveal">
+    <div class="pkg-seo-inner">
+      <div class="pkg-seo-text">
+
+        <div class="pkg-seo-block">
+          <h3 class="pkg-seo-heading">Custom Packaging for Your Brand</h3>
+          <p class="pkg-seo-paragraph">Packhelp provides businesses with a comprehensive selection of custom packaging solutions. We offer multiple ways to personalise your packaging, from full-colour digital printing to elegant hot-stamping with metallic foils. Add your logo, brand colours, and unique designs directly onto boxes, bags, and mailers. This process gives you direct control over the final appearance of your packaging, ensuring it aligns with your brand identity for e-commerce deliveries, retail sales, or subscription boxes. We handle print-on-demand orders, allowing for flexibility with quantities and designs.</p>
+        </div>
+
+        <div class="pkg-seo-block">
+          <h3 class="pkg-seo-heading">A Complete Range of Packaging Supplies</h3>
+          <p class="pkg-seo-paragraph">Our catalogue includes a wide variety of packaging supplies to meet diverse business needs. The range covers everything from rigid cardboard containers to flexible film mailers. We produce structures suitable for shipping heavy items, presenting delicate products, or creating gift sets. This selection includes classic cardboard boxes, lightweight postal bags, and secure carrier bags for in-store purchases. Each category contains multiple sizes and material options, providing a single source for all packaging requirements. Whether for a small online shop or a large retail operation, we stock the necessary components for a complete packaging setup.</p>
+        </div>
+
+        <div class="pkg-seo-block">
+          <h3 class="pkg-seo-heading">Durable Shipping Packaging</h3>
+          <p class="pkg-seo-paragraph">For businesses that ship products, our shipping packaging offers security and reliability. We construct our mailer boxes from tough corrugated cardboard, which provides structural integrity during transit. For clothing or non-fragile goods, our poly mailing bags offer a lightweight and water-resistant alternative. We make these bags from durable poly film and they often feature a self-sealing adhesive strip for quick packing. For documents or flat items, we provide a selection of board-backed or bubble-lined envelopes that prevent bending and absorb impacts. We design these solutions to fit within standard courier size limits, helping to manage postage costs effectively.</p>
+        </div>
+
+        <div class="pkg-seo-block">
+          <h3 class="pkg-seo-heading">Versatile Product Packaging</h3>
+          <p class="pkg-seo-paragraph">Effective product packaging serves both to protect items and present them professionally. Our range is suitable for direct-to-consumer sales, retail shelves, and subscription services. We use materials like solid and kraft cardboard to create clean, sharp finishes for gift boxes and retail cartons. These materials provide a solid base for high-quality printing. For items like posters, artwork, or cylindrical products, our cardboard packaging tubes offer a purpose-built solution that prevents crushing and creasing. You can select packaging that fits specific product dimensions and enhances the customer's initial interaction with the item.</p>
+        </div>
+
+        <div class="pkg-seo-block">
+          <h3 class="pkg-seo-heading">Customisable Packaging Boxes</h3>
+          <p class="pkg-seo-paragraph">Packaging boxes form a core component of our offering, available in numerous styles and configurations. We manufacture boxes from single or double-walled corrugated cardboard for shipping applications, providing robust protection against impacts and compression. For retail and presentation purposes, we use solid cardboard which offers a smoother surface for premium printing. Options include classic shipping cartons, mailer boxes with hinged lids for e-commerce, and two-piece boxes for luxury goods or gift sets. We produce all styles in custom sizes and can print them with your specific artwork.</p>
+        </div>
+
+        <div class="pkg-seo-block">
+          <h3 class="pkg-seo-heading">Flexible Packaging and Accessories</h3>
+          <p class="pkg-seo-paragraph">Beyond boxes, we supply a range of flexible packaging formats and essential extras. Our packaging pouch bags work well for small items, samples, or food products, and we supply them in various materials including kraft paper and films. To complete your packaging, explore our packaging accessories category. This includes items such as custom-printed packing tape to seal your boxes securely, tissue paper to wrap products, and void fill to cushion items inside a shipping box. These elements add an extra layer of protection and contribute to a cohesive brand presentation.</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <a href="index.html" class="footer-logo" aria-label="Packhelp"><img src="logo-packhelp.1iheyVke.svg" alt="Packhelp"></a>
+
+        <p class="footer-newsletter-copy">Don't miss out – get 15% off your first order when you join the newsletter.</p>
+
+        <form class="footer-newsletter">
+          <input type="email" class="footer-newsletter-input" placeholder="Your email" required>
+          <button type="submit" class="btn-pill md footer-newsletter-btn">Sign up</button>
+        </form>
+
+        <div class="footer-badges">
+          <span class="footer-badge"><img src="https://zapakuj.to/_astro/fsc-badge.CT_C2C6x.svg" alt="FSC certified"></span>
+          <span class="footer-badge"><img src="https://zapakuj.to/_astro/esg-badge-yellow-black.C3wtyeOu.svg" alt="ESG badge"></span>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col-group">
+          <div class="footer-col">
+            <p class="footer-col-title">Contact &amp; Help</p>
+            <ul>
+              <li><a href="#">Contact us</a></li>
+              <li><a href="#">Send us a brief</a></li>
+              <li><a href="#">Help</a></li>
+              <li><a href="#">Return policy</a></li>
+              <li><a href="#">Impressum</a></li>
+              <li><a href="#">Press</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <p class="footer-col-title">Company</p>
+            <ul>
+              <li><a href="#">Press</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-col-group">
+          <div class="footer-col">
+            <p class="footer-col-title">Sustainability</p>
+            <ul>
+              <li><a href="#">Sustainability Hub</a></li>
+              <li><a href="#">Our Progress Reports</a></li>
+              <li><a href="#">Responsible Supply Chain</a></li>
+              <li><a href="#">Eco badge</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <p class="footer-col-title">Resources</p>
+            <ul>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Terms of service</a></li>
+              <li><a href="#">Privacy policy</a></li>
+              <li><a href="#">Whistleblowing policy</a></li>
+              <li><a href="#">Sitemap</a></li>
+              <li><a href="#">Cookie settings</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title">Connect</p>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">X</a></li>
+            <li><a href="#">Pinterest</a></li>
+            <li><a href="#">Tiktok</a></li>
+            <li><a href="#">Linkedin</a></li>
+            <li><a href="#">Youtube</a></li>
+            <li><a href="#">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <span>Copyright Packhelp 2025</span>
+        <span>Business Hours Monday - Friday 8:00-15:00</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var navRow1 = document.querySelector('.nav-row1');
+    var stickyBar = document.getElementById('stickyBar');
+
+    function onScroll() {
+      var rect = navRow1.getBoundingClientRect();
+      var pinned = rect.bottom <= 0;
+      stickyBar.classList.toggle('is-pinned', pinned);
+
+      var minTop = 12;
+      var naturalTop = rect.top + rect.height / 2 - stickyBar.offsetHeight / 2;
+      stickyBar.style.top = Math.max(minTop, naturalTop) + 'px';
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+  })();
+
+  (function () {
+    var targets = document.querySelectorAll('.reveal');
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    targets.forEach(function (el) { observer.observe(el); });
+  })();
+
+  (function () {
+    var btn = document.getElementById('sortBtn');
+    var menu = document.getElementById('sortMenu');
+    var label = document.getElementById('sortLabel');
+    var options = menu.querySelectorAll('.sort-option');
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var open = menu.classList.toggle('open');
+      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+
+    options.forEach(function (option) {
+      option.addEventListener('click', function () {
+        options.forEach(function (o) { o.classList.remove('active'); });
+        option.classList.add('active');
+        label.textContent = option.textContent;
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!menu.contains(e.target) && e.target !== btn) {
+        menu.classList.remove('open');
+        btn.setAttribute('aria-expanded', 'false');
+      }
+    });
+  })();
+
+  (function () {
+    var wraps = document.querySelectorAll('.filter-pill-wrap');
+
+    function closeAll(except) {
+      wraps.forEach(function (wrap) {
+        if (wrap === except) { return; }
+        wrap.querySelector('.filter-panel').classList.remove('open');
+        wrap.querySelector('.filter-pill').setAttribute('aria-expanded', 'false');
+      });
+    }
+
+    wraps.forEach(function (wrap) {
+      var btn = wrap.querySelector('.filter-pill');
+      var panel = wrap.querySelector('.filter-panel');
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var open = panel.classList.toggle('open');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        if (open) { closeAll(wrap); }
+      });
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest('.filter-pill-wrap')) { closeAll(); }
+    });
+
+    wraps.forEach(function (wrap) {
+      var badge = wrap.querySelector('.filter-count');
+      var badgeNum = badge.querySelector('.filter-count-num');
+      var inputs = wrap.querySelectorAll('.filter-panel input');
+
+      function updateCount() {
+        var count = 0;
+        inputs.forEach(function (input) {
+          if (input.checked && !input.hasAttribute('data-any')) { count++; }
+        });
+        badgeNum.textContent = count;
+        badge.hidden = count === 0;
+      }
+
+      inputs.forEach(function (input) {
+        input.addEventListener('change', updateCount);
+      });
+
+      badge.addEventListener('click', function (e) {
+        e.stopPropagation();
+        inputs.forEach(function (input) {
+          input.checked = input.type === 'radio' && input.hasAttribute('data-any');
+        });
+        updateCount();
+      });
+
+      updateCount();
+    });
+  })();
+
+  (function () {
+    document.querySelectorAll('.filter-panel').forEach(function (panel) {
+      var preview = panel.querySelector('.filter-preview');
+      if (!preview) { return; }
+      var img = preview.querySelector('img');
+      var rows = panel.querySelectorAll('.filter-radio, .filter-checkbox');
+
+      rows.forEach(function (row) {
+        row.addEventListener('mouseenter', function () {
+          var src = row.getAttribute('data-preview-img');
+          if (src) { img.src = src; }
+
+          var top = row.offsetTop + row.offsetHeight / 2 - preview.offsetHeight / 2;
+          top = Math.max(0, Math.min(top, panel.clientHeight - preview.offsetHeight));
+          preview.style.top = top + 'px';
+        });
+      });
+    });
+  })();
+
+  (function () {
+    var mailerBoxesProducts = [
+      { name: 'Custom Mailer Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom E-commerce Mailer Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Mailer Box Inserts', type: 'Customisable', moq: 240 },
+      { name: 'Custom Mailer Box with Hot Stamping', type: 'Customisable', moq: 120 },
+      { name: 'Plain E-commerce Mailer Box', type: 'Plain', moq: 30 },
+      {
+        name: 'Plain Mailer Box with Custom Sleeve',
+        type: 'Customisable',
+        moq: 30,
+        img: 'https://cdn-pim.packhelp.com/assets/d0f438f9-26bc-4854-9ac4-6317cd338d14/852084-sleeved-mailer?w=640&fit=min&auto=format',
+        hoverImages: [
+          'https://cdn-pim.packhelp.com/assets/4e5dffc9-7c79-4efb-8b9d-bd396d6a7a9c/1841480-sleeved-mailer-box-1?w=1920&h=1459&fit=min&auto=format',
+          'https://cdn-pim.packhelp.com/assets/948ec8da-687e-4d46-bad7-e0d789f040d9/2758183-sleeved-mailer-box-2?w=1920&h=1459&fit=min&auto=format',
+          'https://cdn-pim.packhelp.com/assets/ceef21a7-cc6a-4888-950d-29f13361f56d/2973577-sleeved-mailer-box-3?w=1920&h=1459&fit=min&auto=format'
+        ]
+      },
+      { name: 'Plain Mailer Box', type: 'Plain', moq: 30 },
+      { name: 'Pre-Printed Full-Colour Mailer Box', type: 'Pre-printed', moq: 30 },
+      { name: 'Custom Book Wrap Mailer', type: 'Customisable', moq: 30 },
+      { name: 'Pre-Printed Economic Mailer Box', type: 'Pre-printed', moq: 30 },
+      { name: 'Plain Mailer Box with Custom Stamp', type: 'Bundle', moq: null }
+    ];
+
+    var shippingBoxesProducts = [
+      { name: 'Custom Phone Shipping Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Shipping Box', type: 'Customisable', moq: 30 },
+      { name: 'Plain Laptop Shipping Box', type: 'Plain', moq: 50 },
+      { name: 'Custom Laptop Shipping Box', type: 'Customisable', moq: 50 },
+      { name: 'Plain Flat Shipping Box', type: 'Plain', moq: 10 },
+      { name: 'Plain Phone Shipping Box', type: 'Plain', moq: 30 },
+      { name: 'Plain Shipping Box', type: 'Plain', moq: 25 },
+      { name: 'Plain Laptop Shipping Box (Variant)', type: 'Plain', moq: 20 },
+      { name: 'Plain Ecommerce Shipping Box', type: 'Plain', moq: 20 },
+      { name: 'Plain Shipping Box with Filler and Tape', type: 'Bundle', moq: null },
+      { name: 'Plain Cardboard Wrap Box', type: 'Plain', moq: 50 },
+      { name: 'Plain Shipping Box with Stretch Film', type: 'Plain', moq: 20 }
+    ];
+
+    var foldingCartonsProducts = [
+      { name: 'Custom Snap Lock Product Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Auto Bottom Wine Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Snap Lock Bottle Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Drawer Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Snap Lock Product Box with Embellishments', type: 'Customisable', moq: 30 },
+      { name: 'Custom Snap Lock Box with Window', type: 'Customisable', moq: 30 },
+      { name: 'Custom Hanger Snap Lock Product Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Reverse Tuck End Product Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Auto-Lock Bottom Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Product Box with Lid', type: 'Customisable', moq: 30 },
+      { name: 'Plain Snap Lock Product Box', type: 'Plain', moq: 30 },
+      { name: 'Custom Snap Lock Bottom Product Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Pillow Box', type: 'Customisable', moq: 30 },
+      { name: 'Custom Wine Tube Box', type: 'Customisable', moq: 30 }
+    ];
+
+    var rigidCartonsProducts = [
+      { name: 'Custom Rigid Magnetic Box', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Gift Box with Lid', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Magnetic Wine Box', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Magnetic Cosmetic Box', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Magnetic Gift Box', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Shirt Box with Lid', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Flower Box with Lid', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Jewellery Box with Lid and Foam Insert', type: 'Customisable', moq: 120 },
+      { name: 'Custom Magnetic Wine Box with Wood Wool', type: 'Bundle', moq: null },
+      { name: 'Custom Rigid Wine Box with Lid', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Cosmetic Box with Lid', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Economic Magnetic Box', type: 'Customisable', moq: 120 },
+      { name: 'Custom Rigid Box with Lid', type: 'Customisable', moq: 120 },
+      { name: 'Custom Magnetic Cosmetics Box with Filler', type: 'Bundle', moq: null },
+      { name: 'Custom Magnetic Gift Box with Custom Tissue and Label', type: 'Bundle', moq: null }
+    ];
+
+    var productBoxesProducts = foldingCartonsProducts.concat(rigidCartonsProducts);
+    var boxesProducts = mailerBoxesProducts.concat(shippingBoxesProducts, productBoxesProducts);
+
+    var categoryTree = {
+      root: {
+        title: 'Packaging',
+        desc: '150+ packaging products across boxes, bags, tubes and more — printed with your brand, in days.',
+        breadcrumb: [{ label: 'Packaging' }],
+        tiles: [
+          { key: 'boxes', label: 'Boxes', img: '793725-pre-printed-mailer-box.avif' },
+          { label: 'Packaging Tubes', img: '507697-packhelp-28291.avif' },
+          { label: 'Mailing Bags', img: '208230-paper-bag-01.avif' },
+          { label: 'Product Bags', img: '2948760-ziplock-bag-0.avif' },
+          { label: 'Carrier Bags', img: 'https://cdn-pim.packhelp.com/assets/578699a4-615c-48de-8991-c30e0eee26fd/432173-bags?w=1112&h=800&fit=min&auto=format' },
+          { label: 'Accessories', img: '404068-export.avif' },
+          { label: 'Pouches', img: '193249-stand-up-pouch-brown 1.png' },
+          { label: 'Envelopes', img: '240486-padded-envelope.avif' },
+          { label: 'Food Packaging', img: '225638-pp-single-walled-cup-custom-200-ml.avif' },
+          { label: 'Containers', img: 'https://cdn-pim.packhelp.com/assets/95ea6469-d772-4b06-a2bb-d60a3fdd390a/312546-containers?w=1112&h=800&fit=min&auto=format' },
+          { label: 'Samples', img: 'https://cdn-pim.packhelp.com/assets/10cdb256-3433-490f-a59b-6e0820ba985a/488281-sample?w=1112&h=800&fit=min&auto=format' },
+          { label: 'Bundles' }
+        ]
+      },
+      boxes: {
+        title: 'Boxes',
+        desc: 'Cardboard packaging for retail and e-commerce, made to order in the UK. Our range spans mailer boxes, cardboard shipping boxes, product and rigid box styles, available plain or printed with your logo, in many sizes and wholesale quantities.',
+        breadcrumb: [{ label: 'Packaging', key: 'root' }, { label: 'Boxes' }],
+        tiles: [
+          { key: 'mailer-boxes', label: 'Mailer Boxes', img: 'https://cdn-pim.packhelp.com/assets/d0f438f9-26bc-4854-9ac4-6317cd338d14/852084-sleeved-mailer?w=640&fit=min&auto=format' },
+          { key: 'shipping-boxes', label: 'Shipping Boxes', img: 'https://cdn-pim.packhelp.com/assets/2d1711ec-c078-4ed1-8dae-f4689e0dbc52/181212-b-6-c-9359-f-e-4-c-4-4-a-23-a-928-e-1-af-6410-a-4-cc-png?w=640&fit=min&auto=format' },
+          { key: 'product-boxes', label: 'Product Boxes', img: 'https://cdn-pim.packhelp.com/assets/a0e98036-3664-4d14-82be-146aa0b1a31c/603891-om-packaging-1?w=640&fit=min&auto=format' }
+        ],
+        products: boxesProducts
+      },
+      'product-boxes': {
+        title: 'Product Boxes',
+        desc: 'Product boxes, including folding cartons and rigid styles, for retail and gifting. Choose snap-lock, auto-bottom and drawer designs, or presentation boxes with lids, all custom printed, part of our wider boxes range.',
+        breadcrumb: [{ label: 'Packaging', key: 'root' }, { label: 'Boxes', key: 'boxes' }, { label: 'Product Boxes' }],
+        tiles: [
+          { key: 'folding-cartons', label: 'Folding Cartons', img: 'https://cdn-pim.packhelp.com/assets/a0e98036-3664-4d14-82be-146aa0b1a31c/603891-om-packaging-1?w=640&fit=min&auto=format' },
+          { key: 'rigid-boxes', label: 'Rigid Cartons', img: 'https://cdn-pim.packhelp.com/assets/0df7f906-e452-4388-a8d8-1b90d109de53/89199-718-caa-93-5442-48-c-4-9990-27-f-41-f-66-b-385-png?w=640&fit=min&auto=format' }
+        ],
+        products: productBoxesProducts
+      },
+      'mailer-boxes': {
+        title: 'Mailer Boxes',
+        desc: 'Mailer boxes are robust corrugated cardboard containers, perfect for shipping products. These die-cut mailing boxes are available plain, pre-printed, or as custom mailer boxes with your branding, in various sizes for e-commerce packaging, alongside other types of cardboard boxes.',
+        breadcrumb: [{ label: 'Packaging', key: 'root' }, { label: 'Boxes', key: 'boxes' }, { label: 'Mailer Boxes' }],
+        tiles: [],
+        products: mailerBoxesProducts
+      },
+      'shipping-boxes': {
+        title: 'Cardboard Shipping Boxes',
+        desc: 'Cardboard shipping boxes for products like phones and laptops, plus other items, are available here. Find custom shipping boxes or plain boxes for shipping, ideal for ecommerce packaging and sending parcels across the UK.',
+        breadcrumb: [{ label: 'Packaging', key: 'root' }, { label: 'Boxes', key: 'boxes' }, { label: 'Shipping Boxes' }],
+        tiles: [],
+        products: shippingBoxesProducts
+      },
+      'folding-cartons': {
+        title: 'Folding Cartons',
+        desc: 'Folding cartons are lightweight paperboard product boxes, ideal for retail and gifting. Choose from many custom folding boxes, including snap lock, auto bottom, and drawer styles, available plain or with custom printed product boxes.',
+        breadcrumb: [{ label: 'Packaging', key: 'root' }, { label: 'Boxes', key: 'boxes' }, { label: 'Product Boxes', key: 'product-boxes' }, { label: 'Folding Cartons' }],
+        tiles: [],
+        products: foldingCartonsProducts
+      },
+      'rigid-boxes': {
+        title: 'Rigid Cartons',
+        desc: 'Rigid boxes provide sturdy custom packaging for gifts and premium products. These custom rigid boxes are available with a lid or other closure types in various sizes, ideal for retail and wholesale product boxes.',
+        breadcrumb: [{ label: 'Packaging', key: 'root' }, { label: 'Boxes', key: 'boxes' }, { label: 'Product Boxes', key: 'product-boxes' }, { label: 'Rigid Cartons' }],
+        tiles: [],
+        products: rigidCartonsProducts
+      }
+    };
+
+    var breadcrumbEl = document.getElementById('pkgBreadcrumb');
+    var tilesSection = document.getElementById('pkgTilesSection');
+    var strip = document.getElementById('pkgThumbStrip');
+    var titleEl = document.getElementById('pkgTitle');
+    var descRow = document.getElementById('pkgDescRow');
+    var subtitleEl = document.getElementById('pkgSubtitle');
+    var subtitleTextEl = document.getElementById('pkgSubtitleText');
+    var descToggle = document.getElementById('pkgDescToggle');
+    var productGrid = document.getElementById('pkgProductGrid');
+    var defaultProductGridHTML = productGrid.innerHTML;
+    var quickBoxBannerHTML =
+      '<div class="quick-box-banner">' +
+        '<div class="quick-box-banner-copy">' +
+          '<p class="quick-box-banner-eyebrow">Skip the catalog</p>' +
+          '<h3 class="quick-box-banner-heading">Build any box type</h3>' +
+        '</div>' +
+        '<form class="quick-box-banner-form" action="build-your-box.html">' +
+          '<label class="dimension-field">' +
+            '<span class="dimension-field-label">Width</span>' +
+            '<span class="dimension-input-wrap"><input type="number" class="dimension-input" name="width"><span class="dimension-unit">cm</span></span>' +
+          '</label>' +
+          '<label class="dimension-field">' +
+            '<span class="dimension-field-label">Length</span>' +
+            '<span class="dimension-input-wrap"><input type="number" class="dimension-input" name="length"><span class="dimension-unit">cm</span></span>' +
+          '</label>' +
+          '<label class="dimension-field">' +
+            '<span class="dimension-field-label">Height</span>' +
+            '<span class="dimension-input-wrap"><input type="number" class="dimension-input" name="height"><span class="dimension-unit">cm</span></span>' +
+          '</label>' +
+          '<button type="submit" class="btn-pill lg">Start now</button>' +
+        '</form>' +
+      '</div>';
+
+    function renderProducts(products) {
+      if (!products) {
+        productGrid.innerHTML = defaultProductGridHTML;
+        return;
+      }
+
+      var cardsHTML = products.map(function (product) {
+        var moqBadge = product.moq
+          ? '<span class="product-card-moq">' + product.moq + ' minimum</span>'
+          : '';
+        var mediaImg = product.img
+          ? '<img class="product-card-img" src="' + product.img + '" alt="">'
+          : '';
+        return '<div class="product-card">' +
+          '<div class="product-card-media">' + mediaImg + moqBadge + '<a href="#" class="btn-pill sm product-card-btn">More info</a></div>' +
+          '<div class="product-card-info">' +
+          '<h3 class="product-card-name">' + product.name + '</h3>' +
+          '<p class="product-card-customisation">' + product.type + '</p>' +
+          '</div>' +
+          '</div>';
+      });
+
+      if (cardsHTML.length > 4) {
+        cardsHTML.splice(4, 0, quickBoxBannerHTML);
+      } else {
+        cardsHTML.push(quickBoxBannerHTML);
+      }
+
+      productGrid.innerHTML = cardsHTML.join('');
+
+      var cards = productGrid.querySelectorAll('.product-card');
+      products.forEach(function (product, i) {
+        if (!product.hoverImages || !product.hoverImages.length) { return; }
+
+        var img = cards[i].querySelector('.product-card-img');
+        var timer = null;
+        var idx = 0;
+
+        cards[i].addEventListener('mouseenter', function () {
+          idx = 0;
+          timer = setInterval(function () {
+            img.src = product.hoverImages[idx % product.hoverImages.length];
+            idx++;
+          }, 1000);
+        });
+
+        cards[i].addEventListener('mouseleave', function () {
+          clearInterval(timer);
+          img.src = product.img;
+        });
+      });
+    }
+
+    function renderHeader(node) {
+      titleEl.textContent = node.title;
+      subtitleTextEl.textContent = node.desc;
+      subtitleEl.classList.add('clamped');
+      descRow.classList.remove('expanded');
+      descRow.appendChild(descToggle);
+      descToggle.textContent = 'Show more';
+      descToggle.hidden = subtitleEl.scrollWidth <= subtitleEl.clientWidth + 1;
+    }
+
+    descToggle.addEventListener('click', function () {
+      var collapsed = subtitleEl.classList.contains('clamped');
+      if (collapsed) {
+        subtitleEl.classList.remove('clamped');
+        subtitleEl.appendChild(descToggle);
+        descRow.classList.add('expanded');
+        descToggle.textContent = 'Show less';
+      } else {
+        subtitleEl.classList.add('clamped');
+        descRow.appendChild(descToggle);
+        descRow.classList.remove('expanded');
+        descToggle.textContent = 'Show more';
+      }
+    });
+
+    function renderBreadcrumb(crumbs) {
+      var html = '<a href="index.html">Packhelp</a>';
+      crumbs.forEach(function (crumb) {
+        html += '<span>/</span>';
+        html += crumb.key
+          ? '<a href="#" data-nav="' + crumb.key + '">' + crumb.label + '</a>'
+          : '<span class="current">' + crumb.label + '</span>';
+      });
+      breadcrumbEl.innerHTML = html;
+
+      breadcrumbEl.querySelectorAll('a[data-nav]').forEach(function (a) {
+        a.addEventListener('click', function (e) {
+          e.preventDefault();
+          goTo(a.getAttribute('data-nav'));
+        });
+      });
+    }
+
+    function updateCarouselOverflow() {
+      var carousel = strip.closest('.scroll-carousel');
+      if (!carousel) { return; }
+      strip.scrollLeft = 0;
+      var overflowing = strip.scrollWidth > strip.clientWidth + 1;
+      carousel.classList.toggle('has-overflow', overflowing);
+      var prevBtn = carousel.querySelector('.scroll-carousel-nav.prev');
+      var nextBtn = carousel.querySelector('.scroll-carousel-nav.next');
+      if (prevBtn && nextBtn) {
+        var maxScroll = strip.scrollWidth - strip.clientWidth;
+        prevBtn.disabled = strip.scrollLeft <= 0;
+        nextBtn.disabled = strip.scrollLeft >= maxScroll - 1;
+      }
+    }
+
+    function renderTiles(tiles, currentKey) {
+      if (!tiles.length) {
+        tilesSection.style.display = 'none';
+        return;
+      }
+      tilesSection.style.display = '';
+      strip.innerHTML = tiles.map(function (tile) {
+        var activeClass = tile.key && tile.key === currentKey ? ' active' : '';
+        var keyAttr = tile.key ? ' data-key="' + tile.key + '"' : '';
+        var imgAttr = tile.img ? ' style="--thumb-img:url(\'' + tile.img + '\')"' : '';
+        return '<a class="thumb-item' + activeClass + '" href="#"' + keyAttr + '>' +
+          '<div class="thumb-photo"' + imgAttr + '></div>' +
+          '<span class="thumb-caption">' + tile.label + '</span>' +
+          '</a>';
+      }).join('');
+      bindTileClicks();
+      updateCarouselOverflow();
+    }
+
+    function bindTileClicks() {
+      var tiles = strip.querySelectorAll('.thumb-item');
+      tiles.forEach(function (tile) {
+        tile.addEventListener('click', function (e) {
+          e.preventDefault();
+          var key = tile.getAttribute('data-key');
+          if (key && categoryTree[key]) {
+            goTo(key);
+            return;
+          }
+          tiles.forEach(function (t) { t.classList.remove('active'); });
+          tile.classList.add('active');
+        });
+      });
+    }
+
+    function goTo(key) {
+      var node = categoryTree[key];
+      if (!node) { return; }
+      renderHeader(node);
+      renderBreadcrumb(node.breadcrumb);
+      renderTiles(node.tiles, key);
+      renderProducts(node.products);
+    }
+
+    renderHeader(categoryTree.root);
+    renderBreadcrumb(categoryTree.root.breadcrumb);
+    bindTileClicks();
+  })();
+
+  (function () {
+    var carousels = document.querySelectorAll('.scroll-carousel');
+
+    Array.prototype.forEach.call(carousels, function (carousel) {
+      var prevBtn = carousel.querySelector('.scroll-carousel-nav.prev');
+      var nextBtn = carousel.querySelector('.scroll-carousel-nav.next');
+      var track = null;
+
+      for (var i = 0; i < carousel.children.length; i++) {
+        var child = carousel.children[i];
+        if (child !== prevBtn && child !== nextBtn && !child.classList.contains('scroll-fade')) {
+          track = child;
+          break;
+        }
+      }
+
+      if (!prevBtn || !nextBtn || !track) {
+        return;
+      }
+
+      function updateNavState() {
+        var maxScroll = track.scrollWidth - track.clientWidth;
+        prevBtn.disabled = track.scrollLeft <= 0;
+        nextBtn.disabled = track.scrollLeft >= maxScroll - 1;
+      }
+
+      function checkOverflow() {
+        var overflowing = track.scrollWidth > track.clientWidth + 1;
+        carousel.classList.toggle('has-overflow', overflowing);
+        updateNavState();
+      }
+
+      prevBtn.addEventListener('click', function () {
+        track.scrollBy({ left: -track.clientWidth * 0.8, behavior: 'smooth' });
+      });
+
+      nextBtn.addEventListener('click', function () {
+        track.scrollBy({ left: track.clientWidth * 0.8, behavior: 'smooth' });
+      });
+
+      track.addEventListener('scroll', updateNavState);
+      window.addEventListener('resize', checkOverflow);
+
+      if (window.ResizeObserver) {
+        new ResizeObserver(checkOverflow).observe(track);
+      } else {
+        checkOverflow();
+      }
+    });
+  })();
+</script>
+
+<button id="filterSettingsBtn" class="filter-settings-btn" aria-label="Filter settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+</button>
+
+<div id="filterSettingsPanel" class="filter-settings-panel">
+  <p class="filter-settings-title">Filter display</p>
+  <div class="filter-settings-row">
+    <div>
+      <p class="filter-settings-label">Selected filters as pills</p>
+      <p class="filter-settings-desc">Show active filter values below the filter bar</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleActiveFilterPills">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('filterSettingsBtn');
+    var panel = document.getElementById('filterSettingsPanel');
+    var toggle = document.getElementById('toggleActiveFilterPills');
+    var filtersBar = document.querySelector('.pkg-filters-bar');
+    var activeRow = document.getElementById('activeFilterPills');
+    var filterInputs = document.querySelectorAll('.filter-panel input');
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!panel.contains(e.target) && e.target !== btn) {
+        panel.classList.remove('open');
+      }
+    });
+
+    function renderActivePills() {
+      activeRow.innerHTML = '';
+
+      filterInputs.forEach(function (input) {
+        var isActive = input.type === 'checkbox'
+          ? input.checked
+          : (input.checked && !input.hasAttribute('data-any'));
+        if (!isActive) { return; }
+
+        var label = input.closest('label');
+        var chip = document.createElement('button');
+        chip.type = 'button';
+        chip.className = 'active-filter-chip';
+        chip.textContent = label.textContent.trim();
+
+        var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+        icon.setAttribute('viewBox', '0 0 24 24');
+        icon.setAttribute('fill', 'none');
+        icon.setAttribute('stroke', 'currentColor');
+        icon.setAttribute('stroke-width', '2');
+        icon.setAttribute('stroke-linecap', 'round');
+        icon.setAttribute('stroke-linejoin', 'round');
+        icon.innerHTML = '<path d="M18 6 6 18M6 6l12 12"/>';
+        chip.appendChild(icon);
+
+        chip.addEventListener('click', function () {
+          if (input.type === 'radio') {
+            var anyInput = input.closest('.filter-panel').querySelector('input[data-any]');
+            if (anyInput) { anyInput.checked = true; }
+          } else {
+            input.checked = false;
+          }
+          input.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+
+        activeRow.appendChild(chip);
+      });
+    }
+
+    filterInputs.forEach(function (input) {
+      input.addEventListener('change', renderActivePills);
+    });
+
+    function applyPillsSetting(show) {
+      filtersBar.classList.toggle('show-active-pills', show);
+      toggle.checked = show;
+      if (show) { renderActivePills(); }
+    }
+
+    applyPillsSetting(localStorage.getItem('showActiveFilterPills') === '1');
+
+    toggle.addEventListener('change', function () {
+      applyPillsSetting(toggle.checked);
+      localStorage.setItem('showActiveFilterPills', toggle.checked ? '1' : '0');
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1489 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sample Packs — Packhelp</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<style>
+
+  /* ---------- ANNOUNCEMENT ---------- */
+  .announcement-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 0.75rem 2rem calc(0.75rem + 20px);
+    background: var(--color-bg-accent-subtle);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .announcement-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: rgba(255,255,255,.5);
+    color: var(--color-text-primary);
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .announcement-copy:hover {
+    background: rgba(255,255,255,.8);
+  }
+
+  .announcement-copy svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* top nav (sticky bar + nav-wrapper) styles live in components.css.
+     The "Book an expert call" avatar-stack isn't promoted there yet (still
+     duplicated per-page on index/packaging/build-your-box.html) — same
+     duplicate here so nav-header.js's markup renders styled. */
+  .cta-avatars {
+    display: flex;
+    margin-right: var(--space-3);
+  }
+
+  .cta-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+    border: 2px solid var(--color-accent);
+    margin-left: -8px;
+  }
+
+  .cta-avatar:first-child {
+    margin-left: 0;
+  }
+
+  .cta-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .cta-avatars.sm {
+    margin-right: var(--space-2);
+  }
+
+  .cta-avatars.sm .cta-avatar {
+    width: 18px;
+    height: 18px;
+    border-width: 1.5px;
+  }
+
+  /* ---------- page shell ----------
+     No bottom padding here — the marquee section right after it already
+     supplies its own top padding, so this stays 0 to avoid stacking two
+     gaps (which made the marquee's bottom-to-footer gap look smaller than
+     its top-to-content gap). */
+  .samples-page {
+    padding: var(--space-10) var(--space-8) 0;
+  }
+
+  .samples-intro {
+    max-width: 34rem;
+    margin: 0 0 var(--space-14);
+  }
+
+  .samples-heading {
+    margin: 0 0 var(--space-3);
+    font-weight: 500;
+    font-size: clamp(2rem, 3.2vw, 2.75rem);
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+  .samples-subheading {
+    margin: 0;
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .samples-grid {
+    display: grid;
+    grid-template-columns: 1fr 22rem;
+    align-items: start;
+    gap: var(--space-10);
+  }
+
+  /* ---------- groups (accordion) ---------- */
+  .sample-groups {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .sample-group {
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+  }
+
+  .sample-group-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    width: 100%;
+    padding: var(--space-4) var(--space-5);
+    border: none;
+    background: var(--color-bg-surface);
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .sample-group-thumb {
+    display: block;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  .sample-group-thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sample-avatar {
+    flex: none;
+  }
+
+  /* ---------- avatar hover preview ----------
+     A single shared element appended to <body> (see script below) and
+     positioned via getBoundingClientRect on hover, rather than one nested
+     inside each avatar — nesting it meant it inherited every ancestor's
+     `overflow: hidden` (group card rounding, accordion collapse box, etc.)
+     and got clipped. Living on <body> with position:fixed guarantees it
+     always renders above all page content, unclipped. Same 160x160/
+     radius-md/shadow recipe as .filter-preview on packaging.html. */
+  .hover-preview {
+    position: fixed;
+    z-index: 1000;
+    width: 160px;
+    height: 160px;
+    transform: translateX(-50%);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+    box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity .15s ease, visibility 0s linear .15s;
+  }
+
+  .hover-preview.visible {
+    opacity: 1;
+    visibility: visible;
+    transition: opacity .15s ease;
+  }
+
+  .hover-preview img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sample-group-title {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 1.25rem;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    color: var(--color-text-primary);
+  }
+
+  .sample-group-count {
+    flex: none;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    height: 24px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-full);
+    background: var(--color-bg-accent-subtle);
+    color: var(--color-accent);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+  }
+
+  .sample-group-count.has-items { display: flex; }
+
+  .sample-group-chevron {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-muted);
+    transition: transform 0.25s ease;
+  }
+
+  .sample-group.open .sample-group-chevron {
+    transform: rotate(180deg);
+  }
+
+  .sample-group-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.35s cubic-bezier(.4,0,.2,1);
+  }
+
+  .sample-group.open .sample-group-body {
+    max-height: 2000px;
+  }
+
+  .sample-group-body-inner {
+    padding: 0 var(--space-5) var(--space-5);
+  }
+
+  .sample-group.open .sample-group-body-inner {
+    /* matches .sample-group-header's own vertical padding (--space-4), so the
+       gap below the avatar/title row equals the gap above it */
+    padding-top: var(--space-4);
+  }
+
+  /* ---------- segmented tabs (Print Sample / Size Sample) ----------
+     Same pill-with-sliding-indicator recipe as .toggle-switch on
+     build-your-box.html (2-3 option mode switch), stretched to fill
+     the group's full width instead of hugging its content. */
+  .sample-tabs {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    margin-bottom: var(--space-5);
+    padding: var(--space-1);
+    border-radius: var(--radius-full);
+    background: var(--color-bg-muted);
+  }
+
+  .sample-tab {
+    position: relative;
+    z-index: 1;
+    flex: 1 1 0;
+    border: none;
+    background: transparent;
+    padding: var(--space-2) 0;
+    border-radius: var(--radius-full);
+    font-size: 0.875rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    text-align: center;
+    transition: color 0.15s ease;
+  }
+
+  .sample-tab.active {
+    color: var(--color-text-primary);
+  }
+
+  .sample-tab-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-surface);
+    box-shadow: 0 2px 4px 0 rgba(0,0,0,.08);
+    transition: transform 0.3s ease, width 0.3s ease;
+  }
+
+  .sample-tab-panel[hidden] { display: none; }
+
+  /* ---------- sample rows ---------- */
+  .sample-row-list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .sample-row {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border-default);
+    cursor: pointer;
+  }
+
+  .sample-row:last-child { border-bottom: none; }
+
+  .sample-row-media {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+    height: 80px;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: var(--color-bg-muted);
+  }
+
+  /* the box/avatar area stays full size — only the image asset itself is
+     inset smaller within it (two successive 10% reductions: 90% then 90%
+     of that = 81%), centered, so the placeholder box behind it (for rows
+     with no image yet) is unaffected */
+  .sample-row-media img {
+    display: block;
+    width: 81%;
+    height: 81%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .sample-row-info { flex: 1 1 auto; min-width: 0; }
+
+  .sample-row-title {
+    margin: 0 0 2px;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .sample-row-desc {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .sample-row input { position: absolute; width: 0; height: 0; opacity: 0; }
+
+  .sample-checkbox-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--color-border-hover);
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .sample-row input:checked + .sample-checkbox-box {
+    border-color: var(--color-accent);
+    background: var(--color-accent);
+  }
+
+  .sample-row input:checked + .sample-checkbox-box::after {
+    content: "";
+    display: block;
+    width: 5px;
+    height: 9px;
+    border: solid var(--color-bg-surface);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) translate(-1px, -1px);
+  }
+
+  .sample-row input:focus-visible + .sample-checkbox-box {
+    box-shadow: 0 0 0 3px var(--color-focus-ring);
+  }
+
+  .sample-row.is-disabled {
+    opacity: .4;
+    cursor: not-allowed;
+  }
+
+  /* ---------- grid mode (site-settings toggle) ----------
+     Same rows/markup, just re-laid-out: the row becomes a vertical photo
+     card instead of a horizontal list item, and the checkbox — instead of
+     sitting at the row's end — becomes an overlay pinned to the image's
+     top-right corner. */
+  /* :not([hidden]) keeps this below .sample-tab-panel[hidden]{display:none} in
+     specificity — without it, the higher-specificity body+class selector here
+     would win and force the inactive (Size Sample) panel visible too. */
+  body.grid-mode .sample-row-list:not([hidden]) {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-6);
+  }
+
+  body.grid-mode .sample-row {
+    position: relative;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    padding: 0;
+    border-bottom: none;
+  }
+
+  body.grid-mode .sample-row .sample-avatar {
+    width: 100%;
+    margin-bottom: var(--space-3);
+  }
+
+  body.grid-mode .sample-row .sample-row-media {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+  }
+
+  body.grid-mode .sample-row .sample-row-media img {
+    width: 83%;
+    height: 83%;
+    transition: transform 0.3s ease;
+  }
+
+  /* the floating hover-preview is skipped for row avatars in grid mode (see
+     script below) since the image is already shown large in the grid card —
+     swapped for an in-place zoom instead, same recipe as .product-card-img
+     on packaging.html's catalog cards */
+  body.grid-mode .sample-row:hover .sample-row-media img {
+    transform: scale(1.08);
+  }
+
+  body.grid-mode .sample-checkbox-box {
+    position: absolute;
+    top: var(--space-3);
+    right: var(--space-3);
+    background: var(--color-bg-surface);
+  }
+
+  @media (max-width: 900px) {
+    body.grid-mode .sample-row-list:not([hidden]) { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  /* ---------- SITE SETTINGS (gear) ---------- */
+  .site-settings-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-bg-surface);
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .site-settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  }
+
+  .site-settings-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .site-settings-panel {
+    position: fixed;
+    bottom: 92px;
+    right: 24px;
+    z-index: 1000;
+    width: 280px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    padding: var(--space-5);
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .site-settings-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .site-settings-title {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .site-settings-label {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-desc {
+    margin: 2px 0 0;
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  /* ---------- summary card ---------- */
+  .samples-summary {
+    position: sticky;
+    top: var(--space-8);
+  }
+
+  .samples-summary-card {
+    padding: var(--space-6);
+    border: 1px solid var(--color-border-default);
+    border-radius: var(--radius-lg);
+  }
+
+  .samples-summary-title {
+    margin: 0 0 var(--space-3);
+    font-weight: 500;
+    font-size: 1.5rem;
+    letter-spacing: -0.04em;
+    color: var(--color-text-primary);
+  }
+
+  .samples-summary-delivery {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0 0 var(--space-5);
+    padding-bottom: var(--space-5);
+    border-bottom: 1px solid var(--color-border-default);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .samples-summary-delivery svg {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+
+  .samples-summary-delivery strong {
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .samples-summary-list {
+    display: flex;
+    flex-direction: column;
+    min-height: 3.5rem;
+  }
+
+  .samples-summary-empty {
+    margin: var(--space-4) 0;
+    font-size: 0.875rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .samples-summary-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .samples-summary-item:last-child {
+    border-bottom: none;
+  }
+
+  .samples-summary-item-media {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-muted);
+  }
+
+  .samples-summary-item-info { flex: 1 1 auto; min-width: 0; }
+
+  .samples-summary-item-name {
+    margin: 0 0 1px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .samples-summary-item-variant {
+    margin: 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .samples-summary-item-remove {
+    flex: none;
+    width: 32px;
+    height: 32px;
+  }
+
+  .samples-summary-item-remove svg { width: 18px; height: 18px; }
+
+  .samples-summary-total {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-top: var(--space-4);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--color-border-default);
+    font-size: 0.9375rem;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .btn-pill.samples-checkout {
+    width: 100%;
+    margin-top: var(--space-5);
+  }
+
+  .samples-checkout:disabled {
+    background: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    cursor: not-allowed;
+  }
+
+  .samples-summary-note {
+    margin: var(--space-3) 0 0;
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .samples-grid { grid-template-columns: 1fr; }
+    .samples-summary { position: static; margin-top: var(--space-8); }
+  }
+
+  @media (max-width: 700px) {
+    .samples-page { padding: var(--space-8) var(--space-5) 0; }
+  }
+
+  /* ---------- MARQUEE (same recipe as index.html) ---------- */
+  .marquee-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow-x: hidden;
+    padding: var(--space-24) 0;
+    background: var(--color-bg-page);
+  }
+
+  .marquee-outer {
+    width: 104%;
+    height: 48px;
+    margin-left: -2%;
+    transform: rotate(-2deg);
+    background: var(--color-bg-accent-subtle);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 22s linear infinite;
+  }
+
+  .marquee-content {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0 var(--space-7);
+    white-space: nowrap;
+  }
+
+  .marquee-text {
+    font-size: 0.9375rem;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .marquee-text-light {
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .marquee-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--color-text-primary);
+    flex: none;
+  }
+
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ---------- FOOTER (same recipe as index.html/packaging.html) ---------- */
+  .site-footer {
+    position: relative;
+    padding: var(--space-16) 0 0;
+  }
+
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-inner {
+    padding: 0 var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12);
+    justify-content: space-between;
+  }
+
+  .footer-left {
+    flex: 0 1 420px;
+    max-width: 460px;
+  }
+
+  .footer-logo {
+    display: inline-flex;
+  }
+
+  .footer-logo img {
+    height: 26px;
+    width: auto;
+  }
+
+  .footer-newsletter-copy {
+    margin: var(--space-5) 0 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .footer-newsletter {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  /* .footer-newsletter-input lives in components.css */
+
+  .footer-newsletter-btn {
+    flex: 0 0 auto;
+  }
+
+  .footer-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+
+  .footer-badge {
+    display: flex;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border-hover);
+    border-radius: var(--radius-sm);
+  }
+
+  .footer-badge img {
+    height: 44px;
+    width: auto;
+  }
+
+  .footer-links {
+    display: flex;
+    flex: 0 1 auto;
+    gap: var(--space-14);
+  }
+
+  .footer-col {
+    width: 200px;
+    flex: 0 0 auto;
+  }
+
+  .footer-col-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .footer-col-title {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .footer-col a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  .footer-col a:hover {
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    position: relative;
+    margin-top: var(--space-14);
+  }
+
+  .footer-bottom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-bottom-inner {
+    padding: var(--space-6) var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 700px) {
+    .site-footer { padding: 3rem 0 0; }
+    .footer-inner { padding: 0 1.5rem; }
+    .footer-bottom-inner { padding: 1.5rem; }
+    .footer-newsletter { flex-direction: column; align-items: stretch; }
+    .footer-links { flex-wrap: wrap; gap: 2rem 1.5rem; }
+  }
+
+</style>
+</head>
+<body>
+
+<div class="announcement-bar">
+  <span>The more products you add, the more you save. Code: <strong>BUNDLEUP</strong></span>
+  <button class="announcement-copy" aria-label="Copy code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+</div>
+
+<div id="ph-sticky-bar"></div>
+
+<div class="container">
+  <div id="ph-nav-wrapper"></div>
+  <script src="nav-header.js"></script>
+
+<main class="samples-page">
+  <div class="samples-intro">
+    <h1 class="samples-heading">Pick up to 8 samples</h1>
+    <p class="samples-subheading">Try before you buy — and get your money back with your first order. Select up to 8 samples and compare different types of packaging, materials and sizes. Usually shipped in <strong>3–5 days</strong>.</p>
+  </div>
+
+  <div class="samples-grid">
+
+    <div class="sample-groups" id="sampleGroups">
+      <!-- groups injected by script -->
+    </div>
+
+    <aside class="samples-summary">
+      <div class="samples-summary-card">
+        <h2 class="samples-summary-title">Sample Pack <span id="summaryCount">0</span>/8</h2>
+
+        <p class="samples-summary-delivery">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="15" height="12" rx="1"/><path d="M16 10h4l3 3v5h-7z"/><circle cx="6" cy="20" r="2"/><circle cx="18" cy="20" r="2"/></svg>
+          Delivered by&nbsp;<strong>Tuesday, 4 August</strong>
+        </p>
+
+        <div class="samples-summary-list" id="summaryList">
+          <p class="samples-summary-empty">No samples selected yet.</p>
+        </div>
+
+        <div class="samples-summary-total">
+          <span>Total</span>
+          <span id="summaryTotal">£0.00</span>
+        </div>
+
+        <button class="btn-pill lg samples-checkout" id="checkoutBtn" type="button" disabled>Checkout</button>
+        <p class="samples-summary-note">Includes VAT 20.0% and shipping</p>
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<section class="marquee-section">
+  <div class="marquee-outer">
+    <div class="marquee-track">
+      <div class="marquee-content">
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+      </div>
+      <div class="marquee-content" aria-hidden="true">
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-left">
+      <a href="index.html" class="footer-logo" aria-label="Packhelp"><img src="logo-packhelp.1iheyVke.svg" alt="Packhelp"></a>
+
+      <p class="footer-newsletter-copy">Don't miss out – get 15% off your first order when you join the newsletter.</p>
+
+      <form class="footer-newsletter">
+        <input type="email" class="footer-newsletter-input" placeholder="Your email" required>
+        <button type="submit" class="btn-pill md footer-newsletter-btn">Sign up</button>
+      </form>
+
+      <div class="footer-badges">
+        <span class="footer-badge"><img src="https://zapakuj.to/_astro/fsc-badge.CT_C2C6x.svg" alt="FSC certified"></span>
+        <span class="footer-badge"><img src="https://zapakuj.to/_astro/esg-badge-yellow-black.C3wtyeOu.svg" alt="ESG badge"></span>
+      </div>
+    </div>
+
+    <div class="footer-links">
+      <div class="footer-col-group">
+        <div class="footer-col">
+          <p class="footer-col-title">Contact &amp; Help</p>
+          <ul>
+            <li><a href="#">Contact us</a></li>
+            <li><a href="#">Send us a brief</a></li>
+            <li><a href="#">Help</a></li>
+            <li><a href="#">Return policy</a></li>
+            <li><a href="#">Impressum</a></li>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title">Company</p>
+          <ul>
+            <li><a href="#">Press</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-col-group">
+        <div class="footer-col">
+          <p class="footer-col-title">Sustainability</p>
+          <ul>
+            <li><a href="#">Sustainability Hub</a></li>
+            <li><a href="#">Our Progress Reports</a></li>
+            <li><a href="#">Responsible Supply Chain</a></li>
+            <li><a href="#">Eco badge</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title">Resources</p>
+          <ul>
+            <li><a href="#">Blog</a></li>
+            <li><a href="#">Terms of service</a></li>
+            <li><a href="#">Privacy policy</a></li>
+            <li><a href="#">Whistleblowing policy</a></li>
+            <li><a href="#">Sitemap</a></li>
+            <li><a href="#">Cookie settings</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <p class="footer-col-title">Connect</p>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">X</a></li>
+          <li><a href="#">Pinterest</a></li>
+          <li><a href="#">Tiktok</a></li>
+          <li><a href="#">Linkedin</a></li>
+          <li><a href="#">Youtube</a></li>
+          <li><a href="#">Facebook</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-inner">
+      <span>Copyright Packhelp 2025</span>
+      <span>Business Hours Monday - Friday 8:00-15:00</span>
+    </div>
+  </div>
+</footer>
+
+</div>
+
+<script>
+(function () {
+  var navRow1 = document.querySelector('.nav-row1');
+  var stickyBar = document.getElementById('stickyBar');
+
+  function onScroll() {
+    var rect = navRow1.getBoundingClientRect();
+    var pinned = rect.bottom <= 0;
+    stickyBar.classList.toggle('is-pinned', pinned);
+
+    var minTop = 12;
+    var naturalTop = rect.top + rect.height / 2 - stickyBar.offsetHeight / 2;
+    stickyBar.style.top = Math.max(minTop, naturalTop) + 'px';
+  }
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll);
+  onScroll();
+})();
+
+(function () {
+  var UNIT_PRICE = 4.5;
+  var MAX_SAMPLES = 8;
+
+  // "CODE - outer dims - Inside/Outside dimensions ..." -> { name: "CODE — outer dims", desc: "Inside/Outside dimensions ..." }
+  function sizeItem(raw) {
+    var parts = raw.split(' - ');
+    return { name: parts[0] + ' — ' + parts[1], desc: parts.slice(2).join(' - ') };
+  }
+
+  var groups = [
+    {
+      key: 'mailer-box',
+      title: 'Mailer Box',
+      singular: 'Mailer Box',
+      thumb: 'https://cdn-pim.packhelp.com/assets/d0f438f9-26bc-4854-9ac4-6317cd338d14/852084-sleeved-mailer?w=760&fit=min&auto=format',
+      print: [
+        { name: 'One Colour - Kraft', desc: 'Printing with one CMYK color on kraft cardboard keeps costs low, perfect for minimalist designs.', img: 'https://packhelp.com/build/shared-images/product-key-visuals/mailerbox_eco_desktop_one_box.png' },
+        { name: 'One Colour - White', desc: 'Printing with one CMYK color on white cardboard gives clean results, perfect for simple, minimal designs.', img: 'https://packhelp.com/build/shared-images/product-key-visuals/mailerbox_ecowhite_desktop_one_box.png' },
+        { name: 'Multicolour – saturated', desc: 'Affordable multi-colour printing on bleached cardboard. White uncoated surface gives good colour accuracy and soft, natural finish.', img: 'https://packhelp.com/build/shared-images/product-key-visuals/mailerbox_eco_color_desktop.png' },
+        { name: 'Multicolour – premium with glossy foil', desc: 'Premium multicolour printing with glossy foil for maximum shine and eye-catching colours.', img: 'https://packhelp.com/build/shared-images/product-key-visuals/mailerbox_full_color_desktop.png' },
+        { name: 'Multicolour – premium with matte foil', desc: 'Premium multicolour printing with matte foil for vibrant colours and a smooth, elegant finish.', img: 'https://packhelp.com/build/shared-images/product-key-visuals/mailerbox_full_color_desktop.png' },
+        { name: 'White Colour', desc: 'White ink with UV printing creates strong contrasts on kraft cardboard for a premium look. More costly than standard CMYK.', img: 'https://packhelp.com/build/shared-images/product-key-visuals/mailerbox_white_ink.png' }
+      ],
+      size: [
+        'F23 - 9.2 x 9.2 x 5 cm - Inside dimensions 7.9 x 8.7 x 4.5 cm',
+        'F33 - 11.8 x 14 x 8 cm - Inside dimensions 10.2 x 13.5 x 7.5 cm',
+        'F44 - 20.7 x 15.6 x 9.1 cm - Inside dimensions 19.6 x 15.1 x 8.6 cm',
+        'F45 - 23.1 x 14 x 8 cm - Inside dimensions 22 x 13.5 x 7.5 cm',
+        'F46 - 24.5 x 19.4 x 2.4 cm - Inside dimensions 24 x 18.9 x 1.9 cm',
+        'F52 - 26.5 x 19.5 x 6 cm - Inside dimensions 24.9 x 19 x 5.5 cm',
+        'F56 - 26 x 20 x 10.5 cm - Inside dimensions 24.5 x 19.5 x 10 cm',
+        'F59 - 32 x 18.2 x 9 cm - Inside dimensions 30.5 x 17.7 x 8.5 cm',
+        'F62 - 30.2 x 23.3 x 8.8 cm - Inside dimensions 28.9 x 22.8 x 8.3 cm',
+        'F65 - 35 x 25 x 5 cm - Inside dimensions 34.5 x 24.5 x 4.5 cm',
+        'F71 - 35 x 26 x 10 cm - Inside dimensions 33.7 x 25.5 x 9.5 cm',
+        'F79 - 36.4 x 31.4 x 12.5 cm - Inside dimensions 34.7 x 30.9 x 12 cm',
+        'F93 - 44 x 33.9 x 15.9 cm - Inside dimensions 42.6 x 33.4 x 15.4 cm',
+        'F112 - 42.5 x 52 x 18 cm - Inside dimensions 40 x 51.1 x 17.4 cm'
+      ].map(sizeItem)
+    },
+    {
+      key: 'ecommerce-delivery-box',
+      title: 'Ecommerce Delivery Box',
+      singular: 'Ecommerce Delivery Box',
+      print: [
+        { name: 'Ecommerce Delivery Box - Kraft', desc: 'Are you an online retailer looking for boxes to ship your products? Well, look no further! Packhelp’s E-commerce Delivery Boxes are the ideal solution.' },
+        { name: 'Ecommerce Delivery Box - White', desc: 'Are you an online retailer looking for boxes to ship your products? Well, look no further! Packhelp’s E-commerce Delivery Boxes are the ideal solution.' }
+      ],
+      size: [
+        'AS55 - 30 x 19 x 7.5 cm - Inside dimensions 29 x 18.5 x 7 cm',
+        'AS73 - 39 x 30 x 7.5 cm - Inside dimensions 37 x 29 x 7 cm',
+        'AS80 - 39 x 30 x 14.5 cm - Inside dimensions 37 x 29 x 14 cm',
+        'AS91 - 44 x 38 x 13 cm - Inside dimensions 42 x 37 x 12 cm'
+      ].map(sizeItem)
+    },
+    {
+      key: 'two-piece-product-boxes',
+      title: 'Two Piece Product Boxes',
+      singular: 'Two Piece Product Box',
+      print: [
+        { name: 'Two Piece Product Box - White', desc: 'Two-Piece Product Box is an elegant packaging with a lid. The white variant comes with full CMYK printing options.' },
+        { name: 'Two Piece Product Box - Kraft', desc: 'A kraft variant of a Two-Piece Product Box. It is an elegant, minimalist version that comes with an imprint in black. An ideal solution for an eco-friendly store.' }
+      ],
+      size: [
+        'P19 - 8 x 8 x 2.9 cm - Inside dimensions 7.5 x 7.5 x 2.7 cm',
+        'P27 - 11.5 x 11.5 x 4.8 cm - Inside dimensions 11 x 11 x 4.6 cm',
+        'P28 - 15.5 x 6.9 x 5.9 cm - Inside dimensions 15 x 6.4 x 5.7 cm',
+        'P37 - 17 x 17 x 2.4 cm - Inside dimensions 16.5 x 16.5 x 2.2 cm',
+        'P40 - 16.9 x 16.9 x 8 cm - Inside dimensions 16.4 x 16.4 x 7.8 cm',
+        'P41 - 24.5 x 11.4 x 4.7 cm - Inside dimensions 24 x 10.9 x 4.5 cm'
+      ].map(sizeItem)
+    },
+    {
+      key: 'product-box',
+      title: 'Product Box',
+      singular: 'Product Box',
+      print: [
+        { name: 'Classic Product Box - White', desc: 'Classic Product Box is an easily foldable box made from high-quality Arktika paper. Ideal to use as product packaging. Available with CMYK imprint performed on a white layer of paper.' },
+        { name: 'Classic Product Box - Natural Kraft', desc: 'An elegant Classic Product Box in a more rustic version. You can use it to pack products in your store or as a premium gift packaging. Available with CMYK imprint performed directly on paperboard.' }
+      ],
+      size: [
+        'P24 - 7 x 5 x 12 cm - Inside dimensions 7 x 5 x 12 cm',
+        'P30 - 10 x 10 x 10 cm - Inside dimensions 10 x 10 x 10 cm',
+        'P43 - 18 x 3 x 22 cm - Inside dimensions 18 x 3 x 22 cm'
+      ].map(sizeItem)
+    },
+    {
+      key: 'wine-product-box',
+      title: 'Wine Product Box',
+      singular: 'Wine Product Box',
+      tabs: false,
+      items: [
+        { name: 'Wine Box - White', desc: 'A box made to fit a 0.7 l bottle of wine or other liquid. You can print beautifully colourful designs on the white variant.' },
+        { name: 'Wine Box - Kraft', desc: 'A kraft variant of a wine box. It is an elegant, minimalist version that comes with an imprint in black. An ideal solution for an eco-friendly wine store.' }
+      ]
+    },
+    {
+      key: 'paper-bag',
+      title: 'Paper Bag',
+      singular: 'Paper Bag',
+      print: [
+        { name: 'Paper Bag - White', desc: 'You can use paper bags in your store, as well as during company events or as a complementary product for your mailer boxes. The white variant is great for colourful, lively imprints. Printing in PANTONE.' },
+        { name: 'Paper Bag - Natural Kraft', desc: 'You can use paper bags in your store, as well as during company events or as a complementary product for your mailer boxes. The natural kraft is available with black imprint in PANTONE.' }
+      ],
+      size: [
+        'B66 - 24 x 32 cm - Outside dimensions 24 x 32 cm',
+        'B70 - 24 x 36 cm - Outside dimensions 24 x 36 cm',
+        'B82 - 30.5 x 34 cm - Outside dimensions 30.5 x 34 cm',
+        'B95 - 33 x 50 cm - Outside dimensions 33 x 50 cm',
+        'B107 - 50 x 39 cm - Outside dimensions 50 x 39 cm'
+      ].map(sizeItem)
+    }
+  ];
+
+  // A larger floating preview only makes sense when there's a real image to
+  // zoom into — the data-preview-img attribute is simply omitted otherwise,
+  // so plain grey placeholder avatars never trigger the hover-preview JS.
+  function previewAttr(imgUrl) {
+    return imgUrl ? ' data-preview-img="' + imgUrl + '"' : '';
+  }
+
+  function rowsHtml(list, group, kindKey, cartKindLabel) {
+    // Row media is a plain placeholder by default; individual items can opt in
+    // with their own `img` (not inherited from the group thumb).
+    var cartName = cartKindLabel ? (group.singular + ' ' + cartKindLabel) : (group.singular + ' Sample');
+
+    return list.map(function (item, i) {
+      var id = group.key + '__' + kindKey + '__' + i;
+      var media = item.img ? '<img src="' + item.img + '" alt="" loading="lazy">' : '';
+      return (
+        '<label class="sample-row" data-sample-id="' + id + '">' +
+          '<span class="sample-avatar"' + previewAttr(item.img) + '>' +
+            '<span class="sample-row-media">' + media + '</span>' +
+          '</span>' +
+          '<span class="sample-row-info">' +
+            '<p class="sample-row-title">' + item.name + '</p>' +
+            '<p class="sample-row-desc">' + item.desc + '</p>' +
+          '</span>' +
+          '<input type="checkbox" data-name="' + cartName + '" data-label="' + item.name + '">' +
+          '<span class="sample-checkbox-box"></span>' +
+        '</label>'
+      );
+    }).join('');
+  }
+
+  function groupHtml(group, index) {
+    var thumbImg = group.thumb ? '<img src="' + group.thumb + '" alt="">' : '';
+    var body;
+
+    if (group.tabs === false) {
+      body = '<div class="sample-row-list">' + rowsHtml(group.items, group, 'item', null) + '</div>';
+    } else {
+      body = (
+        '<div class="sample-tabs" data-tabs>' +
+          '<div class="sample-tab-indicator"></div>' +
+          '<button class="sample-tab active" data-tab="print" type="button">Print Sample</button>' +
+          '<button class="sample-tab" data-tab="size" type="button">Size Sample</button>' +
+        '</div>' +
+        '<div class="sample-row-list sample-tab-panel" data-tab-panel="print">' + rowsHtml(group.print, group, 'print', 'Print Sample') + '</div>' +
+        '<div class="sample-row-list sample-tab-panel" data-tab-panel="size" hidden>' + rowsHtml(group.size, group, 'size', 'Size Sample') + '</div>'
+      );
+    }
+
+    return (
+      '<div class="sample-group' + (index === 0 ? ' open' : '') + '" data-group="' + group.key + '">' +
+        '<button class="sample-group-header" type="button">' +
+          '<span class="sample-avatar"' + previewAttr(group.thumb) + '>' +
+            '<span class="sample-group-thumb">' + thumbImg + '</span>' +
+          '</span>' +
+          '<span class="sample-group-title">' + group.title + '</span>' +
+          '<span class="sample-group-count"></span>' +
+          '<svg class="sample-group-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>' +
+        '</button>' +
+        '<div class="sample-group-body">' +
+          '<div class="sample-group-body-inner">' + body + '</div>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  var groupsEl = document.getElementById('sampleGroups');
+  groupsEl.innerHTML = groups.map(groupHtml).join('');
+
+  /* ---------- accordion open/close ---------- */
+  groupsEl.querySelectorAll('.sample-group-header').forEach(function (header) {
+    header.addEventListener('click', function () {
+      header.closest('.sample-group').classList.toggle('open');
+    });
+  });
+
+  /* ---------- avatar hover preview ----------
+     One shared element on <body>, positioned via getBoundingClientRect on
+     hover instead of living nested inside each avatar — see the .hover-preview
+     CSS comment for why. Row avatars (not the group header's) skip this in
+     grid mode, since the card's own image already serves as the "zoomed" view. */
+  var hoverPreview = document.createElement('div');
+  hoverPreview.className = 'hover-preview';
+  hoverPreview.innerHTML = '<img alt="">';
+  document.body.appendChild(hoverPreview);
+  var hoverPreviewImg = hoverPreview.querySelector('img');
+
+  groupsEl.querySelectorAll('[data-preview-img]').forEach(function (avatar) {
+    avatar.addEventListener('mouseenter', function () {
+      if (document.body.classList.contains('grid-mode') && avatar.closest('.sample-row')) return;
+      var rect = avatar.getBoundingClientRect();
+      hoverPreviewImg.src = avatar.getAttribute('data-preview-img');
+      hoverPreview.style.left = (rect.left + rect.width / 2) + 'px';
+      hoverPreview.style.top = (rect.bottom + 8) + 'px';
+      hoverPreview.classList.add('visible');
+    });
+    avatar.addEventListener('mouseleave', function () {
+      hoverPreview.classList.remove('visible');
+    });
+  });
+
+  /* ---------- segmented tabs ---------- */
+  groupsEl.querySelectorAll('[data-tabs]').forEach(function (tabs) {
+    var group = tabs.closest('.sample-group');
+    var indicator = tabs.querySelector('.sample-tab-indicator');
+    var options = tabs.querySelectorAll('.sample-tab');
+
+    function moveIndicator(el) {
+      indicator.style.width = el.offsetWidth + 'px';
+      indicator.style.transform = 'translateX(' + el.offsetLeft + 'px)';
+    }
+
+    options.forEach(function (opt) {
+      opt.addEventListener('click', function (e) {
+        e.stopPropagation();
+        options.forEach(function (o) { o.classList.remove('active'); });
+        opt.classList.add('active');
+        moveIndicator(opt);
+        group.querySelectorAll('.sample-tab-panel').forEach(function (panel) {
+          panel.hidden = panel.dataset.tabPanel !== opt.dataset.tab;
+        });
+      });
+    });
+
+    moveIndicator(tabs.querySelector('.sample-tab.active'));
+  });
+
+  /* ---------- selection state ---------- */
+  var summaryList = document.getElementById('summaryList');
+  var summaryCount = document.getElementById('summaryCount');
+  var summaryTotal = document.getElementById('summaryTotal');
+  var checkoutBtn = document.getElementById('checkoutBtn');
+  var allCheckboxes = groupsEl.querySelectorAll('.sample-row input[type="checkbox"]');
+  var selected = [];
+
+  function currency(n) {
+    return '£' + n.toFixed(2);
+  }
+
+  function render() {
+    var count = selected.length;
+
+    summaryCount.textContent = count;
+    summaryTotal.textContent = currency(count * UNIT_PRICE);
+    checkoutBtn.disabled = count === 0;
+
+    groupsEl.querySelectorAll('.sample-group').forEach(function (group) {
+      var key = group.dataset.group;
+      var n = selected.filter(function (s) { return s.groupKey === key; }).length;
+      var badge = group.querySelector('.sample-group-count');
+      badge.textContent = n;
+      badge.classList.toggle('has-items', n > 0);
+    });
+
+    allCheckboxes.forEach(function (cb) {
+      var isChecked = selected.some(function (s) { return s.id === cb.closest('.sample-row').dataset.sampleId; });
+      cb.checked = isChecked;
+      cb.closest('.sample-row').classList.toggle('is-disabled', !isChecked && count >= MAX_SAMPLES);
+    });
+
+    if (count === 0) {
+      summaryList.innerHTML = '<p class="samples-summary-empty">No samples selected yet.</p>';
+      return;
+    }
+
+    summaryList.innerHTML = selected.map(function (s) {
+      return (
+        '<div class="samples-summary-item" data-sample-id="' + s.id + '">' +
+          '<span class="samples-summary-item-media"></span>' +
+          '<span class="samples-summary-item-info">' +
+            '<p class="samples-summary-item-name">' + s.name + '</p>' +
+            '<p class="samples-summary-item-variant">' + s.label + '</p>' +
+          '</span>' +
+          '<button class="icon-btn samples-summary-item-remove" type="button" aria-label="Remove">' +
+            '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>' +
+          '</button>' +
+        '</div>'
+      );
+    }).join('');
+
+    summaryList.querySelectorAll('.samples-summary-item-remove').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var id = btn.closest('.samples-summary-item').dataset.sampleId;
+        selected = selected.filter(function (s) { return s.id !== id; });
+        render();
+      });
+    });
+  }
+
+  allCheckboxes.forEach(function (cb) {
+    cb.addEventListener('change', function () {
+      var row = cb.closest('.sample-row');
+      var id = row.dataset.sampleId;
+      var groupKey = row.closest('.sample-group').dataset.group;
+
+      if (cb.checked) {
+        if (selected.length >= MAX_SAMPLES) {
+          cb.checked = false;
+          return;
+        }
+        selected.push({ id: id, groupKey: groupKey, name: cb.dataset.name, label: cb.dataset.label });
+      } else {
+        selected = selected.filter(function (s) { return s.id !== id; });
+      }
+      render();
+    });
+  });
+
+  render();
+})();
+</script>
+
+<button id="siteSettingsBtn" class="site-settings-btn" aria-label="Site settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+</button>
+
+<div id="siteSettingsPanel" class="site-settings-panel">
+  <p class="site-settings-title">Page customization</p>
+  <div class="site-settings-row">
+    <div>
+      <p class="site-settings-label">Grid view</p>
+      <p class="site-settings-desc">Show samples as a photo grid instead of a list</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleGrid">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('siteSettingsBtn');
+    var panel = document.getElementById('siteSettingsPanel');
+    var gridToggle = document.getElementById('toggleGrid');
+    if (!btn || !panel || !gridToggle) { return; }
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!panel.contains(e.target) && e.target !== btn) {
+        panel.classList.remove('open');
+      }
+    });
+
+    gridToggle.addEventListener('change', function () {
+      document.body.classList.toggle('grid-mode', gridToggle.checked);
+    });
+  })();
+</script>
+
+</body>
+</html>

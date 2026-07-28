@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "ABC Favorit Variable", "Inter", system-ui, "Segoe UI", Roboto, sans-serif;
+
+  --color-richblue: #00061a;
+  --color-white: #ffffff;
+  --color-ph-blue: #2757ff;
+  --color-dark-blue: #0b38d5;
+  --color-grey-100: #f8f8f8;
+  --color-grey-200: #f2f2f2;
+  --color-grey-300: #e7e7e7;
+  --color-grey-400: #cfcfcf;
+  --color-grey-500: #86868b;
+  --color-grey-600: #555555;
+  --color-preview-bg: #f4f4f4;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-richblue);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hide scrollbar for the Construction carousel while keeping it scrollable */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Close/Open drag slider in the preview panel */
+.open-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 20px;
+  background: transparent;
+  cursor: pointer;
+}
+.open-slider::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to right,
+    var(--color-ph-blue) var(--slider-fill, 0%),
+    var(--color-grey-400) var(--slider-fill, 0%)
+  );
+}
+.open-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  margin-top: -6px;
+  border: none;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, var(--color-white), var(--color-grey-100));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}
+.open-slider::-moz-range-track {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-grey-400);
+}
+.open-slider::-moz-range-progress {
+  height: 8px;
+  border-radius: 9999px;
+  background: var(--color-ph-blue);
+}
+.open-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border: none;
+  border-radius: 9999px;
+  background: linear-gradient(to bottom, var(--color-white), var(--color-grey-100));
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+}

@@ -1,0 +1,3514 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Packhelp</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="base.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* ---------- ANNOUNCEMENT ---------- */
+  .announcement-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    padding: 0.75rem 2rem calc(0.75rem + 20px);
+    background: var(--color-bg-accent-subtle);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .announcement-copy {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    background: rgba(255,255,255,.5);
+    color: var(--color-text-primary);
+    padding: var(--space-2);
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .announcement-copy:hover {
+    background: rgba(255,255,255,.8);
+  }
+
+  .announcement-copy svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* top nav (sticky bar + nav-wrapper) styles live in components.css */
+
+  /* ---------- CTA ---------- */
+  .cta-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-8) var(--space-3) var(--space-8);
+    box-sizing: border-box;
+  }
+
+  .cta-section.reveal {
+    transform: translateX(-50%) translateY(80px);
+    transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);
+  }
+
+  .cta-section.reveal.is-visible {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .cta-card {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+    margin: 0 auto;
+    padding: var(--space-20) var(--space-12);
+    border-radius: var(--radius-2xl);
+    background: var(--color-bg-inverse);
+    text-align: center;
+  }
+
+  .cta-content {
+    position: relative;
+    z-index: 2;
+  }
+
+  .cta-blob {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(100px);
+    opacity: 0.35;
+    will-change: transform;
+    mix-blend-mode: soft-light;
+    z-index: 0;
+  }
+
+  .cta-blob-1 {
+    width: 42vw;
+    height: 42vw;
+    background: var(--color-bg-inverse);
+    top: 10%;
+    left: 8%;
+    animation: ctaFloat1 18s ease-in-out infinite;
+  }
+
+  .cta-blob-2 {
+    width: 38vw;
+    height: 38vw;
+    background: var(--gray-600);
+    top: 30%;
+    right: 5%;
+    animation: ctaFloat2 22s ease-in-out infinite;
+  }
+
+  .cta-blob-3 {
+    width: 34vw;
+    height: 34vw;
+    background: var(--gray-600);
+    bottom: 5%;
+    left: 30%;
+    animation: ctaFloat3 26s ease-in-out infinite;
+  }
+
+  @keyframes ctaFloat1 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33%      { transform: translate(6vw, 8vh) scale(1.1); }
+    66%      { transform: translate(-4vw, 4vh) scale(0.95); }
+  }
+
+  @keyframes ctaFloat2 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50%      { transform: translate(-8vw, -6vh) scale(1.08); }
+  }
+
+  @keyframes ctaFloat3 {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    40%      { transform: translate(5vw, -5vh) scale(1.05); }
+    70%      { transform: translate(-6vw, 3vh) scale(0.92); }
+  }
+
+  .cta-grain {
+    position: absolute;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .cta-text {
+    max-width: 44rem;
+    margin: 0 auto;
+    text-align: left;
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-on-accent);
+  }
+
+  .cta-usps {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2) var(--space-6);
+    max-width: 44rem;
+    margin: var(--space-6) auto 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .cta-usps li {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-on-accent);
+  }
+
+  .cta-usp-check {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    color: var(--color-accent);
+  }
+
+  .cta-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    max-width: 44rem;
+    margin: var(--space-8) auto 0;
+  }
+
+  .cta-avatars {
+    display: flex;
+    margin-right: var(--space-3);
+  }
+
+  .cta-avatar {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+    border: 2px solid var(--color-accent);
+    margin-left: -8px;
+  }
+
+  .cta-avatar:first-child {
+    margin-left: 0;
+  }
+
+  .cta-avatar img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+
+  .cta-avatars.sm {
+    margin-right: var(--space-2);
+  }
+
+  .cta-avatars.sm .cta-avatar {
+    width: 18px;
+    height: 18px;
+    border-width: 1.5px;
+  }
+
+  @media (max-width: 700px) {
+    .cta-card { padding: 3rem 1.5rem; }
+    .cta-buttons { flex-direction: column; align-items: stretch; }
+    .cta-content .cta-tiles { flex-direction: column; width: 100%; max-width: 100%; margin-left: 0; margin-right: 0; padding-left: 0; padding-right: 0; }
+    .cta-tiles .cta-tile { width: 100%; height: clamp(280px, 70vw, 480px); }
+  }
+
+  .cta-tiles {
+    display: flex;
+    justify-content: safe center;
+    gap: var(--space-4);
+    box-sizing: border-box;
+    width: calc(100% + 6rem);
+    margin-top: var(--space-14);
+    margin-left: -3rem;
+    margin-right: -3rem;
+    padding-left: var(--space-12);
+    padding-right: var(--space-12);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+  }
+
+  .cta-tile {
+    position: relative;
+    flex: 0 0 auto;
+    width: clamp(220px, 36vw, 460px);
+    height: clamp(280px, calc(40vw + 40px), 548px);
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    padding: var(--space-8);
+    box-sizing: border-box;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    text-align: left;
+  }
+
+  .cta-tile-gradient {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(180deg, var(--color-bg-muted-hover) 0%, var(--color-bg-accent-subtle) 100%);
+  }
+
+  .cta-tile-video {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cta-tile-pills-wrap {
+    position: absolute;
+    left: 32px;
+    right: 32px;
+    bottom: 32px;
+    transform: scale(0.9);
+    transform-origin: bottom left;
+  }
+
+  .cta-tile-video-bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.15);
+    z-index: 0;
+  }
+
+  .cta-tile-video-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0.00) 100%);
+    z-index: 1;
+  }
+
+  .cta-tile-title {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    max-width: 240px;
+    color: var(--color-text-on-accent);
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    line-height: 1.16;
+    font-weight: 450;
+  }
+
+  .cta-tile-gradient .cta-tile-title {
+    color: var(--color-text-primary);
+  }
+
+  .cta-tile-composer {
+    position: absolute;
+    z-index: 2;
+    left: 32px;
+    right: 32px;
+    bottom: 32px;
+    max-width: 100%;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 var(--space-2) 0 var(--space-5);
+    box-sizing: border-box;
+    border-radius: var(--radius-full);
+    border: 1px solid rgba(255, 255, 255, 0.10);
+    background: rgba(255, 255, 255, 0.10);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .cta-tile-composer-text {
+    flex: 1 1 auto;
+    min-width: 0;
+    color: var(--color-text-on-accent);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+
+  .cta-tile-composer-send {
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+    color: var(--color-text-on-accent);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cta-tile-composer-send svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .cta-tile-composer-send.pulse {
+    animation: cta-send-pulse 0.5s ease;
+  }
+
+  @keyframes cta-send-pulse {
+    0% { transform: scale(1); }
+    40% { transform: scale(1.18); }
+    100% { transform: scale(1); }
+  }
+
+  .cta-tile-composer-text.is-placeholder {
+    color: rgba(255,255,255,.5);
+  }
+
+  .cta-tile-bubbles {
+    position: absolute;
+    z-index: 2;
+    right: 32px;
+    bottom: 108px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .cta-tile-bubble {
+    display: inline-flex;
+    padding: var(--space-3);
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-3);
+    border-radius: var(--radius-full);
+    background: var(--color-accent);
+    color: var(--color-text-on-accent);
+    font-size: 11px;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+
+  .cta-tile-bubble.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .cta-tile-pills {
+    font-size: clamp(6px, 1vw, 12px);
+    display: flex;
+    flex-direction: column;
+    gap: 0.8em;
+  }
+
+  .cta-pill-row {
+    display: flex;
+    gap: 0.8em;
+  }
+
+  .cta-pill-row-1 {
+    margin-left: 3em;
+  }
+
+  .cta-pill-row-2 {
+    margin-left: 0;
+  }
+
+  .cta-pill-row-3 {
+    margin-left: 1.5em;
+  }
+
+  .cta-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.401em;
+    padding: 0.642em 0.963em 0.642em 0.642em;
+    border-radius: var(--radius-full);
+    border: 0.321em solid rgba(255,255,255,.40);
+    background: var(--color-bg-surface);
+    background-clip: padding-box;
+    color: var(--color-text-primary);
+    font-feature-settings: 'liga' off, 'clig' off;
+    font-family: "ABC Favorit", sans-serif;
+    font-size: 1em;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    white-space: nowrap;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+
+  .cta-section.is-visible .cta-pill {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .cta-pay-arrow {
+    width: 0;
+    height: 1em;
+    margin-left: 0;
+    flex: none;
+    opacity: 0;
+    overflow: hidden;
+    transition: width 0.3s ease, margin-left 0.3s ease, opacity 0.2s ease;
+  }
+
+  .cta-pay-arrow.show {
+    width: 1em;
+    margin-left: 0.4em;
+    opacity: 1;
+    transition: width 0.55s cubic-bezier(.34,1.56,.64,1), margin-left 0.55s cubic-bezier(.34,1.56,.64,1), opacity 0.25s ease;
+  }
+
+  .cta-pill-img {
+    display: flex;
+    flex: none;
+    width: 3.211em;
+    height: 3.131em;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background: var(--color-bg-muted-hover);
+    overflow: hidden;
+  }
+
+  .cta-pill-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .cta-pill-pay {
+    display: flex;
+    width: fit-content;
+    padding: 0.642em 2.667em;
+    justify-content: center;
+    align-items: center;
+    gap: 0;
+    border-radius: var(--radius-full);
+    border: 0.321em solid rgba(255,255,255,.40);
+    background: var(--color-accent);
+    background-clip: padding-box;
+    color: var(--color-text-on-accent);
+  }
+
+  .cta-tile-quote {
+    max-width: 280px;
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+  }
+
+  .cta-tile-testimonial {
+    position: relative;
+    z-index: 2;
+    margin-top: auto;
+    padding-top: var(--space-4);
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cta-tile-avatar {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background-color: rgba(0, 0, 0, 0.12);
+    background-image: var(--avatar-img);
+    background-size: cover;
+    background-position: center;
+    margin-bottom: var(--space-3);
+  }
+
+  .cta-tile-person-name {
+    margin: 0;
+    color: var(--color-text-primary);
+    font-size: 15px;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    line-height: 1.16;
+  }
+
+  .cta-tile-person-role {
+    margin: 0;
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 13px;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+  }
+
+  /* ---------- SCROLL REVEAL ---------- */
+  .reveal {
+    opacity: 0;
+    transform: translateY(-16px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .categories-section.reveal {
+    transform: translateX(-50%) translateY(-16px);
+  }
+
+  .categories-section.reveal.is-visible {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* ---------- HERO ---------- */
+  .hero {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: stretch;
+    padding: var(--space-12) var(--space-8) var(--space-24);
+    box-sizing: border-box;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: stretch;
+    gap: var(--space-12);
+    width: 100%;
+    max-width: 1216px;
+    margin: 0 auto;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    min-width: 0;
+    padding-right: var(--space-6);
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+
+  h1.headline {
+    margin: 0;
+    font-weight: 450;
+    font-size: 3rem;
+    line-height: 1.08;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+  }
+
+  .hero-subheading {
+    margin: var(--space-4) 0 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .cta-row {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-top: var(--space-5);
+  }
+
+  .hero-cta-buttons {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+
+  .hero-right {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-4);
+    min-width: 0;
+  }
+
+  .hero-visual {
+    position: relative;
+    width: 600px;
+    max-width: 100%;
+    height: 600px;
+    border-radius: var(--radius-xl);
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+    background-image: var(--hero-img);
+    background-position: var(--hero-position, right center);
+    background-size: var(--hero-size, auto 100%);
+    background-repeat: no-repeat;
+  }
+
+  .hero-visual video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+  }
+
+  .hero-visual.is-video video {
+    opacity: 1;
+  }
+
+  .hero-dots {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .hero-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: rgba(0,0,0,.15);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: width 0.35s cubic-bezier(.4,0,.2,1), background-color 0.35s ease;
+  }
+
+  .hero-dot.active {
+    width: 18px;
+    border-radius: var(--radius-full);
+    background: var(--color-text-primary);
+  }
+
+  .cta-tile-slides {
+    position: relative;
+    flex: 1;
+    align-self: stretch;
+  }
+
+  .cta-tile-slide {
+    position: absolute;
+    z-index: 0;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.4s ease;
+  }
+
+  .cta-tile-slide::before {
+    content: "";
+    position: absolute;
+    top: calc(-1 * var(--space-8));
+    right: calc(-1 * var(--space-8));
+    bottom: calc(-1 * var(--space-8));
+    left: calc(-1 * var(--space-8));
+    z-index: -1;
+    background-image: var(--slide-bg);
+    background-repeat: no-repeat;
+    background-position: right center;
+    background-size: auto 100%;
+  }
+
+  .cta-tile-slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .cta-tile-slider-dots {
+    position: absolute;
+    z-index: 3;
+    left: 0;
+    right: 0;
+    bottom: var(--space-4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  .cta-tile-slider-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    transition: width 0.35s cubic-bezier(.4,0,.2,1), background-color 0.35s ease;
+  }
+
+  .cta-tile-slider-dot.active {
+    width: 18px;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-surface);
+  }
+
+  .trust-line {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: var(--space-3);
+    margin-top: var(--space-8);
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .trust-logos-outer {
+    position: relative;
+    width: 100%;
+    margin-top: var(--space-4);
+    overflow: hidden;
+  }
+
+  .trust-logos-outer::before,
+  .trust-logos-outer::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 48px;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .trust-logos-outer::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--color-bg-page) 0%, transparent 100%);
+  }
+
+  .trust-logos-outer::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--color-bg-page) 0%, transparent 100%);
+  }
+
+  .trust-logos-track {
+    display: flex;
+    width: max-content;
+    animation: trust-logos-scroll 20s linear infinite;
+  }
+
+  .trust-logos {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    gap: var(--space-7);
+    padding-right: var(--space-7);
+  }
+
+  .trust-logos img {
+    height: 40px;
+    width: 40px;
+    object-fit: contain;
+    opacity: 0.55;
+    filter: grayscale(100%);
+    transition: opacity 0.2s ease;
+  }
+
+  @keyframes trust-logos-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .trust-logos img:hover {
+    opacity: 0.9;
+  }
+
+  .hero-logos-static {
+    display: none;
+  }
+
+  .hero-logos-label {
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+    white-space: nowrap;
+  }
+
+  .hero-logos-static img {
+    height: 16px;
+    width: auto;
+    opacity: 0.55;
+  }
+
+  .hero-inline-link {
+    margin-left: var(--space-1);
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-decoration: underline;
+  }
+
+  .hero-inline-link:hover {
+    color: var(--color-text-primary);
+  }
+
+  .trust-avatars {
+    display: flex;
+  }
+
+  .trust-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-bg-muted);
+    border: 2px solid var(--color-bg-page);
+    margin-left: -16px;
+  }
+
+  .trust-avatar:first-child {
+    margin-left: 0;
+  }
+
+  .trust-bold {
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    h1.headline { font-size: 2rem; line-height: 1.08; letter-spacing: -0.05em; }
+    .nav-links.desktop-only { display: none; }
+    .nav-megamenu { display: none; }
+    .sticky-bar { display: none; }
+
+    .hero-visual {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1 / 1;
+    }
+
+    body.short-hero .hero-visual {
+      height: auto;
+    }
+  }
+
+  /* ---------- THUMB STRIP ---------- */
+  .thumb-strip-section {
+    padding: var(--space-8) var(--space-8) var(--space-8);
+  }
+
+  /* ---------- FAQ ---------- */
+  .faq-section {
+    padding: var(--space-40) var(--space-8) var(--space-8);
+  }
+
+  .faq-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: start;
+    gap: var(--space-16);
+    max-width: 1216px;
+    margin: 0 auto;
+  }
+
+  .faq-accordions {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .faq-item {
+    border-radius: var(--radius-md);
+    background: var(--color-bg-muted);
+    overflow: hidden;
+  }
+
+  .faq-question {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    width: 100%;
+    padding: var(--space-5) var(--space-6);
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .faq-chevron {
+    flex: none;
+    width: 20px;
+    height: 20px;
+    transition: transform 0.25s ease;
+  }
+
+  .faq-item.open .faq-chevron {
+    transform: rotate(180deg);
+  }
+
+  .faq-answer {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.4s ease;
+  }
+
+  .faq-answer-inner {
+    overflow: hidden;
+  }
+
+  .faq-answer p {
+    margin: 0;
+    padding: 0 var(--space-6) var(--space-5);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-primary);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .faq-item.open .faq-answer {
+    grid-template-rows: 1fr;
+  }
+
+  .faq-item.open .faq-answer p {
+    opacity: 1;
+    transform: translateY(0);
+    transition-delay: 0.15s;
+  }
+
+  .faq-heading {
+    margin: 0 0 var(--space-6);
+    font-weight: 450;
+    font-size: 3rem;
+    line-height: 1.08;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+  }
+
+  .faq-cta-row {
+    display: flex;
+    gap: var(--space-3);
+  }
+
+  @media (max-width: 800px) {
+    .faq-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ---------- MARQUEE ---------- */
+  .marquee-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    overflow-x: hidden;
+    padding: var(--space-24) 0;
+    background: var(--color-bg-page);
+  }
+
+  .marquee-outer {
+    width: 104%;
+    height: 48px;
+    margin-left: -2%;
+    transform: rotate(-2deg);
+    background: var(--color-bg-accent-subtle);
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+  }
+
+  .marquee-track {
+    display: flex;
+    width: max-content;
+    animation: marquee-scroll 22s linear infinite;
+  }
+
+  .marquee-content {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .marquee-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+    padding: 0 var(--space-7);
+    white-space: nowrap;
+  }
+
+  .marquee-text {
+    font-size: 0.9375rem;
+    line-height: 1;
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .marquee-text-light {
+    font-size: 0.9375rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .marquee-icon {
+    width: 22px;
+    height: 22px;
+    color: var(--color-text-primary);
+    flex: none;
+  }
+
+  @keyframes marquee-scroll {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* ---------- STATEMENT ---------- */
+  .statement-section {
+    padding: var(--space-8) var(--space-8) var(--space-24);
+  }
+
+  .statement {
+    flex-shrink: 0;
+    max-width: 80%;
+    margin: var(--space-6) 0 0;
+    text-align: left;
+    font-weight: 450;
+    font-size: 3rem;
+    line-height: 1.08;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+  }
+
+  .statement-grid {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    margin-top: var(--space-12);
+  }
+
+  .statement-grid.reveal {
+    opacity: 0;
+    transform: translateY(80px);
+    transition: opacity 1s cubic-bezier(.16,1,.3,1), transform 1s cubic-bezier(.16,1,.3,1);
+  }
+
+  .statement-grid.reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .statement-row {
+    display: grid;
+    grid-template-columns: 58fr 42fr;
+    gap: var(--space-4);
+  }
+
+  .statement-row-reverse {
+    grid-template-columns: 42fr 58fr;
+  }
+
+  @media (max-width: 700px) {
+    .statement-row,
+    .statement-row-reverse {
+      grid-template-columns: 1fr;
+    }
+
+    .statement-tile {
+      height: clamp(280px, 70vw, 420px);
+    }
+
+    .statement-tile-image {
+      max-width: 45%;
+    }
+
+    .statement-tile-image-branding-wrap {
+      right: 8%;
+      width: min(336px, 34%);
+    }
+
+    .statement-tile-image-brand2 {
+      bottom: 24px;
+      right: 40%;
+      max-width: 24%;
+    }
+
+    .statement-tile-image-material {
+      max-width: min(220px, 55%);
+    }
+
+    .statement-tile-image-custom-wrap {
+      width: min(149px, 55%);
+    }
+
+    .statement-tile-custom-overlay {
+      width: min(149px, 55%);
+    }
+
+    .statement-tile-custom-overlay img {
+      width: 205px;
+    }
+  }
+
+  .statement-tile {
+    position: relative;
+    height: clamp(280px, calc(30vw + 100px), 480px);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-muted-hover);
+    box-sizing: border-box;
+    padding: var(--space-6);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .statement-tile-d {
+    background: var(--color-bg-muted);
+  }
+
+  .statement-tile-text {
+    flex: 0 0 auto;
+  }
+
+  .statement-tile-media {
+    position: relative;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+    margin: 0 -1.5rem -1.5rem;
+  }
+
+  .statement-tile-title {
+    margin: 0 0 var(--space-2);
+    font-size: 1.25rem;
+    letter-spacing: -0.02em;
+    line-height: 1.16;
+    font-weight: 450;
+    color: var(--color-text-primary);
+  }
+
+  .statement-tile-desc {
+    margin: 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .statement-tile-image {
+    position: absolute;
+    left: 50%;
+    bottom: -33%;
+    transform: translateX(-50%);
+    max-width: 80%;
+    max-height: 65%;
+  }
+
+  .statement-tile-image-branding-wrap {
+    position: absolute;
+    bottom: 0;
+    right: 12%;
+    width: min(336px, 54%);
+    max-height: 100%;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1) 0.15s, transform 0.9s cubic-bezier(.16,1,.3,1) 0.15s;
+  }
+
+  .statement-tile-image-branding-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 336 / 363;
+  }
+
+  .statement-grid.is-visible .statement-tile-image-branding-wrap {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .statement-tile-image-brand2 {
+    position: absolute;
+    bottom: 32px;
+    right: 49%;
+    max-width: 40%;
+    max-height: 45%;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1) 0.3s, transform 0.9s cubic-bezier(.16,1,.3,1) 0.3s;
+  }
+
+  .statement-grid.is-visible .statement-tile-image-brand2 {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .statement-tile-image-custom-wrap {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(24px);
+    width: min(204px, 75%);
+    max-height: 100%;
+    overflow: hidden;
+    opacity: 0;
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1) 0.15s, transform 0.9s cubic-bezier(.16,1,.3,1) 0.15s;
+  }
+
+  .statement-tile-image-custom-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 408 / 680;
+  }
+
+  .statement-grid.is-visible .statement-tile-image-custom-wrap {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .statement-tile-custom-overlay {
+    position: absolute;
+    z-index: 3;
+    bottom: 0;
+    left: 50%;
+    width: min(204px, 75%);
+    aspect-ratio: 408 / 680;
+    transform: translateX(-50%) translateY(24px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1) 0.15s, transform 0.9s cubic-bezier(.16,1,.3,1) 0.15s;
+  }
+
+  .statement-grid.is-visible .statement-tile-custom-overlay {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .statement-tile-custom-overlay img {
+    width: 280px;
+    max-width: none;
+    height: auto;
+  }
+
+  .statement-tile-image-material {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%) translateY(24px);
+    max-width: min(360px, 80%);
+    max-height: 100%;
+    opacity: 0;
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1) 0.15s, transform 0.9s cubic-bezier(.16,1,.3,1) 0.15s;
+  }
+
+  .statement-grid.is-visible .statement-tile-image-material {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  .statement-tile-live3d-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transform: scale(1.15);
+  }
+
+  .statement-tile-live3d-overlay {
+    display: block;
+    position: absolute;
+    bottom: 16%;
+    right: 8%;
+    width: min(96px, 22%);
+    height: auto;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1) 0.15s, transform 0.9s cubic-bezier(.16,1,.3,1) 0.15s;
+  }
+
+  .statement-tile-live3d-overlay-left {
+    display: block;
+    position: absolute;
+    bottom: 5%;
+    left: 8%;
+    width: min(96px, 22%);
+    height: auto;
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.9s cubic-bezier(.16,1,.3,1) 0.3s, transform 0.9s cubic-bezier(.16,1,.3,1) 0.3s;
+  }
+
+  .statement-grid.is-visible .statement-tile-live3d-overlay,
+  .statement-grid.is-visible .statement-tile-live3d-overlay-left {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .serif-word {
+    font-style: italic;
+    letter-spacing: 0;
+  }
+
+  .deco-square {
+    display: inline-block;
+    position: relative;
+    width: 64px;
+    height: 0;
+    vertical-align: middle;
+    margin: 0 var(--space-2);
+  }
+
+  .deco-square:hover {
+    z-index: 9999;
+  }
+
+  .statement-section:has(.deco-square:hover) {
+    transform: none;
+  }
+
+  .deco-square::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 64px;
+    height: 64px;
+    background-color: var(--gray-300);
+    background-image: var(--deco-img);
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--radius-sm);
+    transform: translate(-50%, -50%) rotate(-8deg);
+    transition: width .3s ease, height .3s ease, transform .3s ease;
+  }
+
+  .deco-square:hover::before {
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  @media (max-width: 700px) {
+    .statement { font-size: 1.5rem; line-height: 1.32; letter-spacing: -0.02em; }
+    .statement-section > .btn-pill.lg { width: 100%; }
+
+    .deco-square {
+      width: 32px;
+    }
+
+    .deco-square::before {
+      width: 32px;
+      height: 32px;
+    }
+
+    .deco-square:hover::before {
+      width: 100px;
+      height: 100px;
+    }
+  }
+
+  /* ---------- CATEGORIES ---------- */
+  .categories-section {
+    position: relative;
+    width: 100vw;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-40) 0 var(--space-8);
+  }
+
+  .final-cta-section {
+    padding: var(--space-40) var(--space-8) var(--space-32);
+    text-align: center;
+  }
+
+  .final-cta-heading {
+    margin: 0 auto;
+    max-width: 60rem;
+    font-weight: 500;
+    font-size: 5rem;
+    line-height: 1.04;
+    letter-spacing: -0.06em;
+    color: var(--color-text-primary);
+  }
+
+  .final-cta-subheading {
+    max-width: 32rem;
+    margin: var(--space-6) auto 0;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .final-cta-buttons {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-3);
+    margin-top: var(--space-10);
+  }
+
+  @media (max-width: 700px) {
+    .final-cta-heading { font-size: 2.5rem; line-height: 1.08; letter-spacing: -0.05em; }
+    .final-cta-buttons { flex-direction: column; align-items: stretch; }
+  }
+
+  .final-deco-square {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    margin: 0;
+    transition: width 0.6s cubic-bezier(.34,1.56,.64,1) 1s, margin 0.6s cubic-bezier(.34,1.56,.64,1) 1s;
+  }
+
+  .final-cta-section.is-visible .final-deco-square {
+    width: 64px;
+    margin: 0 var(--space-2);
+  }
+
+  .final-deco-square::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 64px;
+    height: 64px;
+    background-color: var(--gray-300);
+    background-image: var(--deco-img);
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--radius-sm);
+    transform: translate(-50%, -50%) rotate(-8deg) scale(0);
+    transition: width .3s ease, height .3s ease, transform .3s ease;
+    animation: final-deco-cycle 2.5s steps(1) infinite;
+  }
+
+  .final-cta-section.is-visible .final-deco-square::before {
+    animation: final-deco-cycle 2.5s steps(1) infinite, final-deco-appear 0.6s cubic-bezier(.34,1.56,.64,1) 1s forwards;
+  }
+
+  @keyframes final-deco-appear {
+    from { transform: translate(-50%, -50%) rotate(-8deg) scale(0); }
+    to   { transform: translate(-50%, -50%) rotate(-8deg) scale(1); }
+  }
+
+  @keyframes final-deco-cycle {
+    0%   { background-image: url('5065069-packhelp-29640.avif'); }
+    20%  { background-image: url('5020808-packhelp-29409.avif'); }
+    40%  { background-image: url('4662199-packhelp-27342.avif'); }
+    60%  { background-image: url('3271617-packhelp-20271.avif'); }
+    80%  { background-image: url('7655716-packhelp-09-2021-0547.avif'); }
+    100% { background-image: url('5065069-packhelp-29640.avif'); }
+  }
+
+  .final-deco-square:hover::before {
+    width: 200px;
+    height: 200px;
+    transform: translate(-50%, -50%) rotate(0deg) scale(1);
+  }
+
+  .hero-deco-square {
+    display: inline-block;
+    position: relative;
+    width: 0;
+    height: 0;
+    vertical-align: middle;
+    margin: 0;
+    transition: width 0.6s cubic-bezier(.34,1.56,.64,1), margin 0.6s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  body.hero-centered .hero-deco-square {
+    width: 56px;
+    margin: 0 0.5rem;
+  }
+
+  .hero-deco-square::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 56px;
+    height: 56px;
+    background-color: var(--gray-300);
+    background-size: cover;
+    background-position: center;
+    border-radius: var(--radius-sm);
+    transform: translate(-50%, -50%) rotate(-8deg) scale(0);
+    transition: transform 0.6s cubic-bezier(.34,1.56,.64,1);
+  }
+
+  body.hero-centered .hero-deco-square::before {
+    transform: translate(-50%, -50%) rotate(-8deg) scale(1);
+    animation: final-deco-cycle 2.5s steps(1) infinite;
+  }
+
+  body.hero-centered .hero-deco-square:nth-of-type(2)::before {
+    animation: hero-deco-cycle-2 2.5s steps(1) infinite;
+    animation-delay: 1.25s;
+  }
+
+  @keyframes hero-deco-cycle-2 {
+    0%   { background-image: url('793725-pre-printed-mailer-box.avif'); }
+    20%  { background-image: url('507697-packhelp-28291.avif'); }
+    40%  { background-image: url('2948760-ziplock-bag-0.avif'); }
+    60%  { background-image: url('404068-export.avif'); }
+    80%  { background-image: url('208230-paper-bag-01.avif'); }
+    100% { background-image: url('793725-pre-printed-mailer-box.avif'); }
+  }
+
+  .section-badge {
+    display: none;
+    margin: 0 0 var(--space-3);
+    padding: var(--space-1) var(--space-3);
+    background: var(--color-bg-muted-hover);
+    color: var(--color-text-muted);
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    border-radius: var(--radius-full);
+  }
+
+  .categories-section .section-badge {
+    margin-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+  }
+
+  .cta-content .section-badge {
+    background: var(--color-bg-inverse);
+    color: rgba(255,255,255,.7);
+    border: 1px solid rgba(255,255,255,.12);
+  }
+
+  body.show-badge .cta-content .section-badge {
+    display: block;
+    width: fit-content;
+    margin-left: max(0px, calc((100% - 44rem) / 2));
+  }
+
+  body.show-badge .section-badge {
+    display: inline-block;
+  }
+
+  body.short-hero .hero-visual {
+    height: 460px;
+  }
+
+  body.hero-centered .hero-right {
+    display: none;
+  }
+
+  body.hero-centered .hero-grid {
+    grid-template-columns: 1fr;
+    max-width: 76rem;
+    text-align: center;
+  }
+
+  body.hero-centered .hero-left {
+    align-items: center;
+    padding-right: 0;
+  }
+
+  body.hero-centered h1.headline {
+    max-width: none;
+    font-size: 4.5rem;
+    font-weight: 500;
+    line-height: 1.04;
+    letter-spacing: -0.06em;
+  }
+
+  body.hero-centered .hero-subheading {
+    display: none;
+  }
+
+  body.hero-centered .cta-row {
+    align-items: center;
+  }
+
+  body.hero-centered .hero-cta-buttons {
+    justify-content: center;
+  }
+
+  body.hero-centered .trust-line {
+    display: none;
+  }
+
+  body.hero-centered .trust-logos-outer {
+    display: none;
+  }
+
+  body.hero-centered .hero-logos-static {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-top: 40px;
+  }
+
+  body.hero-centered .hero {
+    padding-top: var(--space-24);
+  }
+
+  @media (max-width: 700px) {
+    body.hero-centered h1.headline {
+      font-size: 2.5rem;
+      letter-spacing: -0.05em;
+      line-height: 1.08;
+    }
+  }
+
+  .categories-heading {
+    margin: 0 0 var(--space-1);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    font-weight: 500;
+    font-size: 2rem;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
+    color: var(--color-text-primary);
+  }
+
+
+  .categories-subheading {
+    margin: 0 0 var(--space-6);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    padding-right: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .scroll-carousel {
+    position: relative;
+  }
+
+  .scroll-carousel-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%) scale(1);
+    opacity: 1;
+    transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.15s ease;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: var(--radius-full);
+    background: rgba(255, 255, 255, 0.9);
+    color: var(--color-text-primary);
+    cursor: pointer;
+    z-index: 3;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+  }
+
+  .scroll-carousel-nav.prev {
+    left: var(--space-4);
+  }
+
+  .scroll-carousel-nav.next {
+    right: var(--space-4);
+  }
+
+  .scroll-carousel-nav svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .scroll-carousel-nav::after {
+    content: "";
+    position: absolute;
+    inset: -8px;
+  }
+
+  .scroll-carousel.has-overflow .scroll-carousel-nav {
+    display: flex;
+  }
+
+  .scroll-carousel.has-overflow .scroll-carousel-nav[disabled] {
+    transform: translateY(-50%) scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .categories-section .scroll-carousel-nav {
+    top: 160px;
+  }
+
+  .categories-grid {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding-bottom: var(--space-2);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    padding-right: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+  }
+
+  .category-item {
+    flex: 0 0 auto;
+    width: 320px;
+  }
+
+  .category-thumb {
+    position: relative;
+    height: 320px;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+  }
+
+  .category-thumb::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--thumb-img);
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.4s ease;
+  }
+
+  .category-item:hover .category-thumb::before {
+    transform: scale(1.08);
+  }
+
+  .category-title {
+    margin: var(--space-4) 0 var(--space-1);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .category-desc {
+    margin: 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .toggle-switch {
+    position: relative;
+    display: inline-flex;
+    gap: var(--space-1);
+    padding: var(--space-1);
+    margin-bottom: var(--space-6);
+    border-radius: var(--radius-full);
+    background: var(--color-bg-muted);
+  }
+
+  .section-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    padding-left: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+    padding-right: calc((100vw - min(100vw, var(--max-w))) / 2 + 2rem);
+  }
+
+  .section-toolbar .toggle-switch {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 700px) {
+    .section-toolbar {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .section-toolbar > .btn-pill {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  .toggle-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    left: 0;
+    width: 0;
+    border-radius: var(--radius-full);
+    background: var(--color-bg-surface);
+    box-shadow: 0 1px 2px rgba(0,0,0,.08);
+    transition: transform 0.3s ease, width 0.3s ease;
+  }
+
+  .toggle-option {
+    position: relative;
+    z-index: 1;
+    border: none;
+    background: transparent;
+    padding: var(--space-2) var(--space-5);
+    border-radius: var(--radius-full);
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+    cursor: pointer;
+    transition: color 0.15s ease;
+  }
+
+  .toggle-option.active {
+    color: var(--color-text-primary);
+  }
+
+
+  .thumb-strip {
+    display: flex;
+    gap: var(--space-4);
+    overflow-x: auto;
+    padding: var(--space-2) 0;
+    opacity: 1;
+    transition: opacity 0.2s ease;
+  }
+
+  .thumb-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-3);
+    flex: 1 1 112px;
+    flex-shrink: 0;
+    min-width: 112px;
+    max-width: 200px;
+  }
+
+  .thumb-photo {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background-color: var(--color-bg-muted);
+  }
+
+  .thumb-photo::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background-image: var(--thumb-img);
+    background-size: cover;
+    background-position: center;
+    transition: transform 0.3s ease;
+  }
+
+  .thumb-item:hover .thumb-photo::before {
+    transform: scale(1.08);
+  }
+
+  .thumb-caption {
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  /* ---------- PASSWORD GATE ---------- */
+  .password-gate {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--color-bg-page);
+  }
+
+  .password-gate-form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-4);
+    max-width: 320px;
+    width: 100%;
+    padding: var(--space-8);
+    text-align: center;
+    box-sizing: border-box;
+  }
+
+  .password-gate-title {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  /* .password-gate-input lives in components.css */
+
+  .password-gate-error {
+    margin: 0;
+    color: var(--color-danger);
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  /* ---------- SITE SETTINGS ---------- */
+  .site-settings-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 1000;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--color-bg-surface);
+    border: 1px solid rgba(0,0,0,.08);
+    box-shadow: 0 4px 16px rgba(0,0,0,.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .site-settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,.18);
+  }
+
+  .site-settings-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .site-settings-panel {
+    position: fixed;
+    bottom: 92px;
+    right: 24px;
+    z-index: 1000;
+    width: 280px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,.18);
+    padding: var(--space-5);
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+
+  .site-settings-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .site-settings-title {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .site-settings-row + .site-settings-row {
+    margin-top: var(--space-4);
+  }
+
+  .site-settings-label {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-desc {
+    margin: var(--space-1) 0 0;
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  /* .site-toggle lives in components.css */
+
+  body.hide-captions .categories-subheading {
+    display: none;
+  }
+
+  body.hide-captions .categories-heading {
+    margin-bottom: var(--space-2);
+  }
+
+  /* ---------- FOOTER ---------- */
+  .site-footer {
+    position: relative;
+    padding: var(--space-16) 0 0;
+  }
+
+  .site-footer::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-inner {
+    padding: 0 var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-12);
+    justify-content: space-between;
+  }
+
+  .footer-left {
+    flex: 0 1 420px;
+    max-width: 460px;
+  }
+
+  .footer-logo {
+    display: inline-flex;
+  }
+
+  .footer-logo img {
+    height: 26px;
+    width: auto;
+  }
+
+  .footer-newsletter-copy {
+    margin: var(--space-5) 0 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    line-height: 1.32;
+    color: var(--color-text-muted);
+  }
+
+  .footer-newsletter {
+    display: flex;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+  }
+
+  /* .footer-newsletter-input lives in components.css */
+
+  .footer-newsletter-btn {
+    flex: 0 0 auto;
+  }
+
+  .footer-badges {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-6);
+  }
+
+  .footer-badge {
+    display: flex;
+    padding: var(--space-2);
+    border: 1px solid var(--color-border-hover);
+    border-radius: var(--radius-sm);
+  }
+
+  .footer-badge img {
+    height: 44px;
+    width: auto;
+  }
+
+  .footer-links {
+    display: flex;
+    flex: 0 1 auto;
+    gap: var(--space-14);
+  }
+
+  .footer-col {
+    width: 200px;
+    flex: 0 0 auto;
+  }
+
+  .footer-col-group {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-10);
+  }
+
+  .footer-col-title {
+    margin: 0 0 1rem;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  .footer-col ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .footer-col a {
+    color: var(--color-text-primary);
+    text-decoration: none;
+    font-size: 0.9375rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+  }
+
+  .footer-col a:hover {
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    position: relative;
+    margin-top: var(--space-14);
+  }
+
+  .footer-bottom::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100vw;
+    transform: translateX(-50%);
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .footer-bottom-inner {
+    padding: var(--space-6) var(--space-8);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    flex-wrap: wrap;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  @media (max-width: 700px) {
+    .site-footer { padding: 3rem 0 0; }
+    .footer-inner { padding: 0 1.5rem; }
+    .footer-bottom-inner { padding: 1.5rem; }
+    .footer-newsletter { flex-direction: column; align-items: stretch; }
+    .footer-links { flex-wrap: wrap; gap: 2rem 1.5rem; }
+  }
+
+</style>
+</head>
+<body>
+
+<div id="passwordGate" class="password-gate">
+  <form id="passwordGateForm" class="password-gate-form">
+    <p class="password-gate-title">This preview is password protected</p>
+    <input type="password" id="passwordGateInput" class="password-gate-input" placeholder="Enter password" autocomplete="off">
+    <button type="submit" class="btn-pill lg">Enter</button>
+    <p class="password-gate-error" id="passwordGateError" style="display:none;">Incorrect password, try again.</p>
+  </form>
+</div>
+
+<div id="siteContent" style="display:none;">
+
+<div class="announcement-bar">
+  <span>The more products you add, the more you save. Code: <strong>BUNDLEUP</strong></span>
+  <button class="announcement-copy" aria-label="Copy code">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+  </button>
+</div>
+
+<div id="ph-sticky-bar"></div>
+
+<div class="container">
+  <div id="ph-nav-wrapper"></div>
+  <script src="nav-header.js"></script>
+
+  <section class="hero">
+    <div class="hero-grid">
+      <div class="hero-left">
+        <h1 class="headline">Custom <span class="hero-deco-square"></span> packaging, made to measure. And everything <span class="hero-deco-square"></span> inside it.</h1>
+        <p class="hero-subheading">Explore, design and order branded products your customers will love.</p>
+        <div class="cta-row">
+          <div class="hero-cta-buttons">
+            <a href="Listing/packaging.html" class="btn-pill lg">Shop now<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+            <a href="get-a-quote.html" class="btn-pill lg secondary">Get a quote<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+            <a href="Build_your_box/dist/index.html" class="hero-inline-link">or Build your box</a>
+          </div>
+          <div class="trust-line">
+            <span><span class="trust-bold">Trusted by 125 300</span> global companies</span>
+          </div>
+          <div class="trust-logos-outer">
+            <div class="trust-logos-track">
+              <div class="trust-logos">
+                <img src="https://img.logo.dev/hm.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="H&amp;M">
+                <img src="https://img.logo.dev/backmarket.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="Back Market">
+                <img src="https://img.logo.dev/hims.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="hims">
+                <img src="https://img.logo.dev/ubereats.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="Uber Eats">
+                <img src="https://img.logo.dev/heinz.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="Heinz">
+                <img src="https://img.logo.dev/vinted.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="Vinted">
+                <img src="https://img.logo.dev/glossier.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="Glossier">
+                <img src="https://img.logo.dev/oatly.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="Oatly">
+              </div>
+              <div class="trust-logos" aria-hidden="true">
+                <img src="https://img.logo.dev/hm.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+                <img src="https://img.logo.dev/backmarket.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+                <img src="https://img.logo.dev/hims.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+                <img src="https://img.logo.dev/ubereats.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+                <img src="https://img.logo.dev/heinz.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+                <img src="https://img.logo.dev/vinted.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+                <img src="https://img.logo.dev/glossier.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+                <img src="https://img.logo.dev/oatly.com?token=pk_FonKU4KMQo6h0do32M2s_g&size=80&format=png" alt="">
+              </div>
+            </div>
+          </div>
+          <div class="hero-logos-static">
+            <span class="hero-logos-label">Trusted by 125 300 companies</span>
+            <img src="logotypes/logo-backmarket.svg" alt="Back Market">
+            <img src="logotypes/logo-hims.svg" alt="hims">
+            <img src="logotypes/logo-hm.svg" alt="H&amp;M">
+            <img src="logotypes/logo-loreal.svg" alt="L'Oréal">
+            <img src="logotypes/logo-oatly.svg" alt="Oatly">
+            <img src="logotypes/logo-ubereats.svg" alt="Uber Eats">
+            <img src="logotypes/logo-vinted.svg" alt="Vinted">
+            <img src="logotypes/logo-aesop.svg" alt="Aesop">
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="hero-visual" id="heroVisual" style="--hero-img:url('hero.png'); --hero-size:auto 100%; --hero-position:right center;">
+          <video id="heroVideo" src="hero.mp4" muted loop playsinline></video>
+        </div>
+        <div class="hero-dots" id="heroDots">
+          <button class="hero-dot active" data-index="0" aria-label="Slide 1"></button>
+          <button class="hero-dot" data-index="1" aria-label="Slide 2"></button>
+          <button class="hero-dot" data-index="2" aria-label="Slide 3"></button>
+          <button class="hero-dot" data-index="3" aria-label="Slide 4"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="thumb-strip-section reveal">
+    <div class="toggle-switch" id="toggleSwitch">
+      <div class="toggle-indicator" id="toggleIndicator"></div>
+      <button class="toggle-option active" data-target="categories">Categories</button>
+      <button class="toggle-option" data-target="merchandise">Merchandise</button>
+      <button class="toggle-option" data-target="industries">Industries</button>
+    </div>
+
+    <div class="thumb-strip" id="thumbStrip">
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('793725-pre-printed-mailer-box.avif')"></div>
+        <span class="thumb-caption">Boxes</span>
+      </div>
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('507697-packhelp-28291.avif')"></div>
+        <span class="thumb-caption">Packaging Tubes</span>
+      </div>
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('2948760-ziplock-bag-0.avif')"></div>
+        <span class="thumb-caption">Mailing Bags</span>
+      </div>
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('404068-export.avif')"></div>
+        <span class="thumb-caption">Accessories</span>
+      </div>
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('193249-stand-up-pouch-brown 1.png')"></div>
+        <span class="thumb-caption">Pouches</span>
+      </div>
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('208230-paper-bag-01.avif')"></div>
+        <span class="thumb-caption">Packaging Bags</span>
+      </div>
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('240486-padded-envelope.avif')"></div>
+        <span class="thumb-caption">Envelopes</span>
+      </div>
+
+      <div class="thumb-item">
+        <div class="thumb-photo" style="--thumb-img:url('225638-pp-single-walled-cup-custom-200-ml.avif')"></div>
+        <span class="thumb-caption">Food Packaging</span>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="faq-section reveal">
+    <div class="faq-grid">
+
+      <div class="faq-text">
+        <span class="section-badge">Why Packhelp</span>
+        <h2 class="faq-heading">Everything your brand ships — made simple.</h2>
+        <div class="faq-cta-row">
+          <a href="Listing/packaging.html" class="btn-pill lg">Shop now<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+          <a href="get-a-quote.html" class="btn-pill lg secondary">Get a quote<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        </div>
+      </div>
+
+      <div class="faq-accordions">
+        <div class="faq-item">
+          <button class="faq-question">One partner for your entire packaging range<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>Source all types of packaging from one trusted partner. With XXX custom packaging products across ZZZ variants, Packhelp helps you consolidate suppliers, simplify coordination and manage your entire packaging portfolio in one place.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">Expert support, end to end<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>One dedicated packaging expert oversees your project from brief to delivery. We help select the right solution, tailor commercial terms, and develop custom structures or cost optimisations around your operational requirements.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">Design, order and deliver with ease<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>Our advanced online editor lets you create, customise and order packaging exactly to specification. Visualise your design, configure every detail and move seamlessly from concept to production, with selected products delivered in as little as 48 hours.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">Flexible supply, better economics<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>We optimise more than the box, from unit costs and production planning to warehousing and call-off deliveries. Produce in bulk, store with us, and access flexible payment terms of up to 120 days.</p></div></div>
+        </div>
+
+        <div class="faq-item">
+          <button class="faq-question">Responsibility built into every choice<svg class="faq-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg></button>
+          <div class="faq-answer"><div class="faq-answer-inner"><p>Compare FSC-certified papers, recycled content and product-level CO₂ data before placing an order. Clear material information and measurable impact data help your teams make responsible decisions without compromising performance, design or cost.</p></div></div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="categories-section reveal">
+    <span class="section-badge">Custom packaging</span>
+    <h2 class="categories-heading">Whatever you make, we pack it.</h2>
+    <p class="categories-subheading">150+ packaging products across six families. Printed around your brand, at yours in days.</p>
+
+    <div class="section-toolbar">
+      <div class="toggle-switch" id="industryToggleSwitch">
+        <div class="toggle-indicator" id="industryToggleIndicator"></div>
+        <button class="toggle-option active" data-target="ecommerce">E-commerce</button>
+        <button class="toggle-option" data-target="health">Health &amp; Beauty</button>
+        <button class="toggle-option" data-target="food">Food &amp; Drinks</button>
+        <button class="toggle-option" data-target="apparel">Apparel &amp; Fashion</button>
+      </div>
+      <button class="btn-pill secondary sm">See all packaging<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+    <div class="scroll-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="categories-grid" id="packagingGrid"></div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <section class="categories-section reveal">
+    <span class="section-badge">Kits &amp; branded merch</span>
+    <h2 class="categories-heading">The box was never meant to be empty.</h2>
+    <p class="categories-subheading">130+ products, curated so you never scroll through 2,500 pens. Printed with your brand and packed into your box.</p>
+
+    <div class="section-toolbar">
+      <div class="toggle-switch" id="gearToggleSwitch">
+        <div class="toggle-indicator" id="gearToggleIndicator"></div>
+        <button class="toggle-option active" data-target="onboarding">Onboarding packs</button>
+        <button class="toggle-option" data-target="restaurants">Restaurants</button>
+        <button class="toggle-option" data-target="events">Events</button>
+      </div>
+      <button class="btn-pill secondary sm">See all merch<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></button>
+    </div>
+
+    <div class="scroll-carousel">
+      <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+      </button>
+      <div class="categories-grid" id="gearGrid">
+
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('onboarding-apparel.png')"></div>
+          <h3 class="category-title">Apparel</h3>
+          <p class="category-desc">Hoodies and tees people wear on weekends.</p>
+        </div>
+
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('onboarding-notebook.png')"></div>
+          <h3 class="category-title">Notebooks &amp; pens</h3>
+          <p class="category-desc">The desk, upgraded.</p>
+        </div>
+
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('onboarding-bag.png')"></div>
+          <h3 class="category-title">Bags &amp; backpacks</h3>
+          <p class="category-desc">From tote to commuter.</p>
+        </div>
+
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('onboarding-drinkware.png')"></div>
+          <h3 class="category-title">Drinkware</h3>
+          <p class="category-desc">Bottles and mugs that stay on the desk.</p>
+        </div>
+
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('onboarding-treats.png')"></div>
+          <h3 class="category-title">Treats &amp; wellness</h3>
+          <p class="category-desc">The first-day smile.</p>
+        </div>
+
+        <div class="category-item">
+          <div class="category-thumb" style="--thumb-img:url('316d75aaa2c7afdcd0cadda80f9efa3b.jpg')"></div>
+          <h3 class="category-title">Tech &amp; gadgets</h3>
+          <p class="category-desc">Power banks, chargers, cables.</p>
+        </div>
+
+      </div>
+      <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <section class="marquee-section">
+    <div class="marquee-outer">
+      <div class="marquee-track">
+        <div class="marquee-content">
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        </div>
+        <div class="marquee-content" aria-hidden="true">
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+          <span class="marquee-item"><span class="marquee-phrase"><span class="marquee-text-light">Minutes away from</span> <span class="marquee-text">perfect packaging</span></span><svg class="marquee-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 8 12 3 3 8l9 5 9-5Z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/></svg></span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="statement-section reveal">
+    <p class="statement">The world's easiest way to design<span class="deco-square" style="--deco-img:url('5065069-packhelp-29640.avif')"></span>custom packaging. Paper, size<span class="deco-square" style="--deco-img:url('4756660-packhelp-27382.avif')"></span>brand colour, your logo, a live 3D preview. Everything you need to go from a blank box<span class="deco-square" style="--deco-img:url('12802ec5def88cc057d2b234135160e3.jpg')"></span>to a shelf-ready package, in one editor.</p>
+
+    <a href="build-your-box.html" class="btn-pill lg" style="margin-top: 2rem;">Open the editor<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+
+    <div class="statement-grid reveal">
+      <div class="statement-row">
+        <div class="statement-tile statement-tile-a">
+          <div class="statement-tile-text">
+            <h3 class="statement-tile-title">Your branding</h3>
+            <p class="statement-tile-desc">Customize colours, patterns and shapes</p>
+          </div>
+          <div class="statement-tile-media">
+            <img class="statement-tile-image" src="blur.png?v=2" alt="">
+            <div class="statement-tile-image-branding-wrap">
+              <img src="branding-1.png?v=2" alt="">
+            </div>
+            <img class="statement-tile-image-brand2" src="branding-2.png" alt="">
+          </div>
+        </div>
+        <div class="statement-tile statement-tile-b">
+          <div class="statement-tile-text">
+            <h3 class="statement-tile-title">Custom sizing</h3>
+            <p class="statement-tile-desc">Resize and reshape to your individual needs</p>
+          </div>
+          <div class="statement-tile-media">
+            <div class="statement-tile-image-custom-wrap">
+              <img src="custom1.png" alt="">
+            </div>
+            <div class="statement-tile-custom-overlay" style="transition-delay: 0.2s">
+              <img src="custom0.png" alt="Height 12 cm, Length 9 cm, Width 17 cm">
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="statement-row statement-row-reverse">
+        <div class="statement-tile statement-tile-c">
+          <div class="statement-tile-text">
+            <h3 class="statement-tile-title">Material variety</h3>
+            <p class="statement-tile-desc">Choose from hundreds of variants of corrugated, cardstock and rigid packaging</p>
+          </div>
+          <div class="statement-tile-media">
+            <img class="statement-tile-image-material" src="material.png" alt="">
+          </div>
+        </div>
+        <div class="statement-tile statement-tile-d">
+          <div class="statement-tile-text">
+            <h3 class="statement-tile-title">Live 3D preview</h3>
+            <p class="statement-tile-desc">See packaging appear in real time in 3D</p>
+          </div>
+          <div class="statement-tile-media">
+            <video class="statement-tile-live3d-video" src="box-rotation.mp4" autoplay muted loop playsinline></video>
+            <img class="statement-tile-live3d-overlay-left" src="editor-live-preview-2.png" alt="">
+            <img class="statement-tile-live3d-overlay" src="editor-live-preview-1.png" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section reveal">
+    <div class="cta-card">
+      <div class="cta-blob cta-blob-1"></div>
+      <div class="cta-blob cta-blob-2"></div>
+      <div class="cta-blob cta-blob-3"></div>
+      <div class="cta-grain"></div>
+
+      <div class="cta-content">
+        <span class="section-badge">At any scale</span>
+        <p class="cta-text">One supplier for everything your brand ships. When packaging becomes a line in your P&amp;L, you need more than a webshop. A warehouse, an invoice that behaves, and people who answer.</p>
+
+        <ul class="cta-usps">
+          <li><svg class="cta-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>High volumes</li>
+          <li><svg class="cta-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Flexible payment options</li>
+          <li><svg class="cta-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Optimised costs</li>
+          <li><svg class="cta-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Prototyping</li>
+          <li><svg class="cta-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Complex packaging projects</li>
+          <li><svg class="cta-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Fast custom quotes</li>
+          <li><svg class="cta-usp-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>Dedicated packaging expert</li>
+        </ul>
+
+        <div class="cta-buttons">
+          <button class="btn-pill lg">
+            <span class="cta-avatars">
+              <span class="cta-avatar"><img src="expert-01.png" alt=""></span>
+              <span class="cta-avatar"><img src="expert-02.png" alt=""></span>
+              <span class="cta-avatar"><img src="expert-03.png" alt=""></span>
+            </span>
+            Book an expert consultation
+            <svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+          </button>
+          <a href="get-a-quote.html" class="btn-pill lg outline-light">Get a quote<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+        </div>
+
+        <div class="scroll-carousel">
+          <button class="scroll-carousel-nav prev" type="button" aria-label="Przewiń w lewo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></svg>
+          </button>
+          <div class="cta-tiles">
+          <div class="cta-tile cta-tile-video">
+            <video class="cta-tile-video-bg" src="5817229.mp4" autoplay muted loop playsinline></video>
+            <div class="cta-tile-video-overlay"></div>
+            <p class="cta-tile-title">Thousands of products, one invoice</p>
+            <div class="cta-tile-pills-wrap">
+              <div class="cta-tile-pills">
+                <div class="cta-pill-row cta-pill-row-1">
+                  <span class="cta-pill" style="transition-delay: 0s"><span class="cta-pill-img"><img src="https://cdn-pim.packhelp.com/assets/694a8b84-0ce5-4de2-a4c1-271ffb31013b/2001862-ziplock-thumb?w=640&fit=min&auto=format" alt=""></span>Frosted Ziplock Bag</span>
+                  <span class="cta-pill" style="transition-delay: 0.15s"><span class="cta-pill-img"><img src="https://cdn-pim.packhelp.com/assets/a0e98036-3664-4d14-82be-146aa0b1a31c/603891-om-packaging-1?w=640&fit=min&auto=format" alt=""></span>Snap Lock Box</span>
+                </div>
+                <div class="cta-pill-row cta-pill-row-2">
+                  <span class="cta-pill" style="transition-delay: 0.3s"><span class="cta-pill-img"><img src="https://cdn-pim.packhelp.com/assets/1c8f331b-87b6-4fbb-9c9d-fea1d65ddcc7/128308-0428799-e-bd-2-f-4020-931-b-398-bdc-5-f-2-cfa-png?w=640&fit=min&auto=format" alt=""></span>Mailer Box</span>
+                  <span class="cta-pill" style="transition-delay: 0.45s"><span class="cta-pill-img"><img src="https://cdn-pim.packhelp.com/assets/0df7f906-e452-4388-a8d8-1b90d109de53/89199-718-caa-93-5442-48-c-4-9990-27-f-41-f-66-b-385-png?w=640&fit=min&auto=format" alt=""></span>Rigid Magnetic Box</span>
+                </div>
+                <div class="cta-pill-row cta-pill-row-3">
+                  <span class="cta-pill" style="transition-delay: 0.6s"><span class="cta-pill-img"><img src="https://cdn-pim.packhelp.com/assets/e78b410c-109d-4a65-b4a3-dd018790372e/240486-padded-envelope?w=640&fit=min&auto=format" alt=""></span>Eco Padded Enveloper</span>
+                  <span class="cta-pill cta-pill-pay" id="ctaPayPill" style="transition-delay: 0.75s">
+                    Pay Invoice
+                    <svg class="cta-pay-arrow" id="ctaPayArrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="cta-tile cta-tile-video">
+            <video class="cta-tile-video-bg" src="6668870.mp4" autoplay muted loop playsinline></video>
+            <div class="cta-tile-video-overlay"></div>
+            <p class="cta-tile-title">A packaging advisor replies within a day</p>
+            <div class="cta-tile-bubbles">
+              <span class="cta-tile-bubble" id="ctaBubble1">At 8,000 units we can hold 9 business days.</span>
+              <span class="cta-tile-bubble" id="ctaBubble2">I'll lock the slot now, you confirm by Friday.</span>
+            </div>
+            <div class="cta-tile-composer">
+              <span class="cta-tile-composer-text" id="ctaComposerText"></span>
+              <span class="cta-tile-composer-send" id="ctaComposerSend">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="cta-tile cta-tile-gradient" id="testimonialTile">
+            <div class="cta-tile-slides" id="testimonialSlides">
+              <div class="cta-tile-slide active" style="--slide-bg:url('usecase-bg-01.png')">
+                <p class="cta-tile-title cta-tile-quote">&ldquo;Testing is key to get the formula perfect. It&rsquo;s all about product + packing + communication.&rdquo;</p>
+                <div class="cta-tile-testimonial">
+                  <div class="cta-tile-avatar" style="--avatar-img:url('studycase-avatar-01.png')"></div>
+                  <p class="cta-tile-person-name">Alexis Castaneda</p>
+                  <p class="cta-tile-person-role">Head of Operations</p>
+                </div>
+              </div>
+              <div class="cta-tile-slide" style="--slide-bg:url('usecase-bg-02.png')">
+                <p class="cta-tile-title cta-tile-quote">&ldquo;The transparency of all the processes, from design to invoicing, was something that we were looking for.&rdquo;</p>
+                <div class="cta-tile-testimonial">
+                  <div class="cta-tile-avatar" style="--avatar-img:url('studycase-avatar-02.png')"></div>
+                  <p class="cta-tile-person-name">Miquel Regidor</p>
+                  <p class="cta-tile-person-role">Operations Manager at Tropicfeel</p>
+                </div>
+              </div>
+              <div class="cta-tile-slide" style="--slide-bg:url('usecase-bg-03.png')">
+                <p class="cta-tile-title cta-tile-quote">&ldquo;Packhelp has been an invaluable partner for us throughout our packaging journey. Working with them is always exciting.&rdquo;</p>
+                <div class="cta-tile-testimonial">
+                  <div class="cta-tile-avatar" style="--avatar-img:url('studycase-avatar-03.png')"></div>
+                  <p class="cta-tile-person-name">Xhenis Ramaxhiku</p>
+                  <p class="cta-tile-person-role">Operations @ Browniegod</p>
+                </div>
+              </div>
+            </div>
+            <div class="cta-tile-slider-dots" id="testimonialDots">
+              <button class="cta-tile-slider-dot active" type="button" aria-label="Slide 1"></button>
+              <button class="cta-tile-slider-dot" type="button" aria-label="Slide 2"></button>
+              <button class="cta-tile-slider-dot" type="button" aria-label="Slide 3"></button>
+            </div>
+          </div>
+        </div>
+          <button class="scroll-carousel-nav next" type="button" aria-label="Przewiń w prawo">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="final-cta-section reveal">
+    <h2 class="final-cta-heading">Everything in the box.<br>And the <span class="final-deco-square"></span> box.</h2>
+    <p class="final-cta-subheading">The box, the bag, the bottle, the hoodie. Made to measure, ready when you are.</p>
+    <div class="final-cta-buttons">
+      <a href="Listing/packaging.html" class="btn-pill lg">Shop now<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+      <a href="get-a-quote.html" class="btn-pill lg secondary">Get a quote<svg class="btn-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></a>
+    </div>
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <a href="#" class="footer-logo" aria-label="Packhelp"><img src="logo-packhelp.1iheyVke.svg" alt="Packhelp"></a>
+
+        <p class="footer-newsletter-copy">Don't miss out – get 15% off your first order when you join the newsletter.</p>
+
+        <form class="footer-newsletter">
+          <input type="email" class="footer-newsletter-input" placeholder="Your email" required>
+          <button type="submit" class="btn-pill md footer-newsletter-btn">Sign up</button>
+        </form>
+
+        <div class="footer-badges">
+          <span class="footer-badge"><img src="https://zapakuj.to/_astro/fsc-badge.CT_C2C6x.svg" alt="FSC certified"></span>
+          <span class="footer-badge"><img src="https://zapakuj.to/_astro/esg-badge-yellow-black.C3wtyeOu.svg" alt="ESG badge"></span>
+        </div>
+      </div>
+
+      <div class="footer-links">
+        <div class="footer-col-group">
+          <div class="footer-col">
+            <p class="footer-col-title">Contact &amp; Help</p>
+            <ul>
+              <li><a href="#">Contact us</a></li>
+              <li><a href="#">Send us a brief</a></li>
+              <li><a href="#">Help</a></li>
+              <li><a href="#">Return policy</a></li>
+              <li><a href="#">Impressum</a></li>
+              <li><a href="#">Press</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <p class="footer-col-title">Company</p>
+            <ul>
+              <li><a href="#">Press</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-col-group">
+          <div class="footer-col">
+            <p class="footer-col-title">Sustainability</p>
+            <ul>
+              <li><a href="#">Sustainability Hub</a></li>
+              <li><a href="#">Our Progress Reports</a></li>
+              <li><a href="#">Responsible Supply Chain</a></li>
+              <li><a href="#">Eco badge</a></li>
+            </ul>
+          </div>
+
+          <div class="footer-col">
+            <p class="footer-col-title">Resources</p>
+            <ul>
+              <li><a href="#">Blog</a></li>
+              <li><a href="#">Terms of service</a></li>
+              <li><a href="#">Privacy policy</a></li>
+              <li><a href="#">Whistleblowing policy</a></li>
+              <li><a href="#">Sitemap</a></li>
+              <li><a href="#">Cookie settings</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <p class="footer-col-title">Connect</p>
+          <ul>
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">X</a></li>
+            <li><a href="#">Pinterest</a></li>
+            <li><a href="#">Tiktok</a></li>
+            <li><a href="#">Linkedin</a></li>
+            <li><a href="#">Youtube</a></li>
+            <li><a href="#">Facebook</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="footer-bottom-inner">
+        <span>Copyright Packhelp 2025</span>
+        <span>Business Hours Monday - Friday 8:00-15:00</span>
+      </div>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function () {
+    var faqItems = document.querySelectorAll('.faq-item');
+    faqItems.forEach(function (item) {
+      item.querySelector('.faq-question').addEventListener('click', function () {
+        item.classList.toggle('open');
+      });
+    });
+  })();
+
+  (function () {
+    var categories = [
+      { label: 'Boxes', image: '793725-pre-printed-mailer-box.avif' },
+      { label: 'Packaging Tubes', image: '507697-packhelp-28291.avif' },
+      { label: 'Mailing Bags', image: '2948760-ziplock-bag-0.avif' },
+      { label: 'Accessories', image: '404068-export.avif' },
+      { label: 'Pouches', image: '193249-stand-up-pouch-brown 1.png' },
+      { label: 'Packaging Bags', image: '208230-paper-bag-01.avif' },
+      { label: 'Envelopes', image: '240486-padded-envelope.avif' },
+      { label: 'Food Packaging', image: '225638-pp-single-walled-cup-custom-200-ml.avif' }
+    ];
+    var merchandise = [
+      { label: 'Clothing' },
+      { label: 'Office supplies', image: 'https://cdn-pim.packhelp.com/assets/2aba6539-6e81-4b8b-b239-bedb352c55a6/666797-office-supplies?w=1112&h=800&fit=min&auto=format' },
+      { label: 'Tech accessories', image: 'https://cdn-pim.packhelp.com/assets/702ceb42-37c2-4fe6-88aa-5f67c4492a90/203457-tech-accessories?w=1112&h=800&fit=min&auto=format' },
+      { label: 'Drinkware' },
+      { label: 'Home accessories', image: 'https://cdn-pim.packhelp.com/assets/ec444445-7471-4eec-874b-8bd0a8827042/240580-home-accessories?w=1112&h=800&fit=min&auto=format' },
+      { label: 'Bags', image: 'https://cdn-pim.packhelp.com/assets/f899a6fd-4462-49ae-a756-91f2ad2261e3/429179-bags?w=1112&h=800&fit=min&auto=format' },
+      { label: 'Merchandise packaging', image: 'https://cdn-pim.packhelp.com/assets/3e18d2c9-d1a1-4bd9-8f56-c1ef82e217d6/566664-packaging?w=1112&h=800&fit=min&auto=format' },
+      { label: 'Sets' }
+    ];
+    var industries = [
+      { label: 'E-commerce', image: 'industies-ecommerce.png' },
+      { label: 'Beauty & Cosmetics', image: 'industies-beauty.png' },
+      { label: 'Food & Beverage', image: 'industies-food.png' },
+      { label: 'Fashion & Apparel', image: 'industies-fashion.png' },
+      { label: 'Health & Wellness', image: 'industies-health.png' },
+      { label: 'Electronics', image: 'industies-electronic.png' },
+      { label: 'Home & Lifestyle', image: 'industies-home.png' },
+      { label: 'Events & Agencies', image: '04917e61ae687fdcb83a00a4edd3d6e7.jpg' }
+    ];
+
+    var thumbLists = { categories: categories, merchandise: merchandise, industries: industries };
+
+    function itemsHtml(list) {
+      return list.map(function (item) {
+        var label = item.label || item;
+        var image = item.image;
+        var style = image ? ' style="--thumb-img:url(\'' + image + '\')"' : '';
+        return '<div class="thumb-item"><div class="thumb-photo"' + style + '></div><span class="thumb-caption">' + label + '</span></div>';
+      }).join('');
+    }
+
+    var switchEl = document.getElementById('toggleSwitch');
+    var indicator = document.getElementById('toggleIndicator');
+    var strip = document.getElementById('thumbStrip');
+    var options = switchEl.querySelectorAll('.toggle-option');
+
+    function moveIndicator(el) {
+      indicator.style.width = el.offsetWidth + 'px';
+      indicator.style.transform = 'translateX(' + el.offsetLeft + 'px)';
+    }
+
+    options.forEach(function (option) {
+      option.addEventListener('click', function () {
+        if (option.classList.contains('active')) { return; }
+        options.forEach(function (o) { o.classList.remove('active'); });
+        option.classList.add('active');
+        moveIndicator(option);
+
+        strip.style.opacity = '0';
+        setTimeout(function () {
+          strip.innerHTML = itemsHtml(thumbLists[option.getAttribute('data-target')] || categories);
+          strip.style.opacity = '1';
+        }, 200);
+      });
+    });
+
+    moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    window.addEventListener('resize', function () {
+      moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    });
+  })();
+
+  (function () {
+    var items = [
+      { title: 'Boxes', desc: 'Mailer, shipping, product, rigid.' },
+      { title: 'Tubes &amp; envelopes', desc: 'Tube boxes, mailing tubes, padded.' },
+      { title: 'Bags &amp; pouches', desc: 'Mailing, carrier, drawstring, zip.' },
+      { title: 'Containers', desc: 'Bottles and jars, label-ready.' },
+      { title: 'Food packaging', desc: 'Pizza boxes, cups, takeout.' },
+      { title: 'Accessories', desc: 'Tissue, fillers, tape, labels, stickers.' }
+    ];
+
+    var packagingTabs = {
+      ecommerce: [
+        '5065069-packhelp-29640.avif',
+        '5121637-packhelp-27910.avif',
+        '4854400-packhelp-27683.avif',
+        '4976409-packhelp-29353.avif',
+        '4756660-packhelp-27382.avif',
+        '5918223-mg-packhelp-02-2109-4000-px.avif'
+      ],
+      health: [
+        'health-boxes.png',
+        'health-tubes.png',
+        'health-bags.png',
+        'health-containters.png',
+        null,
+        null
+      ],
+      food: [
+        'food-boxes.png',
+        'food-tubes.png',
+        'food-bags.png',
+        'food-containters.png',
+        'food-food.png',
+        'food-accesories.png'
+      ],
+      apparel: [null, null, null, null, null, null]
+    };
+
+    var switchEl = document.getElementById('industryToggleSwitch');
+    var indicator = document.getElementById('industryToggleIndicator');
+    var grid = document.getElementById('packagingGrid');
+    var options = switchEl.querySelectorAll('.toggle-option');
+
+    function moveIndicator(el) {
+      indicator.style.width = el.offsetWidth + 'px';
+      indicator.style.transform = 'translateX(' + el.offsetLeft + 'px)';
+    }
+
+    function renderGrid(tabKey) {
+      var images = packagingTabs[tabKey];
+      grid.innerHTML = items.map(function (item, i) {
+        var image = images[i];
+        var thumbStyle = image ? ' style="--thumb-img:url(\'' + image + '\')"' : '';
+        return '<div class="category-item">' +
+          '<div class="category-thumb"' + thumbStyle + '></div>' +
+          '<h3 class="category-title">' + item.title + '</h3>' +
+          '<p class="category-desc">' + item.desc + '</p>' +
+          '</div>';
+      }).join('');
+    }
+
+    options.forEach(function (option) {
+      option.addEventListener('click', function () {
+        if (option.classList.contains('active')) { return; }
+        options.forEach(function (o) { o.classList.remove('active'); });
+        option.classList.add('active');
+        moveIndicator(option);
+        renderGrid(option.getAttribute('data-target'));
+      });
+    });
+
+    renderGrid('ecommerce');
+    moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    window.addEventListener('resize', function () {
+      moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    });
+  })();
+
+  (function () {
+    var items = [
+      { title: 'Apparel', desc: 'Hoodies and tees people wear on weekends.' },
+      { title: 'Notebooks &amp; pens', desc: 'The desk, upgraded.' },
+      { title: 'Bags &amp; backpacks', desc: 'From tote to commuter.' },
+      { title: 'Drinkware', desc: 'Bottles and mugs that stay on the desk.' },
+      { title: 'Treats &amp; wellness', desc: 'The first-day smile.' },
+      { title: 'Tech &amp; gadgets', desc: 'Power banks, chargers, cables.' }
+    ];
+
+    var gearTabs = {
+      onboarding: [
+        'onboarding-apparel.png',
+        'onboarding-notebook.png',
+        'onboarding-bag.png',
+        'onboarding-drinkware.png',
+        'onboarding-treats.png',
+        '316d75aaa2c7afdcd0cadda80f9efa3b.jpg'
+      ],
+      events: ['events-apparel.png', 'events-notebook.png', 'events-bag.png', null, null, null],
+      restaurants: [
+        'restaurants-apparel.png',
+        'restaurants-notebook.png',
+        'restaurants-bag.png',
+        'restaurants-drinkware.png',
+        'restaurants-treats.png',
+        'restaurants-gadget.png'
+      ]
+    };
+
+    var switchEl = document.getElementById('gearToggleSwitch');
+    var indicator = document.getElementById('gearToggleIndicator');
+    var grid = document.getElementById('gearGrid');
+    var options = switchEl.querySelectorAll('.toggle-option');
+
+    function moveIndicator(el) {
+      indicator.style.width = el.offsetWidth + 'px';
+      indicator.style.transform = 'translateX(' + el.offsetLeft + 'px)';
+    }
+
+    function renderGrid(tabKey) {
+      var images = gearTabs[tabKey];
+      grid.innerHTML = items.map(function (item, i) {
+        var image = images[i];
+        var thumbStyle = image ? ' style="--thumb-img:url(\'' + image + '\')"' : '';
+        return '<div class="category-item">' +
+          '<div class="category-thumb"' + thumbStyle + '></div>' +
+          '<h3 class="category-title">' + item.title + '</h3>' +
+          '<p class="category-desc">' + item.desc + '</p>' +
+          '</div>';
+      }).join('');
+    }
+
+    options.forEach(function (option) {
+      option.addEventListener('click', function () {
+        if (option.classList.contains('active')) { return; }
+        options.forEach(function (o) { o.classList.remove('active'); });
+        option.classList.add('active');
+        moveIndicator(option);
+        renderGrid(option.getAttribute('data-target'));
+      });
+    });
+
+    moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    window.addEventListener('resize', function () {
+      moveIndicator(switchEl.querySelector('.toggle-option.active'));
+    });
+  })();
+
+  (function () {
+    var navRow1 = document.querySelector('.nav-row1');
+    var stickyBar = document.getElementById('stickyBar');
+
+    function onScroll() {
+      var rect = navRow1.getBoundingClientRect();
+      var pinned = rect.bottom <= 0;
+      stickyBar.classList.toggle('is-pinned', pinned);
+
+      var minTop = 12;
+      var naturalTop = rect.top + rect.height / 2 - stickyBar.offsetHeight / 2;
+      stickyBar.style.top = Math.max(minTop, naturalTop) + 'px';
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+    onScroll();
+  })();
+
+  (function () {
+    var targets = document.querySelectorAll('.reveal');
+    var observer = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    targets.forEach(function (el) { observer.observe(el); });
+  })();
+
+  (function () {
+    var el = document.getElementById('ctaComposerText');
+    var bubble1 = document.getElementById('ctaBubble1');
+    var bubble2 = document.getElementById('ctaBubble2');
+    var sendBtn = document.getElementById('ctaComposerSend');
+    if (!el || !bubble1 || !bubble2 || !sendBtn) { return; }
+
+    var phrases = ['Can lead time go under 2 weeks', 'if we bump to 8,000?'];
+    var phraseIndex = 0;
+    var charIndex = 0;
+
+    function pulseSend() {
+      sendBtn.classList.remove('pulse');
+      void sendBtn.offsetWidth;
+      sendBtn.classList.add('pulse');
+    }
+
+    function typeTick() {
+      var phrase = phrases[phraseIndex];
+      charIndex++;
+      el.textContent = phrase.slice(0, charIndex);
+
+      if (charIndex >= phrase.length) {
+        var isLastPhrase = phraseIndex === phrases.length - 1;
+        setTimeout(function () {
+          if (isLastPhrase) { pulseSend(); }
+          phraseIndex++;
+          charIndex = 0;
+          el.textContent = '';
+
+          if (phraseIndex >= phrases.length) {
+            showPlaceholder();
+            return;
+          }
+
+          setTimeout(typeTick, 400);
+        }, 1800);
+        return;
+      }
+
+      setTimeout(typeTick, 45);
+    }
+
+    function showPlaceholder() {
+      el.textContent = 'Type your message...';
+      el.classList.add('is-placeholder');
+
+      setTimeout(function () { bubble1.classList.add('show'); }, 500);
+      setTimeout(function () { bubble2.classList.add('show'); }, 1600);
+
+      setTimeout(resetSequence, 4200);
+    }
+
+    function resetSequence() {
+      bubble1.classList.remove('show');
+      bubble2.classList.remove('show');
+      el.classList.remove('is-placeholder');
+      el.textContent = '';
+      phraseIndex = 0;
+      charIndex = 0;
+      setTimeout(typeTick, 600);
+    }
+
+    typeTick();
+  })();
+
+  (function () {
+    var pill = document.getElementById('ctaPayPill');
+    var arrow = document.getElementById('ctaPayArrow');
+    if (!pill || !arrow) { return; }
+
+    function blinkLoop() {
+      setTimeout(function () {
+        arrow.classList.remove('show');
+        setTimeout(function () {
+          arrow.classList.add('show');
+          blinkLoop();
+        }, 3000);
+      }, 3000);
+    }
+
+    var arrowObserver = new IntersectionObserver(function (entries) {
+      entries.forEach(function (entry) {
+        if (entry.isIntersecting) {
+          setTimeout(function () {
+            arrow.classList.add('show');
+            blinkLoop();
+          }, 1000);
+          arrowObserver.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    arrowObserver.observe(pill);
+  })();
+
+  (function () {
+    var images = ['hero.png', 'hero2.png', 'hero3.png', null];
+    var sizes = ['auto 100%', 'auto 100%', 'auto 100%', 'auto 100%'];
+    var positions = ['right center', 'center center', 'center center', 'center center'];
+    var durations = [3000, 3000, 3000, 15000];
+    var visual = document.getElementById('heroVisual');
+    var video = document.getElementById('heroVideo');
+    var dotsWrap = document.getElementById('heroDots');
+    if (!visual || !dotsWrap) { return; }
+    var dots = dotsWrap.querySelectorAll('.hero-dot');
+    var index = 0;
+    var timer;
+
+    function show(i) {
+      index = (i + images.length) % images.length;
+      var isVideo = images[index] === null;
+      visual.classList.toggle('is-video', isVideo);
+      if (isVideo) {
+        if (video) { video.currentTime = 0; video.play(); }
+      } else {
+        if (video) { video.pause(); }
+        visual.style.setProperty('--hero-img', "url('" + images[index] + "')");
+        visual.style.setProperty('--hero-size', sizes[index]);
+        visual.style.setProperty('--hero-position', positions[index]);
+      }
+      dots.forEach(function (dot, d) { dot.classList.toggle('active', d === index); });
+    }
+
+    function restartTimer() {
+      clearTimeout(timer);
+      timer = setTimeout(function () { show(index + 1); restartTimer(); }, durations[index]);
+    }
+
+    dots.forEach(function (dot) {
+      dot.addEventListener('click', function () {
+        show(parseInt(dot.dataset.index, 10));
+        restartTimer();
+      });
+    });
+
+    window.addEventListener('keydown', function (e) {
+      if (e.key === 'ArrowRight') { show(index + 1); restartTimer(); }
+      if (e.key === 'ArrowLeft') { show(index - 1); restartTimer(); }
+    });
+
+    restartTimer();
+  })();
+
+</script>
+
+<button id="siteSettingsBtn" class="site-settings-btn" aria-label="Site settings">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+</button>
+
+<div id="siteSettingsPanel" class="site-settings-panel">
+  <p class="site-settings-title">Page customization</p>
+  <div class="site-settings-row">
+    <div>
+      <p class="site-settings-label">Show captions</p>
+      <p class="site-settings-desc">Subheading copy under section titles</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleCaptions" checked>
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+  <div class="site-settings-row">
+    <div>
+      <p class="site-settings-label">Custom packaging badge</p>
+      <p class="site-settings-desc">Small badge above "Whatever you make, we pack it."</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleBadge">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+  <div class="site-settings-row">
+    <div>
+      <p class="site-settings-label">Short hero</p>
+      <p class="site-settings-desc">Hero image height: 460px</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleShortHero">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+  <div class="site-settings-row">
+    <div>
+      <p class="site-settings-label">Centered hero</p>
+      <p class="site-settings-desc">No hero image, layout like "Everything in the box."</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="toggleHeroCentered">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+  <div class="site-settings-row">
+    <div>
+      <p class="site-settings-label">Pulsing dots</p>
+      <p class="site-settings-desc">Red "click here" indicators on Packaging, Industries, Start now</p>
+    </div>
+    <label class="site-toggle">
+      <input type="checkbox" id="togglePulseDots">
+      <span class="site-toggle-track"><span class="site-toggle-thumb"></span></span>
+    </label>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var btn = document.getElementById('siteSettingsBtn');
+    var panel = document.getElementById('siteSettingsPanel');
+    var toggle = document.getElementById('toggleCaptions');
+
+    btn.addEventListener('click', function (e) {
+      e.stopPropagation();
+      panel.classList.toggle('open');
+    });
+
+    document.addEventListener('click', function (e) {
+      if (!panel.contains(e.target) && e.target !== btn) {
+        panel.classList.remove('open');
+      }
+    });
+
+    function applyCaptions(show) {
+      document.body.classList.toggle('hide-captions', !show);
+      toggle.checked = show;
+    }
+
+    var saved = localStorage.getItem('hideCaptions');
+    applyCaptions(saved !== '1');
+
+    toggle.addEventListener('change', function () {
+      applyCaptions(toggle.checked);
+      localStorage.setItem('hideCaptions', toggle.checked ? '0' : '1');
+    });
+
+    var badgeToggle = document.getElementById('toggleBadge');
+
+    function applyBadge(show) {
+      document.body.classList.toggle('show-badge', show);
+      badgeToggle.checked = show;
+    }
+
+    applyBadge(localStorage.getItem('showBadge') === '1');
+
+    badgeToggle.addEventListener('change', function () {
+      applyBadge(badgeToggle.checked);
+      localStorage.setItem('showBadge', badgeToggle.checked ? '1' : '0');
+    });
+
+    var shortHeroToggle = document.getElementById('toggleShortHero');
+
+    function applyShortHero(active) {
+      document.body.classList.toggle('short-hero', active);
+      shortHeroToggle.checked = active;
+    }
+
+    applyShortHero(localStorage.getItem('shortHero') === '1');
+
+    shortHeroToggle.addEventListener('change', function () {
+      applyShortHero(shortHeroToggle.checked);
+      localStorage.setItem('shortHero', shortHeroToggle.checked ? '1' : '0');
+    });
+
+    var heroCenteredToggle = document.getElementById('toggleHeroCentered');
+
+    function applyHeroCentered(active) {
+      document.body.classList.toggle('hero-centered', active);
+      heroCenteredToggle.checked = active;
+    }
+
+    applyHeroCentered(localStorage.getItem('heroCentered') !== '0');
+
+    heroCenteredToggle.addEventListener('change', function () {
+      applyHeroCentered(heroCenteredToggle.checked);
+      localStorage.setItem('heroCentered', heroCenteredToggle.checked ? '1' : '0');
+    });
+
+    // hide-pulse-dots class is applied on every page by nav-header.js — this
+    // just keeps the checkbox in sync and lets the user flip it from here.
+    var pulseDotsToggle = document.getElementById('togglePulseDots');
+
+    function applyPulseDots(show) {
+      document.body.classList.toggle('hide-pulse-dots', !show);
+      pulseDotsToggle.checked = show;
+    }
+
+    applyPulseDots(localStorage.getItem('pulseDotsHidden') !== '1');
+
+    pulseDotsToggle.addEventListener('change', function () {
+      applyPulseDots(pulseDotsToggle.checked);
+      localStorage.setItem('pulseDotsHidden', pulseDotsToggle.checked ? '0' : '1');
+    });
+  })();
+</script>
+
+<script>
+  (function () {
+    var carousels = document.querySelectorAll('.scroll-carousel');
+
+    Array.prototype.forEach.call(carousels, function (carousel) {
+      var prevBtn = carousel.querySelector('.scroll-carousel-nav.prev');
+      var nextBtn = carousel.querySelector('.scroll-carousel-nav.next');
+      var track = null;
+
+      for (var i = 0; i < carousel.children.length; i++) {
+        var child = carousel.children[i];
+        if (child !== prevBtn && child !== nextBtn) {
+          track = child;
+          break;
+        }
+      }
+
+      if (!prevBtn || !nextBtn || !track) {
+        return;
+      }
+
+      function updateNavState() {
+        var maxScroll = track.scrollWidth - track.clientWidth;
+        prevBtn.disabled = track.scrollLeft <= 0;
+        nextBtn.disabled = track.scrollLeft >= maxScroll - 1;
+      }
+
+      function checkOverflow() {
+        var overflowing = track.scrollWidth > track.clientWidth + 1;
+        carousel.classList.toggle('has-overflow', overflowing);
+        updateNavState();
+      }
+
+      prevBtn.addEventListener('click', function () {
+        track.scrollBy({ left: -track.clientWidth * 0.8, behavior: 'smooth' });
+      });
+
+      nextBtn.addEventListener('click', function () {
+        track.scrollBy({ left: track.clientWidth * 0.8, behavior: 'smooth' });
+      });
+
+      track.addEventListener('scroll', updateNavState);
+      window.addEventListener('resize', checkOverflow);
+
+      if (window.ResizeObserver) {
+        new ResizeObserver(checkOverflow).observe(track);
+      } else {
+        checkOverflow();
+      }
+    });
+  })();
+
+  (function () {
+    var tile = document.getElementById('testimonialTile');
+    if (!tile) { return; }
+
+    var slides = tile.querySelectorAll('.cta-tile-slide');
+    var dots = tile.querySelectorAll('.cta-tile-slider-dot');
+    var current = 0;
+    var timer;
+
+    function goToSlide(index) {
+      current = index;
+      slides.forEach(function (slide, i) {
+        slide.classList.toggle('active', i === index);
+      });
+      dots.forEach(function (dot, i) {
+        dot.classList.toggle('active', i === index);
+      });
+    }
+
+    function startAutoplay() {
+      clearInterval(timer);
+      timer = setInterval(function () {
+        goToSlide((current + 1) % slides.length);
+      }, 3000);
+    }
+
+    dots.forEach(function (dot, i) {
+      dot.addEventListener('click', function () {
+        goToSlide(i);
+        startAutoplay();
+      });
+    });
+
+    startAutoplay();
+  })();
+</script>
+
+</div>
+
+<script>
+  (function () {
+    var CORRECT_PASSWORD = 'shipbox42';
+    var gate = document.getElementById('passwordGate');
+    var content = document.getElementById('siteContent');
+    var form = document.getElementById('passwordGateForm');
+    var input = document.getElementById('passwordGateInput');
+    var error = document.getElementById('passwordGateError');
+
+    function unlock() {
+      gate.style.display = 'none';
+      content.style.display = '';
+      window.dispatchEvent(new Event('resize'));
+    }
+
+    if (sessionStorage.getItem('phGateOk') === '1') {
+      unlock();
+    }
+
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      if (input.value === CORRECT_PASSWORD) {
+        sessionStorage.setItem('phGateOk', '1');
+        unlock();
+      } else {
+        error.style.display = 'block';
+        input.value = '';
+        input.focus();
+      }
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1699,12 +1699,16 @@
     gap: 24px;
   }
 
+  /* Same size/weight/color as .editor-field-label-text (e.g. "Get
+     branding with AI" in the real Branding step) instead of a small
+     uppercase eyebrow — reads as part of the same form, not a distinct
+     dialog convention. */
   .editor-modal-section-label {
     margin: 0 0 10px;
-    font-size: 0.75rem;
-    letter-spacing: .02em;
-    text-transform: uppercase;
-    color: var(--color-text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
   }
 
   .editor-modal-logo-grid {
@@ -1767,28 +1771,83 @@
   }
 
   .editor-modal-color-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    display: flex;
+    flex-wrap: wrap;
     gap: 10px;
   }
 
+  /* Same plain-square swatch as the real Branding step's palette
+     (.editor-color-swatch) — no hex text baked onto the tile itself, that
+     only shows in a dark tooltip on hover (see ::after below), same
+     recipe as .editor-color-toast elsewhere in this file. */
   .editor-modal-color-swatch {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 44px;
-    border: 2px solid transparent;
+    position: relative;
+    flex: none;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    border: none;
     border-radius: var(--radius-sm);
-    font-size: 0.75rem;
-    font-weight: 500;
-    letter-spacing: -0.02em;
     cursor: pointer;
-    box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .08);
-    transition: border-color .15s ease;
+    box-shadow: 0 0 0 2px transparent;
+    transition: box-shadow .15s ease;
   }
 
   .editor-modal-color-swatch.is-selected {
-    border-color: var(--color-accent);
+    box-shadow: 0 0 0 2px var(--white), 0 0 0 4px var(--color-accent);
+  }
+
+  .editor-modal-color-swatch::after {
+    content: attr(data-color);
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    margin-bottom: 10px;
+    padding: 6px 10px;
+    background: var(--rich-blue);
+    color: var(--white);
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    border-radius: var(--radius-sm);
+    box-shadow: 0 4px 12px 0 rgba(0, 0, 0, .15);
+    opacity: 0;
+    transform: translateX(-50%) translateY(4px);
+    transition: opacity .15s ease, transform .15s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .editor-modal-color-swatch::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    bottom: 100%;
+    margin-bottom: 4px;
+    transform: translateX(-50%) translateY(4px);
+    border: 5px solid transparent;
+    border-top-color: var(--rich-blue);
+    opacity: 0;
+    transition: opacity .15s ease, transform .15s ease;
+    pointer-events: none;
+    z-index: 10;
+  }
+
+  .editor-modal-color-swatch:hover::after,
+  .editor-modal-color-swatch:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* White is invisible against the modal's own white background — the one
+     exception that gets a subtle inset border so it stays legible as a
+     swatch instead of reading as an empty gap. Case-insensitive attribute
+     match needs no JS: every swatch already carries data-color. */
+  .editor-color-swatch[data-color="#ffffff" i],
+  .editor-modal-color-swatch[data-color="#ffffff" i] {
+    box-sizing: border-box;
+    border: 1px solid var(--gray-400);
   }
 
   .editor-modal-font-grid {
@@ -1806,6 +1865,7 @@
     background: none;
     border: 2px solid var(--gray-300);
     border-radius: var(--radius-sm);
+    text-align: left; /* buttons default to center — this tile's content never should */
     cursor: pointer;
     transition: border-color .15s ease;
   }
@@ -1818,16 +1878,42 @@
     border-color: var(--color-accent);
   }
 
+  /* Not on Google Fonts — can't actually be applied (there's nothing to
+     load), so the tile is inert rather than a selectable option that
+     silently does nothing. */
+  .editor-modal-font-tile.is-unavailable {
+    cursor: not-allowed;
+    opacity: .55;
+  }
+
+  .editor-modal-font-tile.is-unavailable:hover {
+    border-color: var(--gray-300);
+  }
+
   .editor-modal-font-preview {
+    width: 100%;
     font-size: 1.5rem;
     line-height: 1;
+    text-align: left;
     color: var(--color-text-primary);
   }
 
   .editor-modal-font-name {
+    width: 100%;
     font-size: 0.8125rem;
     letter-spacing: -0.02em;
+    text-align: left;
     color: var(--color-text-secondary);
+  }
+
+  .editor-modal-font-unavailable-note {
+    width: 100%;
+    margin: 0;
+    font-size: 0.75rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    text-align: left;
+    color: var(--color-text-muted);
   }
 
   .editor-modal-toggle-label {
@@ -2972,14 +3058,31 @@
     // the browser falls back to the rest of the stack — same graceful
     // degradation already accepted for the "Google Sans" option.
     var loadedGoogleFonts = {};
+    function googleFontCssUrl(fontName) {
+      return 'https://fonts.googleapis.com/css2?family='
+        + encodeURIComponent(fontName).replace(/%20/g, '+') + ':wght@400;700&display=swap';
+    }
+
     function ensureGoogleFontLoaded(fontName) {
       if (loadedGoogleFonts[fontName]) return;
       loadedGoogleFonts[fontName] = true;
       var link = document.createElement('link');
       link.rel = 'stylesheet';
-      link.href = 'https://fonts.googleapis.com/css2?family='
-        + encodeURIComponent(fontName).replace(/%20/g, '+') + ':wght@400;700&display=swap';
+      link.href = googleFontCssUrl(fontName);
       document.head.appendChild(link);
+    }
+
+    // Real availability check — Google's own API is the source of truth for
+    // whether this family exists at all, rather than optimistically
+    // assuming it does. It answers with a plain HTTP status (200 for a
+    // real family, 400 otherwise); the 400 response carries no CORS
+    // header, so a cross-origin fetch() for it rejects outright — either
+    // outcome (a resolved non-ok response or a rejected promise) is read
+    // the same way here, both meaning "not available."
+    function checkGoogleFontAvailable(fontName) {
+      return fetch(googleFontCssUrl(fontName), { method: 'HEAD', mode: 'cors' })
+        .then(function (res) { return res.ok; })
+        .catch(function () { return false; });
     }
 
     // Step 3 font picker's selection logic, reused by the website-fetch
@@ -3490,14 +3593,25 @@
         try { return new URL(href, baseUrl).href; } catch (e) { return null; }
       }
 
-      // ---- extraction from the fetched (inert — DOMParser never runs
-      // <script> tags) document + collected CSS text ----
-      function contrastText(hex) {
-        var r = parseInt(hex.slice(1, 3), 16), g = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16);
-        var luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        return luminance > 0.6 ? '#00061A' : '#FFFFFF';
+      // Reduces a Facebook/Instagram link down to just the profile handle
+      // — e.g. "https://www.instagram.com/acmecorp/?hl=en" -> "acmecorp"
+      // — since the Elements field is meant to hold a profile name, not a
+      // full URL. Only the first path segment is kept, so a link into a
+      // sub-page (.../acmecorp/reels/) still reduces to the handle alone.
+      function socialHandleFromUrl(href, baseUrl) {
+        var resolved = resolveUrl(href, baseUrl);
+        if (!resolved) return href;
+        try {
+          var path = new URL(resolved).pathname.replace(/^\/+/, '').replace(/\/+$/, '');
+          var firstSegment = path.split('/')[0];
+          return firstSegment || href;
+        } catch (e) {
+          return href;
+        }
       }
 
+      // ---- extraction from the fetched (inert — DOMParser never runs
+      // <script> tags) document + collected CSS text ----
       function normalizeHex(hex) {
         hex = hex.toLowerCase();
         if (hex.length === 4) hex = '#' + hex[1] + hex[1] + hex[2] + hex[2] + hex[3] + hex[3];
@@ -3604,15 +3718,16 @@
         return out;
       }
 
-      // Stores the actual href (not just a found/not-found flag) — Apply
-      // pre-fills the Instagram/Facebook fields in Elements with these, so
-      // the real profile URL is what needs keeping, not a boolean.
-      function extractSocialLinks(doc) {
+      // Stores just the profile handle (not a found/not-found flag, and not
+      // the full URL) — Apply pre-fills the Instagram/Facebook fields in
+      // Elements with these, and that field is meant to hold a profile
+      // name like "acmecorp", not "https://www.instagram.com/acmecorp/".
+      function extractSocialLinks(doc, baseUrl) {
         var found = {};
         Array.prototype.forEach.call(doc.querySelectorAll('a[href]'), function (a) {
           var href = a.getAttribute('href') || '';
-          if (!found.facebook && /facebook\.com/i.test(href)) found.facebook = href;
-          if (!found.instagram && /instagram\.com/i.test(href)) found.instagram = href;
+          if (!found.facebook && /facebook\.com/i.test(href)) found.facebook = socialHandleFromUrl(href, baseUrl);
+          if (!found.instagram && /instagram\.com/i.test(href)) found.instagram = socialHandleFromUrl(href, baseUrl);
         });
         return found;
       }
@@ -3729,24 +3844,34 @@
             if (!fontNames.length) fontNames = ['Poppins'];
 
             var logos = extractLogoCandidates(doc, url.href);
-            var social = extractSocialLinks(doc);
+            var social = extractSocialLinks(doc, url.href);
             var slogan = extractSlogan(doc);
 
-            currentKit = {
-              domain: url.hostname,
-              displayDomain: /^www\./.test(url.hostname) ? url.hostname : 'www.' + url.hostname,
-              accent: colorHexes[0],
-              colors: colorHexes,
-              logos: logos,
-              fonts: fontNames,
-              slogan: slogan,
-              social: social
-            };
-            renderKit(currentKit);
+            // A name already in the picker's fixed list is guaranteed
+            // available (it's loaded at page load, see the <head> Google
+            // Fonts <link>s); anything else needs a real check against
+            // Google Fonts before it can be offered as a selectable tile.
+            return Promise.all(fontNames.map(function (name) {
+              return findFontOption(name) ? Promise.resolve(true) : checkGoogleFontAvailable(name);
+            })).then(function (availabilities) {
+              var fonts = fontNames.map(function (name, i) { return { name: name, available: availabilities[i] }; });
 
-            lastFetchedRawInput = rawInput;
-            lastKit = currentKit;
-            updateFetchButtonState();
+              currentKit = {
+                domain: url.hostname,
+                displayDomain: /^www\./.test(url.hostname) ? url.hostname : 'www.' + url.hostname,
+                accent: colorHexes[0],
+                colors: colorHexes,
+                logos: logos,
+                fonts: fonts,
+                slogan: slogan,
+                social: social
+              };
+              renderKit(currentKit);
+
+              lastFetchedRawInput = rawInput;
+              lastKit = currentKit;
+              updateFetchButtonState();
+            });
           })
           .catch(function (err) {
             currentKit = null;
@@ -3786,20 +3911,23 @@
         return tile;
       }
 
-      function buildFontTile(fontName, isSelected) {
+      function buildFontTile(fontObj, isSelected) {
+        var fontName = fontObj.name;
         var option = findFontOption(fontName);
-        var family = option ? option.style.fontFamily : ('"' + fontName.replace(/"/g, '') + '", sans-serif');
-        if (!option) ensureGoogleFontLoaded(fontName);
 
         var tile = document.createElement('button');
         tile.type = 'button';
-        tile.className = 'editor-modal-font-tile' + (isSelected ? ' is-selected' : '');
+        tile.className = 'editor-modal-font-tile';
         tile.dataset.font = fontName;
 
+        // Large preview is a fixed sample string, not the font's own name —
+        // the name (real text, always legible) belongs to the label below;
+        // the point of the big line is to show what the TYPEFACE looks
+        // like, which a self-referential "Roboto" rendered in Roboto
+        // doesn't really demonstrate as well as a generic sample does.
         var preview = document.createElement('span');
         preview.className = 'editor-modal-font-preview';
-        preview.style.fontFamily = family;
-        preview.textContent = fontName;
+        preview.textContent = 'Abcdefgh';
 
         var label = document.createElement('span');
         label.className = 'editor-modal-font-name';
@@ -3807,6 +3935,26 @@
 
         tile.appendChild(preview);
         tile.appendChild(label);
+
+        if (!fontObj.available) {
+          // Not a real Google Fonts family — there's nothing to actually
+          // apply, so the tile is disabled rather than a selectable option
+          // that would silently do nothing when picked. Preview stays in
+          // the default UI font instead of the (nonexistent) target one.
+          tile.classList.add('is-unavailable');
+          tile.disabled = true;
+          var note = document.createElement('p');
+          note.className = 'editor-modal-font-unavailable-note';
+          note.textContent = 'Not available as a web font';
+          tile.appendChild(note);
+          return tile;
+        }
+
+        if (isSelected) tile.classList.add('is-selected');
+        var family = option ? option.style.fontFamily : ('"' + fontName.replace(/"/g, '') + '", sans-serif');
+        if (!option) ensureGoogleFontLoaded(fontName);
+        preview.style.fontFamily = family;
+
         return tile;
       }
 
@@ -3850,14 +3998,19 @@
           swatch.type = 'button';
           swatch.className = 'editor-modal-color-swatch' + (i < 4 ? ' is-selected' : '');
           swatch.style.background = hex;
-          swatch.style.color = contrastText(hex);
           swatch.dataset.color = hex;
-          swatch.textContent = hex.toUpperCase();
+          swatch.setAttribute('aria-label', hex.toUpperCase());
           colorGrid.appendChild(swatch);
         });
 
+        // Default selection goes to the first AVAILABLE font — selecting
+        // one that's disabled would just leave nothing chosen at all.
+        var defaultFontIndex = -1;
+        for (var fi = 0; fi < kit.fonts.length; fi++) {
+          if (kit.fonts[fi].available) { defaultFontIndex = fi; break; }
+        }
         fontGrid.innerHTML = '';
-        kit.fonts.forEach(function (fontName, i) { fontGrid.appendChild(buildFontTile(fontName, i === 0)); });
+        kit.fonts.forEach(function (fontObj, i) { fontGrid.appendChild(buildFontTile(fontObj, i === defaultFontIndex)); });
 
         var hasSlogan = kit.slogan.length > 0;
         sloganInput.value = kit.slogan;
@@ -3898,7 +4051,7 @@
 
       fontGrid.addEventListener('click', function (e) {
         var tile = e.target.closest('.editor-modal-font-tile');
-        if (!tile) return;
+        if (!tile || tile.disabled) return; // disabled <button> elements don't dispatch click anyway — belt and suspenders
         fontGrid.querySelectorAll('.is-selected').forEach(function (el) { el.classList.remove('is-selected'); });
         tile.classList.add('is-selected');
       });

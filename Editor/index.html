@@ -946,9 +946,9 @@
     justify-content: center;
     height: 28px;
     padding: 0 14px;
-    background: var(--rich-blue);
+    background: var(--color-accent);
     color: var(--white);
-    border: none;
+    border: 1px solid transparent;
     border-radius: var(--radius-full);
     font-family: inherit;
     font-size: 0.8125rem;
@@ -956,7 +956,7 @@
     cursor: pointer;
     opacity: 0;
     pointer-events: none;
-    transition: opacity .15s ease, background-color .15s ease;
+    transition: opacity .15s ease, background-color .15s ease, border-color .15s ease, color .15s ease;
   }
 
   .editor-website-input-wrap.has-value .editor-website-fetch-btn {
@@ -965,7 +965,21 @@
   }
 
   .editor-website-fetch-btn:hover {
-    background: #1a1f33;
+    background: var(--color-accent-hover);
+  }
+
+  /* Tertiary state: the address hasn't changed since the last successful
+     fetch, so there's nothing new to look up — "Fetch" becomes "Edit" and
+     drops to a quiet outlined pill instead of looking like a fresh action. */
+  .editor-website-fetch-btn.editor-website-fetch-btn--tertiary {
+    background: none;
+    color: var(--color-text-secondary);
+    border-color: var(--gray-400);
+  }
+
+  .editor-website-fetch-btn.editor-website-fetch-btn--tertiary:hover {
+    border-color: var(--gray-600);
+    background: var(--gray-100);
   }
 
   .editor-upload-dropzone {
@@ -1538,16 +1552,19 @@
     align-items: center;
     justify-content: space-between;
     flex: none;
-    padding: 24px 28px;
+    padding: 24px 56px;
     border-bottom: 1px solid var(--color-border-default);
   }
 
+  /* Same size/weight as the step titles (.editor-sidebar-title, e.g.
+     "What's your design idea?") so the modal reads as part of the same
+     flow instead of a visually distinct dialog style. */
   .editor-modal-title {
     margin: 0;
-    font-size: 1.375rem;
-    line-height: 1.16;
-    letter-spacing: -0.02em;
     font-weight: 500;
+    font-size: 28px;
+    line-height: 1.08;
+    letter-spacing: -1.4px;
     color: var(--color-text-primary);
   }
 
@@ -1599,7 +1616,7 @@
     display: flex;
     flex-direction: column;
     gap: 24px;
-    padding: 20px 28px 28px;
+    padding: 20px 56px 28px;
   }
 
   .editor-modal-banner {
@@ -1643,11 +1660,43 @@
     cursor: pointer;
   }
 
+  /* Loading state replaces the section headers/grids entirely (rather than
+     just dimming them) — a single centered line with an AI-tool-style
+     shimmer sweep, since there's nothing real to show yet. */
+  .editor-modal-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 280px;
+  }
+
+  .editor-modal-loading-text {
+    margin: 0;
+    font-size: 1.0625rem;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    background-image: linear-gradient(
+      90deg,
+      var(--gray-500) 30%,
+      var(--rich-blue) 50%,
+      var(--gray-500) 70%
+    );
+    background-size: 250% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    animation: editor-loading-shimmer 1.8s linear infinite;
+  }
+
+  @keyframes editor-loading-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -50% 0; }
+  }
+
   #brandFetchSections {
     display: flex;
     flex-direction: column;
     gap: 24px;
-    transition: opacity .15s ease;
   }
 
   .editor-modal-section-label {
@@ -1662,6 +1711,17 @@
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 10px;
+  }
+
+  .editor-modal-empty-note {
+    grid-column: 1 / -1;
+    margin: 0;
+    padding: 14px;
+    background: var(--gray-100);
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-secondary);
   }
 
   .editor-modal-logo-tile {
@@ -1855,7 +1915,7 @@
 
   .editor-modal-footer {
     flex: none;
-    padding: 14px 28px;
+    padding: 14px 56px;
     border-top: 1px solid var(--color-border-default);
     font-size: 0.8125rem;
     letter-spacing: -0.02em;
@@ -2235,6 +2295,9 @@
                       <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
                     </button>
                   </div>
+                  <div class="editor-elem-input-wrap">
+                    <input type="text" class="editor-text-input" id="instagramInput" value="instagram.com/yourprofile">
+                  </div>
                 </div>
 
                 <div class="editor-elem-item is-off" data-elem="facebook">
@@ -2243,6 +2306,9 @@
                     <button type="button" class="editor-elem-toggle" aria-label="Toggle Facebook">
                       <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
                     </button>
+                  </div>
+                  <div class="editor-elem-input-wrap">
+                    <input type="text" class="editor-text-input" id="facebookInput" value="facebook.com/yourpage">
                   </div>
                 </div>
 
@@ -2517,15 +2583,19 @@
         <h2 class="editor-modal-title" id="brandFetchTitle">Pick your assets</h2>
         <div class="editor-modal-header-actions">
           <button type="button" class="editor-modal-btn editor-modal-btn--ghost" id="brandFetchCancel">Cancel</button>
-          <button type="button" class="editor-modal-btn editor-modal-btn--primary" id="brandFetchSave">Save &amp; Apply</button>
+          <button type="button" class="editor-modal-btn editor-modal-btn--primary" id="brandFetchSave">Apply</button>
         </div>
       </div>
 
       <div class="editor-modal-body">
-        <div class="editor-modal-banner" id="brandFetchBanner">
+        <div class="editor-modal-banner" id="brandFetchBanner" hidden>
           <span class="editor-modal-banner-dot" id="brandFetchBannerDot"></span>
           <span id="brandFetchBannerText"></span>
           <button type="button" class="editor-modal-banner-retry" id="brandFetchRetryBtn" hidden>Try again</button>
+        </div>
+
+        <div class="editor-modal-loading" id="brandFetchLoading" hidden>
+          <p class="editor-modal-loading-text" id="brandFetchLoadingText"></p>
         </div>
 
         <div id="brandFetchSections">
@@ -3307,6 +3377,8 @@
       var bannerDot = document.getElementById('brandFetchBannerDot');
       var bannerText = document.getElementById('brandFetchBannerText');
       var retryBtn = document.getElementById('brandFetchRetryBtn');
+      var loading = document.getElementById('brandFetchLoading');
+      var loadingText = document.getElementById('brandFetchLoadingText');
       var sections = document.getElementById('brandFetchSections');
       var logoGrid = document.getElementById('brandFetchLogoGrid');
       var colorGrid = document.getElementById('brandFetchColorGrid');
@@ -3321,21 +3393,46 @@
       var cancelBtn = document.getElementById('brandFetchCancel');
       var saveBtn = document.getElementById('brandFetchSave');
 
-      var currentKit = null; // set once a fetch succeeds, read by Save & Apply
-      var lastRawInput = '';
+      var currentKit = null; // the kit currently shown/editable in the modal
+      var lastRawInput = ''; // raw input last attempted (successful or not) — what Retry replays
+      var lastFetchedRawInput = null; // raw input as of the last SUCCESSFUL fetch
+      var lastKit = null; // that fetch's result — survives Cancel/Save so "Edit" can reopen it without re-fetching
 
-      // ---- input -> Fetch pill ----
+      // ---- input -> Fetch/Edit pill ----
+      // "Fetch" (primary) runs a real lookup. Once that succeeds, as long as
+      // the address hasn't changed since, there's nothing new to fetch —
+      // the pill relabels to "Edit" (tertiary) and just reopens the modal
+      // on the already-fetched kit. Typing anything different flips it
+      // back to "Fetch".
+      function updateFetchButtonState() {
+        var unchanged = lastFetchedRawInput !== null && input.value.trim() === lastFetchedRawInput.trim();
+        fetchBtn.classList.toggle('editor-website-fetch-btn--tertiary', unchanged);
+        fetchBtn.textContent = unchanged ? 'Edit' : 'Fetch';
+      }
+
+      function triggerFetchOrEdit(rawInput) {
+        var unchanged = lastFetchedRawInput !== null && rawInput.trim() === lastFetchedRawInput.trim();
+        if (unchanged && lastKit) {
+          currentKit = lastKit;
+          openModal();
+          renderKit(lastKit);
+        } else {
+          runFetch(rawInput);
+        }
+      }
+
       input.addEventListener('input', function () {
         wrap.classList.toggle('has-value', input.value.trim().length > 0);
+        updateFetchButtonState();
       });
       input.addEventListener('keydown', function (e) {
         if (e.key === 'Enter' && input.value.trim()) {
           e.preventDefault();
-          runFetch(input.value);
+          triggerFetchOrEdit(input.value);
         }
       });
       fetchBtn.addEventListener('click', function () {
-        if (input.value.trim()) runFetch(input.value);
+        if (input.value.trim()) triggerFetchOrEdit(input.value);
       });
       retryBtn.addEventListener('click', function () {
         if (lastRawInput) runFetch(lastRawInput);
@@ -3460,7 +3557,12 @@
 
       function extractGenericFontFamilies(cssText) {
         var counts = {};
-        var re = /font-family\s*:\s*([^;{}"']+)/g;
+        // Quotes are deliberately NOT excluded from the capture group —
+        // real CSS overwhelmingly writes this as font-family: "Name", ...
+        // and excluding " / ' meant the class only ever matched the rare
+        // unquoted form, silently missing almost every real declaration
+        // and always falling through to the Poppins default instead.
+        var re = /font-family\s*:\s*([^;{}]+)/g;
         var m;
         while ((m = re.exec(cssText))) {
           var first = m[1].split(',')[0].trim().replace(/^['"]|['"]$/g, '');
@@ -3474,53 +3576,43 @@
           .map(function (c) { return c.display; });
       }
 
-      function extractLogoCandidates(doc, baseUrl, hostname) {
+      // Favicons are deliberately never a source here — they're near-never
+      // the actual logo (usually a cropped/simplified mark, sometimes
+      // nothing at all, see the "data:," placeholder case). Only real <img>
+      // elements that look like a logo by name count: either the image
+      // filename itself, or the element's class/id, containing "logo" or a
+      // close synonym.
+      var LOGO_WORD_RE = /logo|brandmark|wordmark/i;
+
+      function extractLogoCandidates(doc, baseUrl) {
         var out = [];
         var seen = {};
-        function push(url, label) {
-          if (!url || seen[url] || out.length >= 3) return;
-          // "href=data:," (no payload after the comma) is a common
-          // deliberate "no favicon" placeholder some sites ship instead of
-          // omitting the <link> entirely — a real but useless candidate
-          // that would otherwise win the default slot over the guaranteed-
-          // real Google favicon fallback pushed below.
-          if (/^data:[^,]*,\s*$/.test(url)) return;
-          seen[url] = true;
-          out.push({ src: url, label: label });
-        }
-
-        Array.prototype.forEach.call(doc.querySelectorAll('link[rel]'), function (link) {
-          var rel = (link.getAttribute('rel') || '').toLowerCase();
-          if (rel.indexOf('icon') === -1) return;
-          push(resolveUrl(link.getAttribute('href'), baseUrl), /apple/.test(rel) ? 'Apple touch icon' : 'Favicon');
-        });
-
-        var ogImage = doc.querySelector('meta[property="og:image"]');
-        if (ogImage) push(resolveUrl(ogImage.getAttribute('content'), baseUrl), 'Open Graph image');
-
-        var twImage = doc.querySelector('meta[name="twitter:image"]');
-        if (twImage) push(resolveUrl(twImage.getAttribute('content'), baseUrl), 'Twitter card image');
 
         Array.prototype.forEach.call(doc.querySelectorAll('img'), function (img) {
-          if (out.length >= 3) return;
-          var hay = ((img.getAttribute('src') || '') + ' ' + (img.getAttribute('alt') || '') + ' '
-            + (img.getAttribute('class') || '') + ' ' + (img.getAttribute('id') || '')).toLowerCase();
-          if (hay.indexOf('logo') !== -1) push(resolveUrl(img.getAttribute('src'), baseUrl), 'Logo image');
+          if (out.length >= 4) return;
+          var src = img.getAttribute('src') || '';
+          var nameMatch = LOGO_WORD_RE.test(src);
+          var attrMatch = LOGO_WORD_RE.test((img.getAttribute('class') || '') + ' ' + (img.getAttribute('id') || ''));
+          if (!nameMatch && !attrMatch) return;
+
+          var resolved = resolveUrl(src, baseUrl);
+          if (!resolved || seen[resolved]) return;
+          seen[resolved] = true;
+          out.push({ src: resolved, label: nameMatch ? 'Logo image' : 'Logo (by class/id)' });
         });
 
-        // Always-available fallback (Google's public favicon service returns
-        // *something* for virtually any domain) so the grid is never empty.
-        push('https://www.google.com/s2/favicons?sz=128&domain=' + encodeURIComponent(hostname), 'Favicon (fallback)');
-
-        return out.slice(0, 4);
+        return out;
       }
 
+      // Stores the actual href (not just a found/not-found flag) — Apply
+      // pre-fills the Instagram/Facebook fields in Elements with these, so
+      // the real profile URL is what needs keeping, not a boolean.
       function extractSocialLinks(doc) {
         var found = {};
         Array.prototype.forEach.call(doc.querySelectorAll('a[href]'), function (a) {
           var href = a.getAttribute('href') || '';
-          if (!found.facebook && /facebook\.com/i.test(href)) found.facebook = true;
-          if (!found.instagram && /instagram\.com/i.test(href)) found.instagram = true;
+          if (!found.facebook && /facebook\.com/i.test(href)) found.facebook = href;
+          if (!found.instagram && /instagram\.com/i.test(href)) found.instagram = href;
         });
         return found;
       }
@@ -3536,17 +3628,6 @@
         text = text.trim();
         if (text.length > 90) text = text.slice(0, 87).trim() + '…';
         return text;
-      }
-
-      function brandNameFromTitle(doc, hostname) {
-        var titleEl = doc.querySelector('title');
-        var title = titleEl ? titleEl.textContent.trim() : '';
-        if (title) {
-          var candidate = title.split(/\s[|\-–—:]\s/)[0].trim();
-          if (candidate && candidate.length <= 40) return candidate;
-        }
-        var label = hostname.replace(/^www\./, '').split('.')[0] || hostname;
-        return label.charAt(0).toUpperCase() + label.slice(1);
       }
 
       // Inline <style>/style="" text is already in `doc`; external
@@ -3574,12 +3655,16 @@
       }
 
       // ---- orchestration ----
+      // Exactly one of {loading, error banner, sections} is visible at a
+      // time — loading replaces the section headers/grids outright rather
+      // than just dimming them (nothing real to show yet), and the banner
+      // is reserved for errors only (a successful fetch never announces
+      // itself, the populated grids speak for themselves).
       function setLoadingState(hostname) {
-        banner.classList.remove('is-error');
-        bannerDot.style.background = 'var(--gray-400)';
-        bannerText.textContent = 'Looking up ' + hostname + '…';
-        retryBtn.hidden = true;
-        sections.style.opacity = '.4';
+        banner.hidden = true;
+        sections.hidden = true;
+        loading.hidden = false;
+        loadingText.textContent = 'Looking up ' + hostname + '…';
         logoGrid.innerHTML = '';
         colorGrid.innerHTML = '';
         fontGrid.innerHTML = '';
@@ -3588,11 +3673,13 @@
       }
 
       function setErrorState(message) {
+        loading.hidden = true;
+        sections.hidden = true;
+        banner.hidden = false;
         banner.classList.add('is-error');
         bannerDot.style.background = 'var(--red-500)';
         bannerText.textContent = message;
         retryBtn.hidden = false;
-        sections.style.opacity = '.4';
       }
 
       function runFetch(rawInput) {
@@ -3641,15 +3728,13 @@
             fontNames = fontNames.slice(0, 2);
             if (!fontNames.length) fontNames = ['Poppins'];
 
-            var logos = extractLogoCandidates(doc, url.href, url.hostname);
+            var logos = extractLogoCandidates(doc, url.href);
             var social = extractSocialLinks(doc);
             var slogan = extractSlogan(doc);
-            var brandName = brandNameFromTitle(doc, url.hostname);
 
             currentKit = {
               domain: url.hostname,
               displayDomain: /^www\./.test(url.hostname) ? url.hostname : 'www.' + url.hostname,
-              brandName: brandName,
               accent: colorHexes[0],
               colors: colorHexes,
               logos: logos,
@@ -3658,6 +3743,10 @@
               social: social
             };
             renderKit(currentKit);
+
+            lastFetchedRawInput = rawInput;
+            lastKit = currentKit;
+            updateFetchButtonState();
           })
           .catch(function (err) {
             currentKit = null;
@@ -3734,14 +3823,26 @@
       }
 
       function renderKit(kit) {
+        // No news is good news: the "Found X on Y" banner was only ever
+        // useful as a confirmation or an error surface — once the grids
+        // below are actually populated, it's redundant, so it's hidden
+        // entirely for a clean fetch (setLoadingState/setErrorState are the
+        // only places that show it, for loading/error respectively).
+        banner.hidden = true;
         banner.classList.remove('is-error');
         retryBtn.hidden = true;
-        sections.style.opacity = '';
-        bannerDot.style.background = kit.accent;
-        bannerText.textContent = 'Found ' + kit.brandName + ' on ' + kit.domain + '. Looks right?';
+        loading.hidden = true;
+        sections.hidden = false;
 
         logoGrid.innerHTML = '';
-        kit.logos.forEach(function (logo, i) { logoGrid.appendChild(buildLogoTile(logo, i === 0)); });
+        if (kit.logos.length) {
+          kit.logos.forEach(function (logo, i) { logoGrid.appendChild(buildLogoTile(logo, i === 0)); });
+        } else {
+          var empty = document.createElement('p');
+          empty.className = 'editor-modal-empty-note';
+          empty.textContent = 'No logo image found automatically — you can still upload one manually in Branding.';
+          logoGrid.appendChild(empty);
+        }
 
         colorGrid.innerHTML = '';
         kit.colors.forEach(function (hex, i) {
@@ -3876,15 +3977,24 @@
           }
         }
 
+        // Pre-fills the Website/Instagram/Facebook fields with whatever was
+        // found — it does NOT turn those elements on. Finding a profile
+        // doesn't mean the user wants it printed on the packaging; that's
+        // still a separate, deliberate choice made in Elements.
         if (contactToggle.classList.contains('is-on')) {
           var websiteInput = document.getElementById('websiteInput');
           if (websiteInput) {
             websiteInput.value = currentKit.displayDomain;
             websiteInput.dispatchEvent(new Event('input'));
           }
-          setElemOn('website', true);
-          if (currentKit.social.facebook) setElemOn('facebook', true);
-          if (currentKit.social.instagram) setElemOn('instagram', true);
+          if (currentKit.social.facebook) {
+            var facebookInput = document.getElementById('facebookInput');
+            if (facebookInput) facebookInput.value = currentKit.social.facebook;
+          }
+          if (currentKit.social.instagram) {
+            var instagramInput = document.getElementById('instagramInput');
+            if (instagramInput) instagramInput.value = currentKit.social.instagram;
+          }
         }
 
         closeModal();

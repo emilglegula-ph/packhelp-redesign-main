@@ -2430,50 +2430,6 @@
     color: var(--color-text-muted);
   }
 
-  .editor-modal-toggle-label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 10px;
-  }
-
-  .editor-modal-toggle-check {
-    display: flex;
-    flex: none;
-    align-items: center;
-    justify-content: center;
-    width: 20px;
-    height: 20px;
-    padding: 0;
-    background: var(--white);
-    border: 1px solid var(--gray-400);
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  .editor-modal-toggle-check.is-on {
-    background: var(--color-accent);
-    border-color: var(--color-accent);
-  }
-
-  .editor-modal-toggle-check.is-on::after {
-    content: "";
-    width: 8px;
-    height: 5px;
-    border-left: 2px solid var(--white);
-    border-bottom: 2px solid var(--white);
-    transform: rotate(-45deg) translateY(-1px);
-  }
-
-  /* Dims (but doesn't hide) the section when its toggle is off, so the
-     fetched value stays visible/legible while clearly excluded from Save
-     & Apply. */
-  .editor-modal-section.is-excluded .editor-modal-slogan-input,
-  .editor-modal-section.is-excluded .editor-modal-contact-row {
-    opacity: .4;
-    pointer-events: none;
-  }
-
   .editor-modal-slogan-input {
     width: 100%;
     padding: 12px 14px;
@@ -2511,15 +2467,6 @@
     width: 14px;
     height: 14px;
     flex: none;
-  }
-
-  .editor-modal-footer {
-    flex: none;
-    padding: 14px 56px;
-    border-top: 1px solid var(--color-border-default);
-    font-size: 0.8125rem;
-    letter-spacing: -0.02em;
-    color: var(--color-text-secondary);
   }
 
   /* ---------- Layout variants ----------
@@ -3986,24 +3933,16 @@
           </div>
 
           <div class="editor-modal-section" id="brandFetchSloganSection">
-            <div class="editor-modal-toggle-label">
-              <button type="button" class="editor-modal-toggle-check is-on" id="brandFetchSloganToggle" aria-label="Toggle slogan" aria-pressed="true"></button>
-              <p class="editor-modal-section-label" style="margin:0">Slogan</p>
-            </div>
+            <p class="editor-modal-section-label">Slogan</p>
             <textarea class="editor-modal-slogan-input" id="brandFetchSloganInput" rows="2"></textarea>
           </div>
 
           <div class="editor-modal-section" id="brandFetchContactSection">
-            <div class="editor-modal-toggle-label">
-              <button type="button" class="editor-modal-toggle-check is-on" id="brandFetchContactToggle" aria-label="Toggle contact and social elements" aria-pressed="true"></button>
-              <p class="editor-modal-section-label" style="margin:0">Contact &amp; social media</p>
-            </div>
+            <p class="editor-modal-section-label">Contact &amp; social media</p>
             <div class="editor-modal-contact-row" id="brandFetchContactRow"></div>
           </div>
         </div>
       </div>
-
-      <div class="editor-modal-footer" id="brandFetchFooter"></div>
     </div>
   </div>
 
@@ -5063,13 +5002,8 @@
       var logoGrid = document.getElementById('brandFetchLogoGrid');
       var colorGrid = document.getElementById('brandFetchColorGrid');
       var fontGrid = document.getElementById('brandFetchFontGrid');
-      var sloganSection = document.getElementById('brandFetchSloganSection');
-      var sloganToggle = document.getElementById('brandFetchSloganToggle');
       var sloganInput = document.getElementById('brandFetchSloganInput');
-      var contactSection = document.getElementById('brandFetchContactSection');
-      var contactToggle = document.getElementById('brandFetchContactToggle');
       var contactRow = document.getElementById('brandFetchContactRow');
-      var footer = document.getElementById('brandFetchFooter');
       var cancelBtn = document.getElementById('brandFetchCancel');
       var saveBtn = document.getElementById('brandFetchSave');
 
@@ -5361,7 +5295,6 @@
         colorGrid.innerHTML = '';
         fontGrid.innerHTML = '';
         contactRow.innerHTML = '';
-        footer.textContent = '';
       }
 
       function setErrorState(message) {
@@ -5589,22 +5522,12 @@
         fontGrid.innerHTML = '';
         kit.fonts.forEach(function (fontObj, i) { fontGrid.appendChild(buildFontTile(fontObj, i === defaultFontIndex)); });
 
-        var hasSlogan = kit.slogan.length > 0;
         sloganInput.value = kit.slogan;
-        sloganToggle.classList.toggle('is-on', hasSlogan);
-        sloganToggle.setAttribute('aria-pressed', String(hasSlogan));
-        sloganSection.classList.toggle('is-excluded', !hasSlogan);
 
         contactRow.innerHTML = '';
         contactRow.appendChild(buildContactChip('website', kit.domain));
         if (kit.social.facebook) contactRow.appendChild(buildContactChip('facebook', 'Facebook'));
         if (kit.social.instagram) contactRow.appendChild(buildContactChip('instagram', 'Instagram'));
-        var hasContact = !!(kit.social.facebook || kit.social.instagram);
-        contactToggle.classList.toggle('is-on', hasContact || true); // website itself always counts as "found"
-        contactToggle.setAttribute('aria-pressed', 'true');
-        contactSection.classList.remove('is-excluded');
-
-        footer.textContent = kit.logos.length + ' logos · ' + kit.colors.length + ' colours · ' + kit.fonts.length + ' fonts';
       }
 
       // ---- selection interactions ----
@@ -5618,12 +5541,7 @@
       colorGrid.addEventListener('click', function (e) {
         var swatch = e.target.closest('.editor-modal-color-swatch');
         if (!swatch) return;
-        if (swatch.classList.contains('is-selected')) {
-          swatch.classList.remove('is-selected');
-          return;
-        }
-        if (colorGrid.querySelectorAll('.is-selected').length >= 4) return; // cap: max 4 selected
-        swatch.classList.add('is-selected');
+        swatch.classList.toggle('is-selected');
       });
 
       fontGrid.addEventListener('click', function (e) {
@@ -5631,18 +5549,6 @@
         if (!tile || tile.disabled) return; // disabled <button> elements don't dispatch click anyway — belt and suspenders
         fontGrid.querySelectorAll('.is-selected').forEach(function (el) { el.classList.remove('is-selected'); });
         tile.classList.add('is-selected');
-      });
-
-      sloganToggle.addEventListener('click', function () {
-        var on = this.classList.toggle('is-on');
-        this.setAttribute('aria-pressed', String(on));
-        sloganSection.classList.toggle('is-excluded', !on);
-      });
-
-      contactToggle.addEventListener('click', function () {
-        var on = this.classList.toggle('is-on');
-        this.setAttribute('aria-pressed', String(on));
-        contactSection.classList.toggle('is-excluded', !on);
       });
 
       // ---- open / close ----
@@ -5698,7 +5604,7 @@
         var selectedFont = fontGrid.querySelector('.is-selected');
         if (selectedFont) applyFontByName(selectedFont.dataset.font);
 
-        if (sloganToggle.classList.contains('is-on') && sloganInput.value.trim()) {
+        if (sloganInput.value.trim()) {
           var mainTextInput = document.getElementById('mainTextInput');
           if (mainTextInput) {
             mainTextInput.value = sloganInput.value.trim();
@@ -5711,20 +5617,18 @@
         // found — it does NOT turn those elements on. Finding a profile
         // doesn't mean the user wants it printed on the packaging; that's
         // still a separate, deliberate choice made in Elements.
-        if (contactToggle.classList.contains('is-on')) {
-          var websiteInput = document.getElementById('websiteInput');
-          if (websiteInput) {
-            websiteInput.value = currentKit.displayDomain;
-            websiteInput.dispatchEvent(new Event('input'));
-          }
-          if (currentKit.social.facebook) {
-            var facebookInput = document.getElementById('facebookInput');
-            if (facebookInput) facebookInput.value = currentKit.social.facebook;
-          }
-          if (currentKit.social.instagram) {
-            var instagramInput = document.getElementById('instagramInput');
-            if (instagramInput) instagramInput.value = currentKit.social.instagram;
-          }
+        var websiteInput = document.getElementById('websiteInput');
+        if (websiteInput) {
+          websiteInput.value = currentKit.displayDomain;
+          websiteInput.dispatchEvent(new Event('input'));
+        }
+        if (currentKit.social.facebook) {
+          var facebookInput = document.getElementById('facebookInput');
+          if (facebookInput) facebookInput.value = currentKit.social.facebook;
+        }
+        if (currentKit.social.instagram) {
+          var instagramInput = document.getElementById('instagramInput');
+          if (instagramInput) instagramInput.value = currentKit.social.instagram;
         }
 
         closeModal();

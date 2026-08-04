@@ -38,6 +38,204 @@
     height: 100vh;
   }
 
+  /* Gmail-style, not the earlier draft's: the top bar (.editor-navbar,
+     hamburger + logo included) never moves — only the row underneath it
+     shifts. .editor-content-row is that row: [drawer, .editor-body], with
+     the drawer pushing .editor-body aside when it opens (a real reflow,
+     not an overlay+backdrop), same as Gmail's own sidebar pushing the
+     inbox list while "Gmail" and the search bar stay put above both. */
+  .editor-content-row {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: row;
+    overflow: hidden;
+  }
+
+  /* ---------- Push-drawer menu ----------
+     Google-Calendar-style: the hamburger before the logo toggles this
+     open, sliding out and pushing .editor-body aside (real reflow via a
+     flex sibling, not an overlay+backdrop over it). No logo/close row of
+     its own — the top navbar's hamburger (which morphs into a close "X",
+     see .editor-hamburger-lines below) already lives right above this,
+     visible the whole time, so repeating the logo in here would just be
+     a second one stacked on top of the real one for no reason; Gmail's
+     own panel doesn't duplicate its wordmark either. Collapsed via
+     negative margin-left rather than width:0 so the 360px content inside
+     never has to reflow mid-transition, only slide. */
+  .editor-drawer {
+    flex: none;
+    width: 360px;
+    height: 100%;
+    margin-left: -360px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-right: 1px solid var(--color-border-default);
+    transition: margin-left .25s ease;
+  }
+
+  .editor-drawer.is-open {
+    margin-left: 0;
+  }
+
+  .editor-drawer-project {
+    flex: none;
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--color-border-default);
+  }
+
+  .editor-drawer-eyebrow {
+    margin: 0 0 4px;
+    font-size: 0.6875rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--color-text-muted);
+  }
+
+  .editor-drawer-project-name {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .editor-drawer-list {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    padding: 8px 12px;
+  }
+
+  .editor-drawer-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    width: 100%;
+    padding: 12px;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    font-family: inherit;
+    color: var(--color-text-primary);
+    text-decoration: none;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .editor-drawer-item:hover {
+    background: var(--gray-100);
+  }
+
+  .editor-drawer-item.is-disabled {
+    color: var(--color-text-muted);
+    cursor: default;
+  }
+
+  .editor-drawer-item.is-disabled:hover {
+    background: none;
+  }
+
+  .editor-drawer-item-icon {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    color: var(--color-text-secondary);
+  }
+
+  .editor-drawer-item.is-disabled .editor-drawer-item-icon {
+    color: var(--color-text-muted);
+  }
+
+  .editor-drawer-item-icon svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+  }
+
+  .editor-drawer-item-body {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .editor-drawer-item-label {
+    margin: 0;
+    font-size: 0.9375rem;
+    letter-spacing: -0.02em;
+    color: inherit;
+  }
+
+  .editor-drawer-item-value {
+    margin: 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-secondary);
+  }
+
+  .editor-drawer-item-action {
+    flex: none;
+    height: 32px;
+    padding: 0 14px;
+    background: none;
+    border: 1px solid var(--gray-400);
+    border-radius: var(--radius-full);
+    font-family: inherit;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  .editor-drawer-item-action:hover {
+    background: var(--white);
+    border-color: var(--gray-600);
+  }
+
+  /* No green anywhere in tokens.css (only blue/gray/red/yellow primitives
+     exist) — hardcoded here rather than reaching for --color-bg-notice
+     (yellow), which reads as a warning, not a confirmation. */
+  .editor-drawer-badge {
+    flex: none;
+    padding: 3px 8px;
+    background: #E3F3E5;
+    border-radius: var(--radius-full);
+    font-size: 0.5625rem;
+    font-weight: 500;
+    letter-spacing: .02em;
+    text-transform: uppercase;
+    color: #1E7A34;
+    white-space: nowrap;
+  }
+
+  .editor-drawer-external {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    color: var(--color-text-muted);
+  }
+
+  .editor-drawer-footer {
+    margin-top: auto;
+    flex: none;
+    padding: 20px 24px;
+    border-top: 1px solid var(--color-border-default);
+  }
+
+  .editor-drawer-email {
+    margin: 4px 0 0;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
   /* ---------- Top bar (always visible, fixed height) ---------- */
   .editor-navbar {
     flex: none;
@@ -45,7 +243,7 @@
     align-items: center;
     justify-content: space-between;
     height: 68px;
-    padding: 12px 32px;
+    padding: 12px 32px 12px 16px;
     border-bottom: 1px solid var(--color-border-default);
   }
 
@@ -53,6 +251,69 @@
     display: flex;
     align-items: center;
     height: 100%;
+  }
+
+  /* Hamburger — opens the push-drawer (see .editor-drawer below). Sits
+     before the logo, same relative position as Google Calendar's own
+     sidebar toggle before its wordmark. */
+  .editor-hamburger-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin-right: 12px;
+    padding: 0;
+    background: none;
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .editor-hamburger-btn:hover {
+    background: var(--gray-100);
+  }
+
+  /* Hamburger-to-X morph: three lines, each individually positioned so
+     the open state can converge them onto one center line and rotate the
+     outer two into an X — a CSS transform animation instead of swapping
+     between two separate icons, so the transition is a genuine morph. */
+  .editor-hamburger-lines {
+    position: relative;
+    flex: none;
+    width: 22px;
+    height: 16px;
+  }
+
+  .editor-hamburger-lines span {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    height: 1.5px;
+    background: currentColor;
+    border-radius: 1px;
+    transition: top .2s ease, transform .2s ease, opacity .15s ease;
+  }
+
+  .editor-hamburger-lines span:nth-child(1) { top: 0; }
+  .editor-hamburger-lines span:nth-child(2) { top: 7px; }
+  .editor-hamburger-lines span:nth-child(3) { top: 14px; }
+
+  .editor-hamburger-btn.is-open .editor-hamburger-lines span:nth-child(1) {
+    top: 7px;
+    transform: rotate(45deg);
+  }
+
+  .editor-hamburger-btn.is-open .editor-hamburger-lines span:nth-child(2) {
+    opacity: 0;
+  }
+
+  .editor-hamburger-btn.is-open .editor-hamburger-lines span:nth-child(3) {
+    top: 7px;
+    transform: rotate(-45deg);
   }
 
   .editor-logo {
@@ -69,14 +330,18 @@
   }
 
   /* Segmented "mode" pill: Editor (active) / Dieline / Skip design */
+  /* Same recipe as .editor-view-toggle (the "Front/Back" pill floating
+     over the preview) — translucent blurred track, gradient-white active
+     pill — just generalized from a fixed 2-item is-active/is-inactive
+     pair to N buttons where any one of them can carry .is-active. */
   .editor-mode-switch {
     position: relative;
     display: flex;
     align-items: center;
-    height: 40px;
-    background: var(--gray-200);
+    height: 36px;
+    background: rgba(0, 0, 0, .05);
+    backdrop-filter: blur(5px);
     border-radius: var(--radius-full);
-    box-shadow: inset 0 1px 4px 0 rgba(0, 0, 0, .04);
   }
 
   .editor-mode-item {
@@ -85,24 +350,26 @@
     justify-content: center;
     height: 40px;
     padding: 0 16px;
-    font-size: 0.9375rem;
-    line-height: 1.32;
+    font-size: 0.8125rem;
     letter-spacing: -0.02em;
     color: var(--color-text-secondary);
+    white-space: nowrap;
     background: none;
     border: none;
     cursor: pointer;
-    white-space: nowrap;
   }
 
   .editor-mode-item.is-active {
-    height: 32px;
+    height: 28px;
     margin: 0 0 0 4px;
     padding: 0 12px;
-    background: var(--white);
+    background: linear-gradient(to bottom, var(--white) 50%, var(--gray-100));
     border-radius: var(--radius-full);
-    color: var(--color-text-primary);
     box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .08);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    white-space: nowrap;
   }
 
   .editor-navbar-right {
@@ -231,7 +498,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 4px;
+    gap: 8px;
   }
 
   .editor-preview-tagline {
@@ -530,18 +797,198 @@
     padding: 32px 44px calc(72px + 12px + 24px);
   }
 
+  /* Makes #aiDesignFlow generate no box of its own — its children
+     (.editor-scroll-fade, #step1..#step6) lay out as if they were direct
+     children of #sidebarContent, so every existing gap/justify-content/
+     .is-multistep rule above keeps working unchanged with the extra
+     nesting level. Toggling the wrapper's `hidden` attribute still fully
+     collapses it (the file's global [hidden]{display:none!important}
+     beats `display:contents` too). */
+  #aiDesignFlow {
+    display: contents;
+  }
+
+  /* ---------- Bottom-menu tab panels (Template/Elements/Brand) ----------
+     Self-contained duplicates of steps 5/4/3's own interactive content
+     (not the same DOM — see the request that added these), each with its
+     own single-line header instead of the step-flow's eyebrow+H2 pair.
+     Reuse the very same classes the step-flow's own elements use
+     (.js-tagline, .js-logo-mark, .editor-design-tile, …) wherever
+     possible, so anything already synced globally via those classes (main
+     preview text/logo/colour/font) — and the very same click handlers,
+     attached again to the second grid/list below — stays in sync for
+     free without extra plumbing. */
+  .editor-menu-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    width: 100%;
+    /* #sidebarContent already has 32px of its own top padding — this adds
+       the other 24px to reach a 56px gap from the very top when scrolled
+       all the way up (see .is-menu-panel above for the flex-start half of
+       "always scrollable back to a visible beginning"). */
+    margin-top: 24px;
+    /* Rapid/double-clicking a tile or button shouldn't leave a blue text
+       selection behind — these read as controls, not copy. Form fields
+       (Elements panel's inputs, etc.) are exempt from this by the
+       platform itself: user-select:none on an ancestor never blocks
+       selecting text you're actively editing inside an <input>. */
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .editor-menu-panel-title {
+    margin: 0;
+    font-weight: 500;
+    font-size: 28px;
+    line-height: 1.08;
+    letter-spacing: -1.4px;
+    color: var(--color-text-primary);
+  }
+
+  /* ---------- "Add" bottom-menu tab ---------- */
+  .editor-menu-panel-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+  }
+
+  /* Subheaders ("Upload"/"Text"/"Graphics") reuse .editor-field-label-text
+     as-is — the same style every other tab's field labels ("Logo", "Print
+     colour", ...) already use — rather than a bespoke bolder variant. */
+
+  /* Same 3-column, 2-row grid as .editor-graphics-grid just below — same
+     tile height (80px) too, so "Text" and "Graphics" read as one
+     consistent tile system rather than two different tile shapes. */
+  .editor-text-tile-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .editor-text-tile {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 80px;
+    padding: 8px 12px;
+    background: var(--gray-100);
+    border: 2px solid transparent;
+    border-radius: var(--radius-sm);
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .editor-text-tile:hover {
+    background: var(--gray-200);
+  }
+
+  .editor-text-tile.is-selected {
+    background: var(--white);
+    border-color: var(--color-accent);
+  }
+
+  .editor-btn-block {
+    width: 100%;
+  }
+
+  .editor-step2-continue.editor-btn-sm {
+    height: 32px;
+    font-size: 0.8125rem;
+  }
+
+  /* Plain text link, not a button — smaller text, muted grey, chevron
+     communicating "expands" rather than the plain label alone. */
+  .editor-link-more {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    width: 100%;
+    padding: 4px;
+    background: none;
+    border: none;
+    font-family: inherit;
+    font-size: 0.8125rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .editor-link-more:hover {
+    color: var(--color-text-primary);
+  }
+
+  .editor-link-more svg {
+    flex: none;
+    width: 10px;
+    height: 10px;
+  }
+
+  .editor-graphics-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    width: 100%;
+  }
+
+  .editor-graphics-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 80px;
+    background: var(--gray-100);
+    border: none;
+    border-radius: var(--radius-sm);
+    color: var(--color-text-secondary);
+    cursor: pointer;
+    transition: background-color .15s ease;
+  }
+
+  .editor-graphics-tile:hover {
+    background: var(--gray-200);
+  }
+
+  .editor-graphics-tile svg {
+    display: block;
+    width: 22px;
+    height: 22px;
+  }
+
+  .editor-graphics-tile-label {
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
   /* Once step 2 is revealed the content no longer fits (and shouldn't be
      vertically centered — that would start the scroll position halfway
      through empty space above step 1), and the gap between the two steps
-     grows to 64px (vs. the 24px used for spacing *within* a step). */
+     grows to 72px (vs. the 24px used for spacing *within* a step). */
   .editor-sidebar-content.is-multistep {
     justify-content: flex-start;
-    gap: 64px;
+    gap: 72px;
     /* Extra scroll slack: without it, step 2's own content often isn't
        tall enough below the fold for the browser to let the container
        scroll far enough to crop step 1 down to just its 40px peek — the
        scroll simply clamps at whatever max scrollTop the content allows. */
     padding-bottom: 240px;
+  }
+
+  /* Same reasoning as .is-multistep above, for the bottom-menu panels
+     (Template/Elements/Brand/Add) instead of the AI-design steps —
+     without flex-start, a panel taller than the viewport gets its TOP
+     cropped by the centering with no way to scroll back up to it. */
+  .editor-sidebar-content.is-menu-panel {
+    justify-content: flex-start;
   }
 
   /* Pinned to the top of the scroll container (not the page) so it fades
@@ -982,6 +1429,11 @@
     background: var(--gray-100);
   }
 
+  .editor-upload-dropzone-wrap {
+    position: relative;
+    width: 100%;
+  }
+
   .editor-upload-dropzone {
     display: flex;
     align-items: center;
@@ -997,11 +1449,61 @@
     letter-spacing: -0.02em;
     color: var(--gray-500);
     cursor: pointer;
-    transition: border-color .15s ease, background-color .15s ease;
+    transition: border-color .15s ease, background-color .15s ease, height .15s ease;
   }
 
   .editor-upload-dropzone:hover {
     background: rgba(244, 244, 244, .8);
+    border-color: var(--gray-600);
+  }
+
+  /* Once a logo is actually uploaded, the dropzone stops being an "empty
+     drop target" (dashed border, centered placeholder text) and becomes a
+     real preview card — same fixed 64px height as before (never grows),
+     just a small 8px inset so the image doesn't touch the edges, and a
+     solid border since there's real content now. */
+  .editor-upload-dropzone.has-image {
+    height: 64px;
+    padding: 8px;
+    border-style: solid;
+    border-color: var(--gray-400);
+  }
+
+  .editor-upload-dropzone.has-image .editor-upload-dropzone-text {
+    display: none;
+  }
+
+  .editor-upload-dropzone.has-image:hover {
+    border-color: var(--gray-600);
+  }
+
+  .editor-upload-dropzone-preview {
+    display: block;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+  }
+
+  .editor-upload-dropzone-delete {
+    position: absolute;
+    right: 8px;
+    bottom: 8px;
+    height: 28px;
+    padding: 0 12px;
+    background: var(--white);
+    border: 1px solid var(--gray-400);
+    border-radius: var(--radius-full);
+    font-family: inherit;
+    font-size: 0.75rem;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    cursor: pointer;
+    box-shadow: 0 2px 6px 0 rgba(0, 0, 0, .1);
+    transition: border-color .15s ease, background-color .15s ease;
+  }
+
+  .editor-upload-dropzone-delete:hover {
+    background: var(--gray-100);
     border-color: var(--gray-600);
   }
 
@@ -1406,27 +1908,39 @@
 
   /* ---------- Step 6 — "Ready for the finishing touches?" (final step,
      no Continue/Skip — it's a free-text refinement prompt, not a gate). ---------- */
+  .editor-prompt-chip-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    width: 100%;
+    /* .editor-step2-body's shared gap (24px, used between every step's
+       fields) is 8px more than this specific pair wants — only used here,
+       so pulling it up locally is safe rather than touching the shared
+       rule every other step still relies on. */
+    margin-top: -8px;
+  }
+
   .editor-prompt-chip {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 100%;
-    height: 44px;
-    padding: 0 16px;
-    background: var(--white);
-    border: 1px solid var(--gray-400);
-    border-radius: 12px;
+    width: auto;
+    height: 28px;
+    padding: 0 12px;
+    background: var(--gray-100);
+    border: none;
+    border-radius: 200px;
     font-family: inherit;
-    font-size: 0.9375rem;
+    font-size: 0.6875rem;
     letter-spacing: -0.02em;
-    color: var(--color-text-primary);
+    color: var(--gray-600); /* #555555 */
+    white-space: nowrap;
     cursor: pointer;
-    transition: background-color .15s ease, border-color .15s ease;
+    transition: background-color .15s ease;
   }
 
   .editor-prompt-chip:hover {
-    background: var(--gray-100);
-    border-color: var(--gray-600);
+    background: var(--gray-200);
   }
 
   /* ---------- Bottom tab bar — floats 12px above the sidebar's bottom edge
@@ -2007,6 +2521,233 @@
     letter-spacing: -0.02em;
     color: var(--color-text-secondary);
   }
+
+  /* ---------- Layout variants ----------
+     Three mutually-exclusive arrangements, picked via the radio group in
+     the "Page customization" panel below (never combined — the panel
+     enforces that, not this CSS). Rather than flex-direction: row-reverse
+     (which would reverse ALL of .editor-body's children, including the
+     rail — wrong, the rail always belongs at the true left edge even when
+     the other two panels swap), each child gets an explicit `order`:
+
+     - default:  preview(1) sidebar(2)              — rail absent
+     - mirrored: sidebar(1) preview(2)               — rail absent
+     - rail:     rail(0) sidebar(1) preview(2)       — same order as
+                 mirrored for sidebar/preview, plus the rail prepended
+
+     .editor-preview-pane/.editor-sidebar both stay exactly as they are
+     (uniform padding, uniform border-radius, no side-specific styling),
+     so reordering them needs nothing beyond `order`. The rail itself is
+     shown/hidden via its `hidden` attribute (set in JS, not a class) —
+     this file's global `[hidden]{display:none!important}` override would
+     otherwise beat a class-scoped `display` rule regardless of source
+     order or specificity. */
+  .editor-preview-pane { order: 1; }
+  .editor-sidebar { order: 2; }
+  .editor-rail { order: 0; }
+
+  .editor-page.is-mirrored .editor-preview-pane,
+  .editor-page.is-rail-nav .editor-preview-pane {
+    order: 2;
+  }
+
+  .editor-page.is-mirrored .editor-sidebar,
+  .editor-page.is-rail-nav .editor-sidebar {
+    order: 1;
+  }
+
+  /* ---------- Rail navigation: vertical icon rail (replaces the
+     sidebar's floating bottom .editor-menu when this variant is active)
+     ---------- */
+  .editor-rail {
+    flex: none;
+    width: 80px;
+    height: 100%;
+    /* .editor-content-row has overflow:hidden, so this 1px reach upward
+       is clipped harmlessly at the bottom — it exists purely to let the
+       rail's own white background paint over the 1px sliver of
+       .editor-navbar's border-bottom that would otherwise sit flush
+       against the first item, reading as if that item had its own top
+       border. */
+    margin-top: -1px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--white);
+    border-right: 1px solid var(--color-border-default);
+  }
+
+  .editor-rail-item {
+    flex: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    width: 100%;
+    height: 72px;
+    padding: 10px 8px;
+    background: none;
+    border: none;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+    color: var(--color-text-secondary);
+    cursor: pointer;
+  }
+
+  .editor-rail-item.is-active {
+    background: var(--blue-50);
+    border-top-color: var(--color-border-default);
+    border-bottom-color: var(--color-border-default);
+    color: var(--color-text-primary);
+  }
+
+  .editor-rail-item svg {
+    display: block;
+    width: 20px;
+    height: 20px;
+    flex: none;
+  }
+
+  .editor-rail-item-label {
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    text-align: center;
+    color: inherit;
+    white-space: nowrap;
+  }
+
+  /* ---------- SITE SETTINGS ----------
+     Same widget as on index.html / sample-packs.html / build-your-box.html,
+     at half the size (28px vs. 56px) and mirrored to the bottom-LEFT corner
+     instead of bottom-right — this page's own convention per the request
+     that added it, so it doesn't collide with anything the preview pane
+     might put in its own bottom-right (zoom controls, etc. are centered/
+     bottom already — but the sidebar's own floating bottom-menu bar
+     (.editor-menu, "AI design"/"Template"/...) occupies the 12-84px band
+     above the viewport bottom, and once mirrored, that band lands on this
+     exact corner too; 96px clears the whole band (with a 12px gap to
+     spare) in both layout modes instead of only the default one. */
+  .site-settings-btn {
+    position: fixed;
+    bottom: 96px;
+    left: 24px;
+    z-index: 1000;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--color-bg-surface);
+    border: 1px solid rgba(0, 0, 0, .08);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, .15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--color-text-muted);
+    transition: transform .15s ease, box-shadow .15s ease;
+  }
+
+  .site-settings-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, .18);
+  }
+
+  .site-settings-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .site-settings-panel {
+    position: fixed;
+    bottom: 136px;
+    left: 24px;
+    z-index: 1000;
+    width: 260px;
+    background: var(--color-bg-surface);
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, .18);
+    padding: var(--space-5);
+    box-sizing: border-box;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity .2s ease, transform .2s ease;
+  }
+
+  .site-settings-panel.open {
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .site-settings-title {
+    margin: 0 0 var(--space-4);
+    font-size: 0.9375rem;
+    line-height: 1.16;
+    letter-spacing: -0.02em;
+    font-weight: 500;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+  }
+
+  .site-settings-label {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+  }
+
+  .site-settings-desc {
+    /* --space-0-5 doesn't exist in tokens.css (this pattern's other
+       instances on index.html/sample-packs.html/build-your-box.html
+       reference it too, but it's undefined there as well — an invalid
+       custom property makes the whole margin declaration invalid, so it
+       silently falls back to <p>'s browser-default margin instead of the
+       intended tight spacing). Using a real value here instead of
+       propagating that bug. */
+    margin: 2px 0 0;
+    font-size: 0.6875rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-muted);
+  }
+
+  /* Three layout variants are mutually exclusive — a radio group, not the
+     independent-flag .site-toggle switches the rest of this panel would
+     otherwise use, since "on" here means "instead of," not "in addition
+     to." */
+  .site-settings-radio-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .site-settings-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8125rem;
+    line-height: 1.32;
+    letter-spacing: -0.02em;
+    color: var(--color-text-primary);
+    cursor: pointer;
+  }
+
+  .site-settings-radio input {
+    flex: none;
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
 </style>
 </head>
 <body>
@@ -2015,6 +2756,9 @@
 
     <header class="editor-navbar">
       <div class="editor-navbar-left">
+        <button type="button" class="editor-hamburger-btn" id="editorHamburgerBtn" aria-label="Open menu" aria-expanded="false">
+          <span class="editor-hamburger-lines" aria-hidden="true"><span></span><span></span><span></span></span>
+        </button>
         <div class="editor-logo">
           <a href="../index.html"><img src="../logo-packhelp.1iheyVke.svg" alt="Packhelp"></a>
         </div>
@@ -2033,7 +2777,138 @@
       </div>
     </header>
 
+    <div class="editor-content-row">
+
+    <aside class="editor-drawer" id="editorDrawer">
+      <div class="editor-drawer-project">
+        <p class="editor-drawer-eyebrow">Project name</p>
+        <p class="editor-drawer-project-name">Untitled design</p>
+      </div>
+
+      <nav class="editor-drawer-list">
+        <div class="editor-drawer-item">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 18.5 18.5" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M14.26 8.47924V0H4.23881V8.47924H0V18.5H18.5V8.47924H14.26ZM5.78032 1.54174H7.70803V3.85424L9.24977 3.08326L10.7913 3.85424V1.54174H12.7183V8.47924H5.78032V1.54174ZM8.47971 16.9585H1.54174V10.0208H3.46875V12.3335L5.01026 11.5625L6.55201 12.3335V10.0208H8.47971V16.9585ZM16.9585 16.9585H10.0205V10.0208H11.9475V12.3335L13.489 11.5625L15.0308 12.3335V10.0208H16.9585V16.9585Z" fill="currentColor"/></svg>
+          </span>
+          <span class="editor-drawer-item-body">
+            <p class="editor-drawer-item-label">Product</p>
+            <p class="editor-drawer-item-value">Custom Classic Poly Mailer</p>
+          </span>
+          <button type="button" class="editor-drawer-item-action">Change</button>
+        </div>
+
+        <div class="editor-drawer-item">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 16.6675 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16.6675 10H13.335V3.335L14.1675 0H10.835L11.6675 3.335V10H8.335V11.6675H10V17.5C10 18.163 10.2634 18.7989 10.7322 19.2678C11.2011 19.7366 11.837 20 12.5 20C13.163 20 13.7989 19.7366 14.2678 19.2678C14.7366 18.7989 15 18.163 15 17.5V11.6675H16.6675V10ZM13.335 17.5C13.335 17.6097 13.3134 17.7182 13.2714 17.8195C13.2295 17.9208 13.168 18.0129 13.0904 18.0904C13.0129 18.168 12.9209 18.2295 12.8195 18.2714C12.7182 18.3134 12.6097 18.335 12.5 18.335C12.279 18.3343 12.0672 18.2461 11.9112 18.0896C11.7551 17.933 11.6675 17.721 11.6675 17.5V11.6675H13.335V17.5Z" fill="currentColor"/><path d="M5.835 0V3.815C5.835 4.25724 5.65932 4.68138 5.3466 4.9941C5.03389 5.30682 4.60975 5.4825 4.1675 5.4825C3.72526 5.4825 3.30112 5.30682 2.9884 4.9941C2.67569 4.68138 2.5 4.25724 2.5 3.815V0C1.7576 0.324123 1.12576 0.85758 0.681763 1.53513C0.237761 2.21267 0.000847402 3.00493 0 3.815C0.00106569 4.45916 0.152345 5.09419 0.441811 5.66965C0.731276 6.24511 1.15095 6.74514 1.6675 7.13V17.5C1.6675 18.163 1.93089 18.7989 2.39973 19.2678C2.86858 19.7366 3.50446 20 4.1675 20C4.83055 20 5.46643 19.7366 5.93527 19.2678C6.40411 18.7989 6.6675 18.163 6.6675 17.5V7.13C7.18405 6.74514 7.60373 6.24511 7.8932 5.66965C8.18266 5.09419 8.33393 4.45916 8.335 3.815C8.33415 3.00493 8.09724 2.21267 7.65324 1.53513C7.20924 0.85758 6.5774 0.324123 5.835 0ZM5 17.5C5 17.721 4.91238 17.933 4.75633 18.0896C4.60027 18.2461 4.38853 18.3343 4.1675 18.335C3.94648 18.3343 3.73473 18.2461 3.57868 18.0896C3.42263 17.933 3.335 17.721 3.335 17.5V8.335H5V17.5Z" fill="currentColor"/></svg>
+          </span>
+          <span class="editor-drawer-item-body">
+            <p class="editor-drawer-item-label">Configuration</p>
+            <p class="editor-drawer-item-value">Size: Y60 (25 x 35 cm)</p>
+            <p class="editor-drawer-item-value">100 pieces &middot; 1.36 / piece</p>
+          </span>
+          <button type="button" class="editor-drawer-item-action">Edit</button>
+        </div>
+
+        <button type="button" class="editor-drawer-item">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="15" cy="5" r="2.2"/><circle cx="6" cy="10" r="2.2"/><circle cx="15" cy="15" r="2.2"/><path d="M7.8 8.8L13.2 6M7.8 11.2L13.2 14"/></svg>
+          </span>
+          <span class="editor-drawer-item-body"><p class="editor-drawer-item-label">Share</p></span>
+        </button>
+
+        <div class="editor-drawer-item is-disabled">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 3.5h9.5L16.5 6.5V16.5H4V3.5Z"/><path d="M6.5 3.5V7.5H12.5V3.5"/><rect x="6.5" y="10.5" width="7" height="6"/></svg>
+          </span>
+          <span class="editor-drawer-item-body"><p class="editor-drawer-item-label">Save project</p></span>
+          <span class="editor-drawer-badge">All changes saved</span>
+        </div>
+
+        <button type="button" class="editor-drawer-item">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 10a6 6 0 1 1-2-4.47"/><path d="M16 3v4h-4"/></svg>
+          </span>
+          <span class="editor-drawer-item-body"><p class="editor-drawer-item-label">Start again</p></span>
+        </button>
+
+        <button type="button" class="editor-drawer-item">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><rect x="3" y="3" width="11" height="11" rx="2"/><path d="M7 17h8a2 2 0 0 0 2-2V7"/></svg>
+          </span>
+          <span class="editor-drawer-item-body"><p class="editor-drawer-item-label">Duplicate project</p></span>
+        </button>
+
+        <a href="#" class="editor-drawer-item">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M5 2.5h7l3.5 3.5V17.5H5V2.5Z"/><path d="M12 2.5V6H15.5"/><path d="M7.5 10H12.5M7.5 13H12.5"/></svg>
+          </span>
+          <span class="editor-drawer-item-body"><p class="editor-drawer-item-label">My projects</p></span>
+          <svg class="editor-drawer-external" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 10L10 4M5 4h5v5"/></svg>
+        </a>
+
+        <a href="#" class="editor-drawer-item">
+          <span class="editor-drawer-item-icon">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="10" cy="10" r="7.5"/><path d="M7.8 8a2.2 2.2 0 1 1 3.4 1.85c-.7.46-1.2.9-1.2 1.65v.3"/><circle cx="10" cy="14.2" r="0.9" fill="currentColor" stroke="none"/></svg>
+          </span>
+          <span class="editor-drawer-item-body"><p class="editor-drawer-item-label">Help</p></span>
+          <svg class="editor-drawer-external" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 10L10 4M5 4h5v5"/></svg>
+        </a>
+      </nav>
+
+      <div class="editor-drawer-footer">
+        <p class="editor-drawer-eyebrow">Logged as</p>
+        <p class="editor-drawer-email">emil.glegula@packhelp.com</p>
+      </div>
+    </aside>
+
     <div class="editor-body">
+
+      <!-- Rail-navigation layout variant only — hidden by default (see the
+           "Page customization" script above), takes over from
+           .editor-menu (the sidebar's floating bottom tab bar) when
+           active. Source: Figma node 6935:684. Icons faithfully
+           reproduced from that node's exported assets as inline
+           fill="currentColor" paths (so the active-state color change
+           works the same way every other icon on this page already
+           does) — except "AI design" and "Upload", which reuse this
+           page's own existing sparkle/magnifier-plus icons: verified
+           identical glyphs to what Figma exported for those two specific
+           items, so reusing keeps one icon per concept instead of two
+           near-duplicates. -->
+      <nav class="editor-rail" id="editorRail" hidden>
+        <button type="button" class="editor-rail-item" data-rail="product">
+          <svg viewBox="0 0 18.5 18.5" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M14.26 8.47924V0H4.23881V8.47924H0V18.5H18.5V8.47924H14.26ZM5.78032 1.54174H7.70803V3.85424L9.24977 3.08326L10.7913 3.85424V1.54174H12.7183V8.47924H5.78032V1.54174ZM8.47971 16.9585H1.54174V10.0208H3.46875V12.3335L5.01026 11.5625L6.55201 12.3335V10.0208H8.47971V16.9585ZM16.9585 16.9585H10.0205V10.0208H11.9475V12.3335L13.489 11.5625L15.0308 12.3335V10.0208H16.9585V16.9585Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">Product</span>
+        </button>
+        <button type="button" class="editor-rail-item" data-rail="configuration">
+          <svg viewBox="0 0 16.6675 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16.6675 10H13.335V3.335L14.1675 0H10.835L11.6675 3.335V10H8.335V11.6675H10V17.5C10 18.163 10.2634 18.7989 10.7322 19.2678C11.2011 19.7366 11.837 20 12.5 20C13.163 20 13.7989 19.7366 14.2678 19.2678C14.7366 18.7989 15 18.163 15 17.5V11.6675H16.6675V10ZM13.335 17.5C13.335 17.6097 13.3134 17.7182 13.2714 17.8195C13.2295 17.9208 13.168 18.0129 13.0904 18.0904C13.0129 18.168 12.9209 18.2295 12.8195 18.2714C12.7182 18.3134 12.6097 18.335 12.5 18.335C12.279 18.3343 12.0672 18.2461 11.9112 18.0896C11.7551 17.933 11.6675 17.721 11.6675 17.5V11.6675H13.335V17.5Z" fill="currentColor"/><path d="M5.835 0V3.815C5.835 4.25724 5.65932 4.68138 5.3466 4.9941C5.03389 5.30682 4.60975 5.4825 4.1675 5.4825C3.72526 5.4825 3.30112 5.30682 2.9884 4.9941C2.67569 4.68138 2.5 4.25724 2.5 3.815V0C1.7576 0.324123 1.12576 0.85758 0.681763 1.53513C0.237761 2.21267 0.000847402 3.00493 0 3.815C0.00106569 4.45916 0.152345 5.09419 0.441811 5.66965C0.731276 6.24511 1.15095 6.74514 1.6675 7.13V17.5C1.6675 18.163 1.93089 18.7989 2.39973 19.2678C2.86858 19.7366 3.50446 20 4.1675 20C4.83055 20 5.46643 19.7366 5.93527 19.2678C6.40411 18.7989 6.6675 18.163 6.6675 17.5V7.13C7.18405 6.74514 7.60373 6.24511 7.8932 5.66965C8.18266 5.09419 8.33393 4.45916 8.335 3.815C8.33415 3.00493 8.09724 2.21267 7.65324 1.53513C7.20924 0.85758 6.5774 0.324123 5.835 0ZM5 17.5C5 17.721 4.91238 17.933 4.75633 18.0896C4.60027 18.2461 4.38853 18.3343 4.1675 18.335C3.94648 18.3343 3.73473 18.2461 3.57868 18.0896C3.42263 17.933 3.335 17.721 3.335 17.5V8.335H5V17.5Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">Configuration</span>
+        </button>
+        <button type="button" class="editor-rail-item is-active" data-rail="ai-design">
+          <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4.03333 20.2507L2.75 18.9673L9.64792 12.0465L5.5 11.0152L10.0375 8.19648L9.64792 2.83398L13.75 6.2944L18.7 4.27773L16.7062 9.25065L20.1667 13.3298L14.8042 12.9632L11.9625 17.5007L10.9312 13.3527L4.03333 20.2507ZM4.58333 8.33398L2.75 6.50065L4.58333 4.66732L6.41667 6.50065L4.58333 8.33398ZM12.7187 12.8486L13.8187 11.0382L15.95 11.1986L14.575 9.57148L15.3771 7.60065L13.4062 8.40273L11.7792 7.05065L11.9396 9.15898L10.1292 10.2819L12.1917 10.7861L12.7187 12.8486ZM16.5 20.2507L14.6667 18.4173L16.5 16.584L18.3333 18.4173L16.5 20.2507Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">AI design</span>
+        </button>
+        <button type="button" class="editor-rail-item" data-rail="logo">
+          <svg viewBox="0 0 20 16.666" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M15 1.33705e-06C13.619 -0.000998663 12.369 0.559002 11.464 1.464L9.99925 2.92875L8.53525 1.46475C7.6305 0.559751 6.38025 1.33705e-06 5 1.33705e-06C2.2395 1.33705e-06 0 2.23825 0 5C0 6.3805 0.55975 7.6305 1.46475 8.53525L8.82175 16.18C9.46925 16.828 10.5307 16.828 11.1792 16.18L18.5355 8.53525C19.4402 7.63025 20 6.38025 20 5C20 2.2395 17.762 1.33705e-06 15 1.33705e-06ZM17.3568 7.35625L10 15.0033L2.666 7.37975C2.0135 6.72725 1.66675 5.8905 1.66675 5C1.66675 3.1625 3.1625 1.667 5 1.667C5.8905 1.667 6.727 2.01375 7.357 2.6435L9.9995 5.2865L12.6425 2.6425C13.2725 2.0135 14.1087 1.667 14.9982 1.667C16.8377 1.667 18.3335 3.16175 18.3335 5C18.3332 5.8905 17.9865 6.727 17.3568 7.35625Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">Logo</span>
+        </button>
+        <button type="button" class="editor-rail-item" data-rail="templates">
+          <svg viewBox="0 0 20 18.3335" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M20 7.00025L13.095 6.0335L10.0017 0L6.91 6.0335L0 7.00025L5.00175 11.6967L3.824 18.3335L10.0017 15.201L16.184 18.3335L15 11.6967L20 7.00025ZM10.0017 13.3325L6.04825 15.337L6.80125 11.0995L3.67925 8.169L7.998 7.56425L10.0017 3.654L12.007 7.5635L16.3228 8.16825L13.2008 11.1003L13.9568 15.336L10.0017 13.3325Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">Templates</span>
+        </button>
+        <button type="button" class="editor-rail-item" data-rail="text">
+          <svg viewBox="0 0 18 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M13 10H12V2C12 0.9 11.1 0 10 0H8C6.9 0 6 0.9 6 2V10H5C2.24 10 0 12.24 0 15V22H18V15C18 12.24 15.76 10 13 10ZM8 2H10V10H8V2ZM16 20H14V17C14 16.45 13.55 16 13 16C12.45 16 12 16.45 12 17V20H10V17C10 16.45 9.55 16 9 16C8.45 16 8 16.45 8 17V20H6V17C6 16.45 5.55 16 5 16C4.45 16 4 16.45 4 17V20H2V15C2 13.35 3.35 12 5 12H13C14.65 12 16 13.35 16 15V20Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">Text</span>
+        </button>
+        <button type="button" class="editor-rail-item" data-rail="elements">
+          <svg viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 6.66675L6.66675 0L0 13.3333H6.66675V20H20V6.66675H10ZM2.697 11.6667L6.66675 3.72625L10.6365 11.6667H2.697ZM18.3333 18.3333H8.33325V13.3333H13.3333L10.8333 8.33325H18.3333V18.3333Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">Elements</span>
+        </button>
+        <button type="button" class="editor-rail-item" data-rail="upload">
+          <svg viewBox="0 0 24 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M16 5H14V8H11V10H14V13H16V10H19V8H16V5ZM2 9C2 6.21 3.64 3.8 6.01 2.68V0.52C2.52 1.76 0 5.09 0 9C0 12.91 2.52 16.24 6.01 17.48V15.32C3.64 14.2 2 11.79 2 9ZM15 0C10.04 0 6 4.04 6 9C6 13.96 10.04 18 15 18C19.96 18 24 13.96 24 9C24 4.04 19.96 0 15 0ZM15 16C11.14 16 8 12.86 8 9C8 5.14 11.14 2 15 2C18.86 2 22 5.14 22 9C22 12.86 18.86 16 15 16Z" fill="currentColor"/></svg>
+          <span class="editor-rail-item-label">Upload</span>
+        </button>
+      </nav>
 
       <div class="editor-preview-pane">
         <div class="editor-preview-card">
@@ -2136,6 +3011,13 @@
 
       <aside class="editor-sidebar">
         <div class="editor-sidebar-content" id="sidebarContent">
+          <!-- Steps 1-6, the guided "AI design" conversation — wrapped as
+               one unit so the bottom-menu's Template/Elements/Brand tabs
+               can hide it wholesale and show their own single-purpose
+               panel instead, then bring it back exactly as it was
+               (mid-conversation state untouched) when "AI design" is
+               clicked again. -->
+          <div id="aiDesignFlow">
           <div class="editor-scroll-fade" aria-hidden="true"></div>
 
           <div class="editor-step" id="step1">
@@ -2263,7 +3145,7 @@
                 <h2 class="editor-sidebar-title">Give it your brand&rsquo;s touch</h2>
               </div>
 
-              <div class="editor-field">
+              <div class="editor-field" id="companyWebsiteField">
                 <div class="editor-field-label">
                   <p class="editor-field-label-text">Get branding with AI</p>
                   <p class="editor-field-optional">Optional</p>
@@ -2278,8 +3160,14 @@
                 <div class="editor-field-label">
                   <p class="editor-field-label-text">Logo</p>
                 </div>
-                <label for="logoUploadInput" class="editor-upload-dropzone" id="logoUploadLabel">Upload image</label>
-                <input type="file" id="logoUploadInput" accept="image/*" hidden>
+                <div class="editor-upload-dropzone-wrap">
+                  <label for="logoUploadInput" class="editor-upload-dropzone" id="logoUploadLabel">
+                    <span class="editor-upload-dropzone-text" id="logoUploadText">Upload image</span>
+                    <img class="editor-upload-dropzone-preview" id="logoUploadPreview" alt="" hidden>
+                  </label>
+                  <input type="file" id="logoUploadInput" accept="image/*" hidden>
+                  <button type="button" class="editor-upload-dropzone-delete" id="logoUploadDelete" hidden>Delete</button>
+                </div>
               </div>
 
               <div class="editor-field">
@@ -2608,11 +3496,406 @@
                 </div>
               </div>
 
-              <div class="editor-field">
-                <p class="editor-field-label-text">Example prompts</p>
-                <button type="button" class="editor-prompt-chip">Reduce logo size by 10%</button>
-                <button type="button" class="editor-prompt-chip">Add eco badges icons</button>
-                <button type="button" class="editor-prompt-chip">Increase slogan font size</button>
+              <div class="editor-prompt-chip-row">
+                <button type="button" class="editor-prompt-chip">Increase logo by 15%</button>
+                <button type="button" class="editor-prompt-chip">Add eco icons</button>
+                <button type="button" class="editor-prompt-chip">Start from scratch</button>
+              </div>
+            </div>
+          </div>
+          </div><!-- /#aiDesignFlow -->
+
+          <!-- "Template" bottom-menu tab — duplicate of step 5's design
+               grid (see the top-of-file note on #aiDesignFlow for why this
+               is a duplicate rather than a shared view). -->
+          <div class="editor-menu-panel" id="menuPanelTemplate" hidden>
+            <h2 class="editor-menu-panel-title">Templates</h2>
+
+            <div class="editor-filter-tabs">
+              <button type="button" class="editor-filter-tab is-active">Recommended</button>
+              <button type="button" class="editor-filter-tab">
+                All designs
+                <svg width="5" height="8" viewBox="0 0 4.44427 8" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M0.628267 0L4.31467 3.68533C4.48747 3.85813 4.48747 4.1408 4.31467 4.3136L0.629333 8L0 7.37173L3.37173 4L0 0.628267L0.628267 0Z" fill="#555555"/></svg>
+              </button>
+            </div>
+
+            <div class="editor-design-grid" id="designGrid2">
+              <button type="button" class="editor-design-tile is-selected" data-design="02">
+                <span class="editor-design-thumb">
+                  <span class="editor-design-mini-stage">
+                    <img class="editor-design-mini-bg" src="assets/preview-bg.png" alt="">
+                    <span class="editor-preview-lockup" data-composition="02">
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                      <span class="editor-preview-logo">
+                        <svg class="editor-preview-logo-svg js-logo-mark" width="216" height="50" viewBox="0 0 216 50"><use href="#logo-wordmark"></use></svg>
+                        <img class="editor-preview-logo-img js-logo-img" alt="" hidden>
+                      </span>
+                      <span class="editor-preview-copy">
+                        <span class="editor-preview-tagline js-tagline">You&rsquo;ve been expecting me</span>
+                        <span class="editor-preview-website js-website" hidden>www.website.com</span>
+                      </span>
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                    </span>
+                  </span>
+                  <img class="editor-design-check" src="assets/step2/checkmark-badge.svg" alt="">
+                </span>
+              </button>
+              <button type="button" class="editor-design-tile" data-design="01">
+                <span class="editor-design-thumb">
+                  <span class="editor-design-mini-stage">
+                    <img class="editor-design-mini-bg" src="assets/preview-bg.png" alt="">
+                    <span class="editor-preview-lockup" data-composition="01">
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                      <span class="editor-preview-logo">
+                        <svg class="editor-preview-logo-svg js-logo-mark" width="216" height="50" viewBox="0 0 216 50"><use href="#logo-wordmark"></use></svg>
+                        <img class="editor-preview-logo-img js-logo-img" alt="" hidden>
+                      </span>
+                      <span class="editor-preview-copy">
+                        <span class="editor-preview-tagline js-tagline">You&rsquo;ve been expecting me</span>
+                        <span class="editor-preview-website js-website" hidden>www.website.com</span>
+                      </span>
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                    </span>
+                  </span>
+                  <img class="editor-design-check" src="assets/step2/checkmark-badge.svg" alt="">
+                </span>
+              </button>
+              <button type="button" class="editor-design-tile" data-design="03">
+                <span class="editor-design-thumb">
+                  <span class="editor-design-mini-stage">
+                    <img class="editor-design-mini-bg" src="assets/preview-bg.png" alt="">
+                    <span class="editor-preview-lockup" data-composition="03">
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                      <span class="editor-preview-logo">
+                        <svg class="editor-preview-logo-svg js-logo-mark" width="216" height="50" viewBox="0 0 216 50"><use href="#logo-wordmark"></use></svg>
+                        <img class="editor-preview-logo-img js-logo-img" alt="" hidden>
+                      </span>
+                      <span class="editor-preview-copy">
+                        <span class="editor-preview-tagline js-tagline">You&rsquo;ve been expecting me</span>
+                        <span class="editor-preview-website js-website" hidden>www.website.com</span>
+                      </span>
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                    </span>
+                  </span>
+                  <img class="editor-design-check" src="assets/step2/checkmark-badge.svg" alt="">
+                </span>
+              </button>
+              <button type="button" class="editor-design-tile" data-design="04">
+                <span class="editor-design-thumb">
+                  <span class="editor-design-mini-stage">
+                    <img class="editor-design-mini-bg" src="assets/preview-bg.png" alt="">
+                    <span class="editor-preview-lockup" data-composition="04">
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                      <span class="editor-preview-logo">
+                        <svg class="editor-preview-logo-svg js-logo-mark" width="216" height="50" viewBox="0 0 216 50"><use href="#logo-wordmark"></use></svg>
+                        <img class="editor-preview-logo-img js-logo-img" alt="" hidden>
+                      </span>
+                      <span class="editor-preview-copy">
+                        <span class="editor-preview-tagline js-tagline">You&rsquo;ve been expecting me</span>
+                        <span class="editor-preview-website js-website" hidden>www.website.com</span>
+                      </span>
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                    </span>
+                  </span>
+                  <img class="editor-design-check" src="assets/step2/checkmark-badge.svg" alt="">
+                </span>
+              </button>
+              <button type="button" class="editor-design-tile" data-design="05">
+                <span class="editor-design-thumb">
+                  <span class="editor-design-mini-stage">
+                    <img class="editor-design-mini-bg" src="assets/preview-bg.png" alt="">
+                    <span class="editor-preview-decor" aria-hidden="true">
+                      <svg class="editor-decor-icon" style="left:6%; top:8%; width:52px; height:26px;"><use href="#decor-wink"></use></svg>
+                      <svg class="editor-decor-icon" style="left:46%; top:4%; width:36px; height:32px;"><use href="#decor-heart"></use></svg>
+                      <svg class="editor-decor-icon" style="left:78%; top:14%; width:18px; height:18px;"><use href="#decor-dot"></use></svg>
+                      <svg class="editor-decor-icon" style="left:4%; top:24%; width:48px; height:27px;"><use href="#decor-lips"></use></svg>
+                      <svg class="editor-decor-icon" style="left:68%; top:18%; width:56px; height:19px; transform:rotate(-8deg);"><use href="#decor-squiggle"></use></svg>
+                      <svg class="editor-decor-icon" style="left:2%; top:66%; width:22px; height:22px; transform:rotate(90deg);"><use href="#decor-squiggle"></use></svg>
+                      <svg class="editor-decor-icon" style="left:26%; top:70%; width:32px; height:29px;"><use href="#decor-heart"></use></svg>
+                      <svg class="editor-decor-icon" style="left:56%; top:74%; width:44px; height:25px;"><use href="#decor-lips"></use></svg>
+                      <svg class="editor-decor-icon" style="left:82%; top:80%; width:16px; height:16px;"><use href="#decor-dot"></use></svg>
+                    </span>
+                    <span class="editor-preview-lockup" data-composition="05">
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                      <span class="editor-preview-logo">
+                        <svg class="editor-preview-logo-svg js-logo-mark" width="216" height="50" viewBox="0 0 216 50"><use href="#logo-wordmark"></use></svg>
+                        <img class="editor-preview-logo-img js-logo-img" alt="" hidden>
+                      </span>
+                      <span class="editor-preview-copy">
+                        <span class="editor-preview-tagline js-tagline">You&rsquo;ve been expecting me</span>
+                        <span class="editor-preview-website js-website" hidden>www.website.com</span>
+                      </span>
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                    </span>
+                  </span>
+                  <img class="editor-design-check" src="assets/step2/checkmark-badge.svg" alt="">
+                </span>
+              </button>
+              <button type="button" class="editor-design-tile" data-design="06">
+                <span class="editor-design-thumb">
+                  <span class="editor-design-mini-stage">
+                    <img class="editor-design-mini-bg" src="assets/preview-bg.png" alt="">
+                    <span class="editor-preview-decor" aria-hidden="true">
+                      <svg class="editor-decor-icon" style="left:8%; top:18%; width:52px; height:52px;"><use href="#decor-star"></use></svg>
+                      <svg class="editor-decor-icon" style="left:66%; top:10%; width:44px; height:36px;"><use href="#decor-scribble"></use></svg>
+                      <svg class="editor-decor-icon" style="left:80%; top:36%; width:16px; height:16px;"><use href="#decor-dot"></use></svg>
+                      <svg class="editor-decor-icon" style="left:14%; top:52%; width:16px; height:16px;"><use href="#decor-dot"></use></svg>
+                      <svg class="editor-decor-icon" style="left:10%; top:64%; width:44px; height:36px; transform:rotate(150deg);"><use href="#decor-scribble"></use></svg>
+                      <svg class="editor-decor-icon" style="left:72%; top:60%; width:52px; height:52px;"><use href="#decor-star"></use></svg>
+                      <svg class="editor-decor-icon" style="left:58%; top:80%; width:16px; height:16px;"><use href="#decor-dot"></use></svg>
+                    </span>
+                    <span class="editor-preview-lockup" data-composition="06">
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                      <span class="editor-preview-logo">
+                        <svg class="editor-preview-logo-svg js-logo-mark" width="216" height="50" viewBox="0 0 216 50"><use href="#logo-wordmark"></use></svg>
+                        <img class="editor-preview-logo-img js-logo-img" alt="" hidden>
+                      </span>
+                      <span class="editor-preview-copy">
+                        <span class="editor-preview-tagline js-tagline">You&rsquo;ve been expecting me</span>
+                        <span class="editor-preview-website js-website" hidden>www.website.com</span>
+                      </span>
+                      <span class="editor-preview-rule" aria-hidden="true"></span>
+                    </span>
+                  </span>
+                  <img class="editor-design-check" src="assets/step2/checkmark-badge.svg" alt="">
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- "Elements" bottom-menu tab — duplicate of step 4's elements
+               list. Inputs get a "2" suffix (mainTextInput2, etc.) to
+               avoid id collisions; each still writes into the same
+               .js-tagline/.js-website/.editor-preview-logo targets as the
+               original, so typing here updates the real preview exactly
+               like typing in step 4 does. On/off state itself is this
+               panel's own (not mirrored back onto step 4's list — see the
+               request that asked for a duplicate, not a shared view). -->
+          <div class="editor-menu-panel" id="menuPanelElements" hidden>
+            <h2 class="editor-menu-panel-title">Elements</h2>
+
+            <div class="editor-elements-list" id="elementsList2">
+              <div class="editor-elem-item is-on" data-elem="logo">
+                <div class="editor-elem-row">
+                  <p class="editor-elem-label">Logo</p>
+                  <button type="button" class="editor-elem-toggle" aria-label="Toggle Logo">
+                    <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
+                  </button>
+                </div>
+              </div>
+
+              <div class="editor-elem-item is-on" data-elem="main-text">
+                <div class="editor-elem-row">
+                  <p class="editor-elem-label">Main text</p>
+                  <button type="button" class="editor-elem-toggle" aria-label="Toggle Main text">
+                    <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
+                  </button>
+                </div>
+                <div class="editor-elem-input-wrap">
+                  <input type="text" class="editor-text-input" id="mainTextInput2" value="You&rsquo;ve been expecting me">
+                </div>
+              </div>
+
+              <div class="editor-elem-item is-off" data-elem="website">
+                <div class="editor-elem-row">
+                  <p class="editor-elem-label">Website</p>
+                  <button type="button" class="editor-elem-toggle" aria-label="Toggle Website">
+                    <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
+                  </button>
+                </div>
+                <div class="editor-elem-input-wrap">
+                  <input type="text" class="editor-text-input" id="websiteInput2" value="www.website.com">
+                </div>
+              </div>
+
+              <div class="editor-elem-item is-off" data-elem="instagram">
+                <div class="editor-elem-row">
+                  <p class="editor-elem-label">Instagram</p>
+                  <button type="button" class="editor-elem-toggle" aria-label="Toggle Instagram">
+                    <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
+                  </button>
+                </div>
+                <div class="editor-elem-input-wrap">
+                  <input type="text" class="editor-text-input" id="instagramInput2" value="instagram.com/yourprofile">
+                </div>
+              </div>
+
+              <div class="editor-elem-item is-off" data-elem="facebook">
+                <div class="editor-elem-row">
+                  <p class="editor-elem-label">Facebook</p>
+                  <button type="button" class="editor-elem-toggle" aria-label="Toggle Facebook">
+                    <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
+                  </button>
+                </div>
+                <div class="editor-elem-input-wrap">
+                  <input type="text" class="editor-text-input" id="facebookInput2" value="facebook.com/yourpage">
+                </div>
+              </div>
+
+              <div class="editor-elem-item is-off" data-elem="eco-badges">
+                <div class="editor-elem-row">
+                  <p class="editor-elem-label">Eco badges</p>
+                  <button type="button" class="editor-elem-toggle" aria-label="Toggle Eco badges">
+                    <img class="editor-elem-check" src="assets/step2/checkmark-badge.svg" alt="">
+                  </button>
+                </div>
+              </div>
+
+              <button type="button" class="editor-elem-item editor-elem-add">
+                <div class="editor-elem-row">
+                  <p class="editor-elem-label">Add other element</p>
+                  <span class="editor-elem-plus" aria-hidden="true">+</span>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <!-- "Brand" bottom-menu tab — duplicate of step 3's Logo/Print
+               colour/Font controls. Logo/colour/font are single global
+               values (one active logo, one brand colour, one font) rather
+               than a multi-part configuration, so — unlike the Elements
+               list above — this panel's controls stay fully mirrored with
+               step 3's own via the shared apply functions, both updated
+               together every time either copy is used.
+
+               "Get branding with AI" is NOT a duplicate — it drives a
+               large, deeply id-wired modal that isn't safely cloneable, so
+               instead the one real #companyWebsiteField element gets
+               *moved* into #companyWebsiteFieldSlot below whenever this
+               tab is shown, and moved back to its step 3 home the moment
+               another tab is picked (see moveWebsiteFetchField()). It's
+               never duplicated, so it's always, trivially, "the same
+               component" — there's only ever one. -->
+          <div class="editor-menu-panel" id="menuPanelBrand" hidden>
+            <h2 class="editor-menu-panel-title">Brand</h2>
+
+            <div id="companyWebsiteFieldSlot"></div>
+
+            <div class="editor-field">
+              <div class="editor-field-label">
+                <p class="editor-field-label-text">Logo</p>
+              </div>
+              <div class="editor-upload-dropzone-wrap">
+                <label for="logoUploadInput2" class="editor-upload-dropzone" id="logoUploadLabel2">
+                  <span class="editor-upload-dropzone-text" id="logoUploadText2">Upload image</span>
+                  <img class="editor-upload-dropzone-preview" id="logoUploadPreview2" alt="" hidden>
+                </label>
+                <input type="file" id="logoUploadInput2" accept="image/*" hidden>
+                <button type="button" class="editor-upload-dropzone-delete" id="logoUploadDelete2" hidden>Delete</button>
+              </div>
+            </div>
+
+            <div class="editor-field">
+              <div class="editor-field-label">
+                <p class="editor-field-label-text">Print colour</p>
+              </div>
+              <div class="editor-color-swatches" id="colorSwatches2">
+                <div class="editor-color-swatches-row">
+                  <button type="button" class="editor-color-swatch is-selected" style="background:#000000" data-color="#000000" aria-label="Black"></button>
+                  <button type="button" class="editor-color-swatch" style="background:#5e5e5e" data-color="#5e5e5e" aria-label="Grey"></button>
+                  <button type="button" class="editor-color-swatch" style="background:#412d0b" data-color="#412d0b" aria-label="Dark brown"></button>
+                  <button type="button" class="editor-color-swatch" style="background:#745308" data-color="#745308" aria-label="Gold"></button>
+                  <button type="button" class="editor-color-swatch" style="background:#003a8c" data-color="#003a8c" aria-label="Blue"></button>
+                  <button type="button" class="editor-color-swatch" style="background:#39159c" data-color="#39159c" aria-label="Purple"></button>
+                  <button type="button" class="editor-color-swatch" style="background:#a12820" data-color="#a12820" aria-label="Red"></button>
+                  <button type="button" class="editor-color-swatch" style="background:#087416" data-color="#087416" aria-label="Green"></button>
+                  <button type="button" class="editor-color-swatch-add" aria-label="Add custom colour">
+                    <svg width="14" height="14" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M17.6006 16.3994L23 16.3994V17.5996L17.6006 17.5996L17.6006 23H16.4004L16.4004 17.5996H11V16.3994H16.4004V11H17.6006V16.3994Z" fill="#555555"/></svg>
+                  </button>
+                </div>
+                <div class="editor-color-swatches-row editor-color-swatches-row--extracted" id="extractedColorRow2"></div>
+              </div>
+            </div>
+
+            <div class="editor-field">
+              <div class="editor-field-label">
+                <p class="editor-field-label-text">Font</p>
+              </div>
+              <div class="editor-select-wrap" id="fontDropdown2">
+                <button type="button" class="editor-select-input" id="fontDropdownTrigger2" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="fontDropdownValue2">Poppins</span>
+                  <svg class="editor-select-chevron" width="10" height="10" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M9.0016 0.71811C9.37534 0.32692 10 0.32692 10.3737 0.71811C10.7241 1.08485 10.7241 1.6623 10.3737 2.02904L5.62456 7L10.3737 11.971C10.7241 12.3377 10.7241 12.9152 10.3737 13.2819C10 13.6731 9.37534 13.6731 9.0016 13.2819L2.99997 7L9.0016 0.71811Z" fill="#00061A"/></svg>
+                </button>
+                <div class="editor-select-menu" id="fontDropdownMenu2" role="listbox" hidden>
+                  <button type="button" class="editor-select-option is-selected" data-font="Poppins" style="font-family:'Poppins',sans-serif" role="option" aria-selected="true">Poppins</button>
+                  <button type="button" class="editor-select-option" data-font="Lora" style="font-family:'Lora',serif" role="option" aria-selected="false">Lora</button>
+                  <button type="button" class="editor-select-option" data-font="Inter" style="font-family:'Inter',sans-serif" role="option" aria-selected="false">Inter</button>
+                  <button type="button" class="editor-select-option" data-font="Bebas Neue" style="font-family:'Bebas Neue',sans-serif" role="option" aria-selected="false">Bebas Neue</button>
+                  <button type="button" class="editor-select-option" data-font="Google Sans" style="font-family:'Google Sans',sans-serif" role="option" aria-selected="false">Google Sans</button>
+                  <button type="button" class="editor-select-option" data-font="Archivo Black" style="font-family:'Archivo Black',sans-serif" role="option" aria-selected="false">Archivo Black</button>
+                  <button type="button" class="editor-select-option" data-font="IBM Plex Serif" style="font-family:'IBM Plex Serif',serif" role="option" aria-selected="false">IBM Plex Serif</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- "Add" bottom-menu tab — a new panel (no corresponding step to
+               duplicate), for dropping extra elements onto the packaging:
+               an uploaded graphic, a preset text snippet, or a stock
+               graphic category. Layout-first pass — tiles/buttons are
+               fully interactive (upload preview+delete, single-select
+               text tiles) but don't yet place anything on the actual
+               preview canvas, since there's no "extra floating element"
+               mechanism on it to hook into. -->
+          <div class="editor-menu-panel" id="menuPanelAdd" hidden>
+            <h2 class="editor-menu-panel-title">Add</h2>
+
+            <div class="editor-menu-panel-section">
+              <p class="editor-field-label-text">Upload</p>
+              <div class="editor-upload-dropzone-wrap">
+                <label for="addUploadInput" class="editor-upload-dropzone" id="addUploadLabel">
+                  <span class="editor-upload-dropzone-text" id="addUploadText">Upload image</span>
+                  <img class="editor-upload-dropzone-preview" id="addUploadPreview" alt="" hidden>
+                </label>
+                <input type="file" id="addUploadInput" accept="image/*" hidden>
+                <button type="button" class="editor-upload-dropzone-delete" id="addUploadDelete" hidden>Delete</button>
+              </div>
+            </div>
+
+            <div class="editor-menu-panel-section">
+              <p class="editor-field-label-text">Text</p>
+              <button type="button" class="editor-step2-continue editor-btn-block editor-btn-sm">Add text</button>
+              <div class="editor-text-tile-row" id="addTextTiles">
+                <button type="button" class="editor-text-tile" style="font-family:'Poppins',sans-serif">Thank you for shopping with us!</button>
+                <button type="button" class="editor-text-tile" style="font-family:'Lora',serif">Handmade with love</button>
+                <button type="button" class="editor-text-tile" style="font-family:'Inter',sans-serif">Eco-friendly packaging</button>
+                <button type="button" class="editor-text-tile" style="font-family:'Bebas Neue',sans-serif">Free returns &amp; exchanges</button>
+                <button type="button" class="editor-text-tile" style="font-family:'Archivo Black',sans-serif">Follow us @yourbrand</button>
+                <button type="button" class="editor-text-tile" style="font-family:'IBM Plex Serif',serif">Made with care, just for you</button>
+              </div>
+              <button type="button" class="editor-link-more">
+                Show more
+                <svg viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+
+            <div class="editor-menu-panel-section">
+              <p class="editor-field-label-text">Graphics</p>
+              <div class="editor-graphics-grid">
+                <button type="button" class="editor-graphics-tile">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M4 16c0-7 5-12 12-12 0 7-5 12-12 12Z"/><path d="M4 16c2-3 6-8 11-11"/></svg>
+                  <span class="editor-graphics-tile-label">Eco symbols</span>
+                </button>
+                <button type="button" class="editor-graphics-tile">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 2l6 3v5c0 4-2.5 7-6 8-3.5-1-6-4-6-8V5l6-3Z"/><path d="M7.3 10l2 2 3.4-4"/></svg>
+                  <span class="editor-graphics-tile-label">Eco properties</span>
+                </button>
+                <button type="button" class="editor-graphics-tile">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M2 6.5h8v7H2z"/><path d="M10 9.5h3l2.5 2.5v1.5H10z"/><circle cx="5" cy="15.5" r="1.4"/><circle cx="13.5" cy="15.5" r="1.4"/></svg>
+                  <span class="editor-graphics-tile-label">Logistics</span>
+                </button>
+                <button type="button" class="editor-graphics-tile">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="7" cy="7" r="3.5"/><rect x="11" y="11" width="6" height="6"/></svg>
+                  <span class="editor-graphics-tile-label">Shapes</span>
+                </button>
+                <button type="button" class="editor-graphics-tile">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M10 2c3 0 6 2 6 5 0 2-1 3-1 5 0 3-2 6-5 6s-6-2-6-6c0-2 1-3 1-5 0-3 2-5 5-5Z"/></svg>
+                  <span class="editor-graphics-tile-label">Abstract</span>
+                </button>
+                <button type="button" class="editor-graphics-tile">
+                  <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="7" cy="6" r="3"/><path d="M2 17c0-3 2-5 5-5s5 2 5 5"/><circle cx="14.5" cy="7" r="2.3"/><path d="M12.3 17c0-2.5 1-4.2 3-4.8"/></svg>
+                  <span class="editor-graphics-tile-label">Social</span>
+                </button>
               </div>
             </div>
           </div>
@@ -2626,10 +3909,10 @@
               <span class="editor-menu-item-label">AI design</span>
             </span>
           </button>
-          <button type="button" class="editor-menu-item" data-menu="template">
+          <button type="button" class="editor-menu-item" data-menu="brand">
             <span class="editor-menu-item-surface">
-              <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.2062 11.459L13.2916 10.1986L15.3771 11.459L14.8271 9.07565L16.6604 7.4944L14.2541 7.28815L13.2916 5.04232L12.3291 7.28815L9.9229 7.4944L11.7562 9.07565L11.2062 11.459ZM11.6416 17.4173H16.775C16.668 17.8145 16.4847 18.1354 16.225 18.3798C15.9653 18.6243 15.6291 18.777 15.2166 18.8382L5.22498 20.0527C4.72081 20.1291 4.2663 20.0107 3.86144 19.6975C3.45658 19.3843 3.22359 18.9757 3.16248 18.4715L1.94789 8.4569C1.88678 7.95273 2.00901 7.50204 2.31456 7.10482C2.62012 6.7076 3.02498 6.47843 3.52915 6.41732L4.58331 6.27982V8.11315L3.75831 8.22773L4.99581 18.2423L11.6416 17.4173ZM8.24998 15.584C7.74581 15.584 7.31422 15.4045 6.95519 15.0454C6.59616 14.6864 6.41665 14.2548 6.41665 13.7507V3.66732C6.41665 3.16315 6.59616 2.73155 6.95519 2.37253C7.31422 2.0135 7.74581 1.83398 8.24998 1.83398H18.3333C18.8375 1.83398 19.2691 2.0135 19.6281 2.37253C19.9871 2.73155 20.1666 3.16315 20.1666 3.66732V13.7507C20.1666 14.2548 19.9871 14.6864 19.6281 15.0454C19.2691 15.4045 18.8375 15.584 18.3333 15.584H8.24998ZM8.24998 13.7507H18.3333V3.66732H8.24998V13.7507Z" fill="currentColor"/></svg>
-              <span class="editor-menu-item-label">Template</span>
+              <svg viewBox="0 0 16.5 20.1667" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.9167 9.16667H11V1.83333C11 0.825 10.175 0 9.16667 0H7.33333C6.325 0 5.5 0.825 5.5 1.83333V9.16667H4.58333C2.05333 9.16667 0 11.22 0 13.75V20.1667H16.5V13.75C16.5 11.22 14.4467 9.16667 11.9167 9.16667ZM7.33333 1.83333H9.16667V9.16667H7.33333V1.83333ZM14.6667 18.3333H12.8333V15.5833C12.8333 15.0792 12.4208 14.6667 11.9167 14.6667C11.4125 14.6667 11 15.0792 11 15.5833V18.3333H9.16667V15.5833C9.16667 15.0792 8.75417 14.6667 8.25 14.6667C7.74583 14.6667 7.33333 15.0792 7.33333 15.5833V18.3333H5.5V15.5833C5.5 15.0792 5.0875 14.6667 4.58333 14.6667C4.07917 14.6667 3.66667 15.0792 3.66667 15.5833V18.3333H1.83333V13.75C1.83333 12.2375 3.07083 11 4.58333 11H11.9167C13.4292 11 14.6667 12.2375 14.6667 13.75V18.3333Z" fill="currentColor"/></svg>
+              <span class="editor-menu-item-label">Brand</span>
             </span>
           </button>
           <button type="button" class="editor-menu-item" data-menu="elements">
@@ -2638,10 +3921,10 @@
               <span class="editor-menu-item-label">Elements</span>
             </span>
           </button>
-          <button type="button" class="editor-menu-item" data-menu="brand">
+          <button type="button" class="editor-menu-item" data-menu="template">
             <span class="editor-menu-item-surface">
-              <svg viewBox="0 0 16.5 20.1667" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.9167 9.16667H11V1.83333C11 0.825 10.175 0 9.16667 0H7.33333C6.325 0 5.5 0.825 5.5 1.83333V9.16667H4.58333C2.05333 9.16667 0 11.22 0 13.75V20.1667H16.5V13.75C16.5 11.22 14.4467 9.16667 11.9167 9.16667ZM7.33333 1.83333H9.16667V9.16667H7.33333V1.83333ZM14.6667 18.3333H12.8333V15.5833C12.8333 15.0792 12.4208 14.6667 11.9167 14.6667C11.4125 14.6667 11 15.0792 11 15.5833V18.3333H9.16667V15.5833C9.16667 15.0792 8.75417 14.6667 8.25 14.6667C7.74583 14.6667 7.33333 15.0792 7.33333 15.5833V18.3333H5.5V15.5833C5.5 15.0792 5.0875 14.6667 4.58333 14.6667C4.07917 14.6667 3.66667 15.0792 3.66667 15.5833V18.3333H1.83333V13.75C1.83333 12.2375 3.07083 11 4.58333 11H11.9167C13.4292 11 14.6667 12.2375 14.6667 13.75V18.3333Z" fill="currentColor"/></svg>
-              <span class="editor-menu-item-label">Brand</span>
+              <svg viewBox="0 0 22 22" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M11.2062 11.459L13.2916 10.1986L15.3771 11.459L14.8271 9.07565L16.6604 7.4944L14.2541 7.28815L13.2916 5.04232L12.3291 7.28815L9.9229 7.4944L11.7562 9.07565L11.2062 11.459ZM11.6416 17.4173H16.775C16.668 17.8145 16.4847 18.1354 16.225 18.3798C15.9653 18.6243 15.6291 18.777 15.2166 18.8382L5.22498 20.0527C4.72081 20.1291 4.2663 20.0107 3.86144 19.6975C3.45658 19.3843 3.22359 18.9757 3.16248 18.4715L1.94789 8.4569C1.88678 7.95273 2.00901 7.50204 2.31456 7.10482C2.62012 6.7076 3.02498 6.47843 3.52915 6.41732L4.58331 6.27982V8.11315L3.75831 8.22773L4.99581 18.2423L11.6416 17.4173ZM8.24998 15.584C7.74581 15.584 7.31422 15.4045 6.95519 15.0454C6.59616 14.6864 6.41665 14.2548 6.41665 13.7507V3.66732C6.41665 3.16315 6.59616 2.73155 6.95519 2.37253C7.31422 2.0135 7.74581 1.83398 8.24998 1.83398H18.3333C18.8375 1.83398 19.2691 2.0135 19.6281 2.37253C19.9871 2.73155 20.1666 3.16315 20.1666 3.66732V13.7507C20.1666 14.2548 19.9871 14.6864 19.6281 15.0454C19.2691 15.4045 18.8375 15.584 18.3333 15.584H8.24998ZM8.24998 13.7507H18.3333V3.66732H8.24998V13.7507Z" fill="currentColor"/></svg>
+              <span class="editor-menu-item-label">Template</span>
             </span>
           </button>
           <button type="button" class="editor-menu-item" data-menu="add">
@@ -2654,7 +3937,9 @@
         </div>
       </aside>
 
-    </div>
+    </div><!-- /.editor-body -->
+
+    </div><!-- /.editor-content-row -->
 
   </div>
 
@@ -2722,7 +4007,133 @@
     </div>
   </div>
 
+  <!-- Same "Page customization" widget as index.html / sample-packs.html /
+       build-your-box.html, half-size and in the bottom-left corner — picks
+       between this page's layout variants (mutually exclusive, hence a
+       radio group rather than this panel's usual independent .site-toggle
+       switches). -->
+  <button id="siteSettingsBtn" class="site-settings-btn" aria-label="Site settings">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+  </button>
+
+  <div id="siteSettingsPanel" class="site-settings-panel">
+    <p class="site-settings-title">Page customization</p>
+    <p class="site-settings-label" style="margin-bottom:10px">Layout variant</p>
+    <div class="site-settings-radio-group">
+      <label class="site-settings-radio">
+        <input type="radio" name="layoutVariant" value="default" id="layoutDefault" checked>
+        <span>Default</span>
+      </label>
+      <label class="site-settings-radio">
+        <input type="radio" name="layoutVariant" value="mirrored" id="layoutMirrored">
+        <span>Mirrored — preview on the right</span>
+      </label>
+      <label class="site-settings-radio">
+        <input type="radio" name="layoutVariant" value="rail" id="layoutRail">
+        <span>Rail navigation</span>
+      </label>
+    </div>
+  </div>
+
   <script>
+    (function () {
+      var btn = document.getElementById('siteSettingsBtn');
+      var panel = document.getElementById('siteSettingsPanel');
+      var variantRadios = document.querySelectorAll('input[name="layoutVariant"]');
+      var editorPage = document.querySelector('.editor-page');
+      var railEl = document.getElementById('editorRail');
+      var menuWrapEl = document.querySelector('.editor-menu-wrap');
+      if (!btn || !panel || !variantRadios.length || !editorPage) return;
+
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        panel.classList.toggle('open');
+      });
+
+      document.addEventListener('click', function (e) {
+        if (!panel.contains(e.target) && e.target !== btn) {
+          panel.classList.remove('open');
+        }
+      });
+
+      function applyVariant(variant) {
+        editorPage.classList.toggle('is-mirrored', variant === 'mirrored');
+        editorPage.classList.toggle('is-rail-nav', variant === 'rail');
+        // .hidden (the IDL property, not a CSS class) — this file's global
+        // [hidden]{display:none!important} override means a class-scoped
+        // `display` rule could never win against it regardless of
+        // specificity, so visibility here is driven straight from JS.
+        if (railEl) railEl.hidden = variant !== 'rail';
+        if (menuWrapEl) menuWrapEl.hidden = variant === 'rail';
+      }
+
+      variantRadios.forEach(function (radio) {
+        radio.addEventListener('change', function () {
+          if (radio.checked) applyVariant(radio.value);
+        });
+      });
+    })();
+  </script>
+
+  <script>
+    // Bottom-menu tabs: "AI design" shows the guided step-1..6 flow
+    // (#aiDesignFlow) exactly as it was left; "Template"/"Elements"/
+    // "Brand" swap it out for their own single-purpose panel instead.
+    // "Product"/"Add" have no panel of their own yet — clicking them just
+    // updates the active-tab highlight, same as before this feature.
+    var MENU_PANEL_IDS = {
+      'ai-design': 'aiDesignFlow',
+      'template': 'menuPanelTemplate',
+      'elements': 'menuPanelElements',
+      'brand': 'menuPanelBrand',
+      'add': 'menuPanelAdd'
+    };
+
+    // The "Get branding with AI" field is never duplicated (see the markup
+    // comment on #menuPanelBrand for why) — instead this moves the one
+    // real #companyWebsiteField element between its step 3 home and the
+    // Brand tab's slot, so it's trivially "the same component" wherever
+    // it's shown; a comment node left behind at its home position marks
+    // exactly where to put it back.
+    var companyWebsiteField = document.getElementById('companyWebsiteField');
+    var companyWebsiteHomeAnchor = null;
+    if (companyWebsiteField) {
+      companyWebsiteHomeAnchor = document.createComment('companyWebsiteField home');
+      companyWebsiteField.parentNode.insertBefore(companyWebsiteHomeAnchor, companyWebsiteField);
+    }
+
+    function moveWebsiteFetchField(toBrand) {
+      if (!companyWebsiteField) return;
+      if (toBrand) {
+        var slot = document.getElementById('companyWebsiteFieldSlot');
+        if (slot) slot.appendChild(companyWebsiteField);
+      } else if (companyWebsiteHomeAnchor) {
+        companyWebsiteHomeAnchor.parentNode.insertBefore(companyWebsiteField, companyWebsiteHomeAnchor.nextSibling);
+      }
+    }
+
+    function showMenuPanel(menuKey) {
+      var targetId = MENU_PANEL_IDS[menuKey];
+      if (!targetId) return; // "product"/"add" — nothing to switch
+      Object.keys(MENU_PANEL_IDS).forEach(function (key) {
+        var el = document.getElementById(MENU_PANEL_IDS[key]);
+        if (el) el.hidden = MENU_PANEL_IDS[key] !== targetId;
+      });
+      moveWebsiteFetchField(menuKey === 'brand');
+
+      // #sidebarContent's default justify-content:center is fine for the
+      // AI-design flow (each step is short, or opts into flex-start itself
+      // via .is-multistep once it grows) but would crop a tall bottom-menu
+      // panel's own top off-screen with no way to scroll back up to it —
+      // same class of bug .is-multistep already solves for steps, applied
+      // here for panels. Resetting scrollTop on every switch guarantees
+      // each panel's beginning is what you see, never wherever the
+      // previous panel happened to leave the scroll position.
+      var sidebarContent = document.getElementById('sidebarContent');
+      sidebarContent.classList.toggle('is-menu-panel', menuKey !== 'ai-design');
+      sidebarContent.scrollTop = 0;
+    }
+
     document.getElementById('editorMenu').addEventListener('click', function (e) {
       var item = e.target.closest('.editor-menu-item');
       if (!item) return;
@@ -2730,7 +4141,51 @@
         el.classList.remove('is-active');
       });
       item.classList.add('is-active');
+      showMenuPanel(item.dataset.menu);
     });
+  </script>
+
+  <script>
+    // Rail-navigation variant's own tab list — same active-swap behavior
+    // as #editorMenu above, just a separate element/query since the two
+    // never coexist visibly (only one nav is un-hidden at a time).
+    document.getElementById('editorRail').addEventListener('click', function (e) {
+      var item = e.target.closest('.editor-rail-item');
+      if (!item) return;
+      document.querySelectorAll('#editorRail .editor-rail-item.is-active').forEach(function (el) {
+        el.classList.remove('is-active');
+      });
+      item.classList.add('is-active');
+    });
+  </script>
+
+  <script>
+    // Push-drawer menu: the hamburger itself is the only open/close
+    // control (morphs into an "X" via .is-open on the BUTTON, driving the
+    // .editor-hamburger-lines CSS transform — see that rule for the
+    // actual animation), plus Escape. No outside-click-to-close and no
+    // separate close button inside the drawer — this is a push layout,
+    // not an overlay, and Gmail's own sidebar works the same way: only
+    // its hamburger toggles it, a stray click elsewhere doesn't.
+    (function () {
+      var drawer = document.getElementById('editorDrawer');
+      var hamburgerBtn = document.getElementById('editorHamburgerBtn');
+      if (!drawer || !hamburgerBtn) return;
+
+      function setOpen(open) {
+        drawer.classList.toggle('is-open', open);
+        hamburgerBtn.classList.toggle('is-open', open);
+        hamburgerBtn.setAttribute('aria-expanded', String(open));
+        hamburgerBtn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      }
+
+      hamburgerBtn.addEventListener('click', function () {
+        setOpen(!drawer.classList.contains('is-open'));
+      });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && drawer.classList.contains('is-open')) setOpen(false);
+      });
+    })();
   </script>
 
   <script>
@@ -2741,6 +4196,7 @@
     // content, and resumes showing whatever we've written to it once empty.
     (function () {
       var textarea = document.querySelector('.editor-idea-input');
+      var chatBubble = document.getElementById('chatBubble');
       if (!textarea) return;
 
       var phrases = [
@@ -2757,8 +4213,19 @@
       var phraseIndex = 0;
       var charIndex = 0;
 
+      // The one true "stop for good" signal — submitting an idea swaps the
+      // box for the chat bubble permanently (a one-way hand-off, not a
+      // toggle). offsetParent being null is a WEAKER signal that just
+      // means "not currently visible" — that's also true while a
+      // Template/Elements/Brand bottom-menu tab has #aiDesignFlow hidden,
+      // which is temporary, not the end of the loop.
+      function isDone() {
+        return chatBubble && !chatBubble.hidden;
+      }
+
       function typeStep() {
-        if (textarea.offsetParent === null) return; // idea box was replaced by the chat bubble — stop
+        if (isDone()) return;
+        if (textarea.offsetParent === null) { setTimeout(typeStep, PAUSE_AFTER_DELETED); return; }
         var phrase = phrases[phraseIndex];
         charIndex++;
         textarea.placeholder = phrase.slice(0, charIndex);
@@ -2770,7 +4237,8 @@
       }
 
       function eraseStep() {
-        if (textarea.offsetParent === null) return;
+        if (isDone()) return;
+        if (textarea.offsetParent === null) { setTimeout(eraseStep, PAUSE_AFTER_DELETED); return; }
         charIndex--;
         textarea.placeholder = phrases[phraseIndex].slice(0, charIndex);
         if (charIndex > 0) {
@@ -2936,16 +4404,29 @@
     // of how many elements (logo, tagline, website, rule lines...) end up
     // depending on it. The uploaded-logo <img>, if any, is left alone — an
     // arbitrary raster image can't be recolored this way.
-    document.getElementById('colorSwatches').addEventListener('click', function (e) {
-      var swatch = e.target.closest('.editor-color-swatch');
-      if (!swatch) return;
+    //
+    // Print colour is a single global value too, same reasoning as the
+    // logo above — selecting a swatch marks *every* swatch sharing that
+    // hex (across both #colorSwatches and #colorSwatches2, including
+    // their extracted-colour rows) as selected, not just the one clicked.
+    function selectPrintColorByHex(hex) {
       document.querySelectorAll('.editor-color-swatch.is-selected').forEach(function (el) {
         el.classList.remove('is-selected');
       });
-      swatch.classList.add('is-selected');
+      document.querySelectorAll('.editor-color-swatch').forEach(function (el) {
+        if (el.dataset.color === hex) el.classList.add('is-selected');
+      });
+      document.documentElement.style.setProperty('--brand-color', hex);
+    }
 
-      document.documentElement.style.setProperty('--brand-color', swatch.dataset.color);
-    });
+    function handleColorSwatchesClick(e) {
+      var swatch = e.target.closest('.editor-color-swatch');
+      if (!swatch) return;
+      selectPrintColorByHex(swatch.dataset.color);
+    }
+    document.getElementById('colorSwatches').addEventListener('click', handleColorSwatchesClick);
+    var colorSwatches2 = document.getElementById('colorSwatches2');
+    if (colorSwatches2) colorSwatches2.addEventListener('click', handleColorSwatchesClick);
   </script>
 
   <script>
@@ -2969,6 +4450,12 @@
     // class instead of id, since id can only ever match one element.
     var LOGO_DEFAULT_AREA = 216 * 50;
 
+    // Logo is a single global value (one active logo), so — unlike the
+    // Elements list's independent on/off state — every upload-field
+    // instance (step 3's original, plus #...2 on the "Brand" bottom-menu
+    // tab) mirrors the same logo, whichever one was used to set it.
+    var LOGO_FIELD_ID_SUFFIXES = ['', '2'];
+
     function applyLogoDataUrl(dataUrl) {
       document.querySelectorAll('.js-logo-img').forEach(function (img) {
         img.onload = function () {
@@ -2985,34 +4472,80 @@
       document.querySelectorAll('.js-logo-mark').forEach(function (svg) {
         svg.setAttribute('hidden', '');
       });
+
+      // Every upload field mirrors whatever logo just got applied to the
+      // real preview (manual file upload or a website-fetch pick both
+      // funnel through here), so each is always showing what's actually
+      // in use rather than a stale filename string.
+      LOGO_FIELD_ID_SUFFIXES.forEach(function (suffix) {
+        var dropzone = document.getElementById('logoUploadLabel' + suffix);
+        var preview = document.getElementById('logoUploadPreview' + suffix);
+        var deleteBtn = document.getElementById('logoUploadDelete' + suffix);
+        if (dropzone && preview) {
+          preview.src = dataUrl;
+          preview.hidden = false;
+          dropzone.classList.add('has-image');
+          if (deleteBtn) deleteBtn.hidden = false;
+        }
+      });
+    }
+
+    // Undoes applyLogoDataUrl(): back to the default wordmark everywhere
+    // it appears, and every upload field back to its empty dashed-border
+    // "drop a file" state.
+    function resetLogoUpload() {
+      document.querySelectorAll('.js-logo-img').forEach(function (img) {
+        img.hidden = true;
+        img.removeAttribute('style');
+        img.src = '';
+      });
+      document.querySelectorAll('.js-logo-mark').forEach(function (svg) {
+        svg.removeAttribute('hidden');
+      });
+
+      LOGO_FIELD_ID_SUFFIXES.forEach(function (suffix) {
+        var input = document.getElementById('logoUploadInput' + suffix);
+        var dropzone = document.getElementById('logoUploadLabel' + suffix);
+        var text = document.getElementById('logoUploadText' + suffix);
+        var preview = document.getElementById('logoUploadPreview' + suffix);
+        var deleteBtn = document.getElementById('logoUploadDelete' + suffix);
+        if (input) input.value = '';
+        if (dropzone) { dropzone.classList.remove('has-image'); dropzone.removeAttribute('title'); }
+        if (text) text.textContent = 'Upload image';
+        if (preview) { preview.hidden = true; preview.src = ''; }
+        if (deleteBtn) deleteBtn.hidden = true;
+      });
+      // Extracted colours (#extractedColorRow) are deliberately left alone
+      // — that row is shared with the website-fetch flow too, so wiping it
+      // here could delete colours that had nothing to do with this logo.
     }
 
     // Own row, separate from the preset palette — cleared and rebuilt fresh
     // on every call rather than tracking which swatches came from where
     // within one shared row. `toastText` lets each caller say where the
-    // colours came from (a logo vs. a scraped website).
+    // colours came from (a logo vs. a scraped website). Populates *both*
+    // #extractedColorRow and #extractedColorRow2 (the "Brand" bottom-menu
+    // tab's duplicate) identically — same single-global-value reasoning as
+    // the logo and print-colour functions above.
     function applyExtractedColors(colors, toastText) {
-      var extractedRow = document.getElementById('extractedColorRow');
-      extractedRow.innerHTML = '';
-
-      colors.forEach(function (color) {
-        var btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'editor-color-swatch';
-        btn.style.background = color.hex;
-        btn.dataset.color = color.hex;
-        btn.setAttribute('aria-label', 'Extracted colour ' + color.hex);
-        extractedRow.appendChild(btn);
+      ['extractedColorRow', 'extractedColorRow2'].forEach(function (rowId) {
+        var row = document.getElementById(rowId);
+        if (!row) return;
+        row.innerHTML = '';
+        colors.forEach(function (color) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'editor-color-swatch';
+          btn.style.background = color.hex;
+          btn.dataset.color = color.hex;
+          btn.setAttribute('aria-label', 'Extracted colour ' + color.hex);
+          row.appendChild(btn);
+        });
       });
 
       // Most frequent/first colour becomes the active print colour.
-      document.querySelectorAll('.editor-color-swatch.is-selected').forEach(function (el) {
-        el.classList.remove('is-selected');
-      });
-      var mostFrequent = extractedRow.firstElementChild;
-      if (!mostFrequent) return;
-      mostFrequent.classList.add('is-selected');
-      document.documentElement.style.setProperty('--brand-color', mostFrequent.dataset.color);
+      if (!colors.length) return;
+      selectPrintColorByHex(colors[0].hex);
 
       showColorExtractToast(toastText);
     }
@@ -3086,25 +4619,33 @@
     }
 
     // Step 3 font picker's selection logic, reused by the website-fetch
-    // modal below. `fontName` matching one of the picker's 6 built-in
-    // options runs the exact same apply steps a manual click would; a
-    // fetched font that ISN'T in that list still gets applied — just
-    // clearing the picker's own selection (none of its options are an
-    // honest match) and loading the font live instead of being dropped.
+    // modal below AND by the "Brand" bottom-menu tab's duplicate dropdown.
+    // `fontName` matching one of the picker's 6 built-in options runs the
+    // exact same apply steps a manual click would — on *every* dropdown
+    // instance that has that option (both #fontDropdownMenu and
+    // #fontDropdownMenu2 carry the same 7 options, so this keeps them in
+    // sync); a fetched font that ISN'T in that list still gets applied —
+    // just clearing every dropdown's own selection (none of their options
+    // are an honest match) and loading the font live instead of being
+    // dropped.
     function applyFontByName(fontName) {
-      var option = findFontOption(fontName);
-      var valueEl = document.getElementById('fontDropdownValue');
-
       document.querySelectorAll('.editor-select-option.is-selected').forEach(function (el) {
         el.classList.remove('is-selected');
         el.setAttribute('aria-selected', 'false');
       });
 
+      var matchingOptions = Array.prototype.filter.call(
+        document.querySelectorAll('.editor-select-option'),
+        function (opt) { return opt.dataset.font === fontName; }
+      );
+
       var fontFamily;
-      if (option) {
-        option.classList.add('is-selected');
-        option.setAttribute('aria-selected', 'true');
-        fontFamily = option.style.fontFamily;
+      if (matchingOptions.length) {
+        matchingOptions.forEach(function (opt) {
+          opt.classList.add('is-selected');
+          opt.setAttribute('aria-selected', 'true');
+        });
+        fontFamily = matchingOptions[0].style.fontFamily;
       } else {
         ensureGoogleFontLoaded(fontName);
         fontFamily = '"' + fontName.replace(/"/g, '') + '", "ABC Favorit", sans-serif';
@@ -3114,8 +4655,12 @@
       // (never a hand-built style="..." string) — fontName can be
       // attacker-influenced text pulled from a fetched website, and both
       // of those APIs treat it as inert data rather than markup/CSS syntax.
-      valueEl.textContent = fontName;
-      valueEl.style.fontFamily = fontFamily;
+      ['fontDropdownValue', 'fontDropdownValue2'].forEach(function (id) {
+        var valueEl = document.getElementById(id);
+        if (!valueEl) return;
+        valueEl.textContent = fontName;
+        valueEl.style.fontFamily = fontFamily;
+      });
       document.querySelectorAll('.js-tagline, .js-website').forEach(function (el) {
         el.style.fontFamily = fontFamily;
       });
@@ -3123,78 +4668,89 @@
   </script>
 
   <script>
-    // Step 3 logo upload: swaps the default wordmark SVG for the uploaded
-    // image via the shared applyLogoDataUrl() above.
-    (function () {
-      var logoUploadInput = document.getElementById('logoUploadInput');
-      var logoUploadLabel = document.getElementById('logoUploadLabel');
-      if (!logoUploadInput) return;
+    // Reads every opaque pixel of an uploaded logo — jpg, png or svg
+    // alike, since all three rasterize the same way once drawn to a
+    // canvas — buckets them (rounding each channel to the nearest 16) so
+    // near-identical anti-aliased pixels count as one colour instead of
+    // hundreds, then ranks buckets by pixel count. Canvas reads are
+    // synchronous once the image has loaded, so this runs in a single
+    // pass with no extra async plumbing. Global (not IIFE-local) since
+    // both logo-upload field instances call it.
+    function extractLogoColors(dataUrl) {
+      var img = new Image();
+      img.onload = function () {
+        var maxDim = 100;
+        var scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
+        var canvas = document.createElement('canvas');
+        canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+        var ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      logoUploadInput.addEventListener('change', function () {
-        var file = logoUploadInput.files && logoUploadInput.files[0];
+        var pixels;
+        try {
+          pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+        } catch (err) {
+          return; // canvas tainted (e.g. file:// edge case) — skip silently
+        }
+
+        var counts = {};
+        for (var i = 0; i < pixels.length; i += 4) {
+          if (pixels[i + 3] < 128) continue; // skip transparent pixels
+          var r = Math.round(pixels[i] / 16) * 16;
+          var g = Math.round(pixels[i + 1] / 16) * 16;
+          var b = Math.round(pixels[i + 2] / 16) * 16;
+          var key = r + ',' + g + ',' + b;
+          counts[key] = (counts[key] || 0) + 1;
+        }
+
+        var toHex = function (n) {
+          return Math.min(255, n).toString(16).padStart(2, '0');
+        };
+        var colors = Object.keys(counts)
+          .map(function (key) {
+            var c = key.split(',').map(Number);
+            return { hex: '#' + toHex(c[0]) + toHex(c[1]) + toHex(c[2]), count: counts[key] };
+          })
+          .sort(function (a, b) { return b.count - a.count; })
+          .slice(0, 6);
+
+        if (colors.length) applyExtractedColors(colors, 'Colors picked up from your logo');
+      };
+      img.src = dataUrl;
+    }
+
+    // Step 3 logo upload: swaps the default wordmark SVG for the uploaded
+    // image via the shared applyLogoDataUrl() above, which also handles
+    // showing the preview image + Delete action inside every upload field.
+    // initLogoUploadInput() wires up ONE field instance; called once for
+    // the original (step 3) and once for the "Brand" bottom-menu tab's
+    // duplicate (#logoUploadInput2 / #logoUploadDelete2).
+    function initLogoUploadInput(inputId, labelId, deleteId) {
+      var input = document.getElementById(inputId);
+      var label = document.getElementById(labelId);
+      var deleteBtn = document.getElementById(deleteId);
+      if (!input) return;
+
+      input.addEventListener('change', function () {
+        var file = input.files && input.files[0];
         if (!file) return;
 
         var reader = new FileReader();
         reader.onload = function () {
           applyLogoDataUrl(reader.result);
-          logoUploadLabel.textContent = file.name;
-
+          label.title = file.name;
           extractLogoColors(reader.result);
         };
         reader.readAsDataURL(file);
       });
 
-      // Reads every opaque pixel of the uploaded logo — jpg, png or svg
-      // alike, since all three rasterize the same way once drawn to a
-      // canvas — buckets them (rounding each channel to the nearest 16) so
-      // near-identical anti-aliased pixels count as one colour instead of
-      // hundreds, then ranks buckets by pixel count. Canvas reads are
-      // synchronous once the image has loaded, so this runs in a single
-      // pass with no extra async plumbing.
-      function extractLogoColors(dataUrl) {
-        var img = new Image();
-        img.onload = function () {
-          var maxDim = 100;
-          var scale = Math.min(1, maxDim / Math.max(img.naturalWidth, img.naturalHeight));
-          var canvas = document.createElement('canvas');
-          canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
-          canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
-          var ctx = canvas.getContext('2d');
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-
-          var pixels;
-          try {
-            pixels = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
-          } catch (err) {
-            return; // canvas tainted (e.g. file:// edge case) — skip silently
-          }
-
-          var counts = {};
-          for (var i = 0; i < pixels.length; i += 4) {
-            if (pixels[i + 3] < 128) continue; // skip transparent pixels
-            var r = Math.round(pixels[i] / 16) * 16;
-            var g = Math.round(pixels[i + 1] / 16) * 16;
-            var b = Math.round(pixels[i + 2] / 16) * 16;
-            var key = r + ',' + g + ',' + b;
-            counts[key] = (counts[key] || 0) + 1;
-          }
-
-          var toHex = function (n) {
-            return Math.min(255, n).toString(16).padStart(2, '0');
-          };
-          var colors = Object.keys(counts)
-            .map(function (key) {
-              var c = key.split(',').map(Number);
-              return { hex: '#' + toHex(c[0]) + toHex(c[1]) + toHex(c[2]), count: counts[key] };
-            })
-            .sort(function (a, b) { return b.count - a.count; })
-            .slice(0, 6);
-
-          if (colors.length) applyExtractedColors(colors, 'Colors picked up from your logo');
-        };
-        img.src = dataUrl;
+      if (deleteBtn) {
+        deleteBtn.addEventListener('click', function () { resetLogoUpload(); });
       }
-    })();
+    }
+    initLogoUploadInput('logoUploadInput', 'logoUploadLabel', 'logoUploadDelete');
+    initLogoUploadInput('logoUploadInput2', 'logoUploadLabel2', 'logoUploadDelete2');
   </script>
 
   <script>
@@ -3234,7 +4790,13 @@
       'website': '.js-website'
     };
 
-    document.getElementById('elementsList').addEventListener('click', function (e) {
+    // Attached to both #elementsList (step 4) and #elementsList2 (the
+    // "Elements" bottom-menu tab's duplicate). Each list's on/off state is
+    // its own — see the top-of-file note on the bottom-menu panels for why
+    // — but toggling either one still shows/hides the *real* preview
+    // piece globally, same as it always has, since ELEM_PREVIEW_TARGETS
+    // was already a class selector reaching every instance.
+    function handleElementsListClick(e) {
       if (e.target.closest('.editor-elem-add')) return;
       if (e.target.closest('.editor-elem-input-wrap')) return;
       var item = e.target.closest('.editor-elem-item');
@@ -3249,38 +4811,41 @@
           target.hidden = !isOn;
         });
       }
-    });
+    }
+    document.getElementById('elementsList').addEventListener('click', handleElementsListClick);
+    var elementsList2 = document.getElementById('elementsList2');
+    if (elementsList2) elementsList2.addEventListener('click', handleElementsListClick);
   </script>
 
   <script>
     // Step 4 "Main text" field starts pre-filled with whatever the preview
     // tagline currently says, and stays in sync as the user types — pushed
     // to every .js-tagline (main preview + each step 5 tile's live
-    // mini-preview), not just one element.
-    (function () {
-      var mainTextInput = document.getElementById('mainTextInput');
-      if (!mainTextInput) return;
-
-      mainTextInput.addEventListener('input', function () {
+    // mini-preview), not just one element. Wired identically for
+    // #mainTextInput2 (the "Elements" bottom-menu tab's duplicate).
+    ['mainTextInput', 'mainTextInput2'].forEach(function (id) {
+      var input = document.getElementById(id);
+      if (!input) return;
+      input.addEventListener('input', function () {
         document.querySelectorAll('.js-tagline').forEach(function (el) {
-          el.textContent = mainTextInput.value;
+          el.textContent = input.value;
         });
       });
-    })();
+    });
   </script>
 
   <script>
-    // Step 4 "Website" field: same live-sync pattern as Main text.
-    (function () {
-      var websiteInput = document.getElementById('websiteInput');
-      if (!websiteInput) return;
-
-      websiteInput.addEventListener('input', function () {
+    // Step 4 "Website" field: same live-sync pattern as Main text, also
+    // wired for #websiteInput2.
+    ['websiteInput', 'websiteInput2'].forEach(function (id) {
+      var input = document.getElementById(id);
+      if (!input) return;
+      input.addEventListener('input', function () {
         document.querySelectorAll('.js-website').forEach(function (el) {
-          el.textContent = websiteInput.value;
+          el.textContent = input.value;
         });
       });
-    })();
+    });
   </script>
 
   <script>
@@ -3292,11 +4857,17 @@
     // choice has nothing to act on there). "Google Sans" is included as an
     // option per the request, but isn't published on Google Fonts —
     // picking it just falls back to the stack's default sans-serif.
-    (function () {
-      var wrap = document.getElementById('fontDropdown');
-      var trigger = document.getElementById('fontDropdownTrigger');
-      var valueEl = document.getElementById('fontDropdownValue');
-      var menu = document.getElementById('fontDropdownMenu');
+    //
+    // initFontDropdown() sets up ONE dropdown instance's open/close/pick
+    // behavior; called once for the original (step 3) and once for
+    // #fontDropdown2 (the "Brand" bottom-menu tab's duplicate). Picking an
+    // option calls the shared applyFontByName(), which already updates
+    // *both* dropdowns' selected state/value text and the real preview —
+    // this function only has to close its own menu afterward.
+    function initFontDropdown(wrapId, triggerId, menuId) {
+      var wrap = document.getElementById(wrapId);
+      var trigger = document.getElementById(triggerId);
+      var menu = document.getElementById(menuId);
       if (!wrap) return;
 
       function closeMenu() {
@@ -3318,30 +4889,16 @@
       menu.addEventListener('click', function (e) {
         var option = e.target.closest('.editor-select-option');
         if (!option) return;
-
-        document.querySelectorAll('.editor-select-option.is-selected').forEach(function (el) {
-          el.classList.remove('is-selected');
-          el.setAttribute('aria-selected', 'false');
-        });
-        option.classList.add('is-selected');
-        option.setAttribute('aria-selected', 'true');
-
-        var font = option.dataset.font;
-        valueEl.textContent = font;
-        valueEl.style.fontFamily = option.style.fontFamily;
-
-        var fontFamily = '"' + font + '", "ABC Favorit", sans-serif';
-        document.querySelectorAll('.js-tagline, .js-website').forEach(function (el) {
-          el.style.fontFamily = fontFamily;
-        });
-
+        applyFontByName(option.dataset.font);
         closeMenu();
       });
 
       document.addEventListener('click', function (e) {
         if (!wrap.contains(e.target)) closeMenu();
       });
-    })();
+    }
+    initFontDropdown('fontDropdown', 'fontDropdownTrigger', 'fontDropdownMenu');
+    initFontDropdown('fontDropdown2', 'fontDropdownTrigger2', 'fontDropdownMenu2');
   </script>
 
   <script>
@@ -3371,13 +4928,21 @@
     // elements — see the [data-composition] rules) rather than swapping in
     // a static image, so it stays live if the user keeps editing content,
     // colour or font afterwards.
-    document.getElementById('designGrid').addEventListener('click', function (e) {
+    //
+    // Attached to both #designGrid (step 5) and #designGrid2 (the
+    // "Template" bottom-menu tab's duplicate) — .editor-design-tile.is-
+    // selected is toggled via a *global* querySelectorAll, so picking a
+    // tile in either grid deselects the other's too, keeping the two
+    // grids' selection in sync automatically.
+    function handleDesignGridClick(e) {
       var tile = e.target.closest('.editor-design-tile');
       if (!tile) return;
       document.querySelectorAll('.editor-design-tile.is-selected').forEach(function (el) {
         el.classList.remove('is-selected');
       });
-      tile.classList.add('is-selected');
+      document.querySelectorAll('.editor-design-tile[data-design="' + tile.dataset.design + '"]').forEach(function (el) {
+        el.classList.add('is-selected');
+      });
 
       var previewLockup = document.getElementById('previewLockup');
       if (previewLockup) previewLockup.dataset.composition = tile.dataset.design;
@@ -3389,18 +4954,30 @@
       var decor06 = document.getElementById('previewDecor06');
       if (decor05) decor05.hidden = tile.dataset.design !== '05';
       if (decor06) decor06.hidden = tile.dataset.design !== '06';
-    });
+    }
+    document.getElementById('designGrid').addEventListener('click', handleDesignGridClick);
+    var designGrid2 = document.getElementById('designGrid2');
+    if (designGrid2) designGrid2.addEventListener('click', handleDesignGridClick);
   </script>
 
   <script>
     // Step 5 filter tabs: single-select — "Recommended" vs "All designs".
-    document.querySelector('.editor-filter-tabs').addEventListener('click', function (e) {
-      var tab = e.target.closest('.editor-filter-tab');
-      if (!tab) return;
-      document.querySelectorAll('.editor-filter-tab.is-active').forEach(function (el) {
-        el.classList.remove('is-active');
+    // Attached to every .editor-filter-tabs instance (step 5's own plus
+    // the "Template" tab's duplicate) — same global-query pattern as the
+    // design grid above keeps both in sync.
+    document.querySelectorAll('.editor-filter-tabs').forEach(function (tabs) {
+      tabs.addEventListener('click', function (e) {
+        var tab = e.target.closest('.editor-filter-tab');
+        if (!tab) return;
+        document.querySelectorAll('.editor-filter-tab.is-active').forEach(function (el) {
+          el.classList.remove('is-active');
+        });
+        document.querySelectorAll('.editor-filter-tabs').forEach(function (otherTabs) {
+          var match = Array.prototype.indexOf.call(tabs.children, tab);
+          var mirrored = otherTabs.children[match];
+          if (mirrored) mirrored.classList.add('is-active');
+        });
       });
-      tab.classList.add('is-active');
     });
   </script>
 
@@ -4108,7 +5685,7 @@
         if (selectedLogo) {
           applyLogoDataUrl(selectedLogo.dataset.src);
           var logoUploadLabel = document.getElementById('logoUploadLabel');
-          if (logoUploadLabel) logoUploadLabel.textContent = 'Fetched from ' + currentKit.domain;
+          if (logoUploadLabel) logoUploadLabel.title = 'Fetched from ' + currentKit.domain;
           setElemOn('logo', true);
         }
 
@@ -4153,6 +5730,58 @@
         closeModal();
       });
     })();
+  </script>
+
+  <script>
+    // "Add" bottom-menu tab — self-contained, independent of the Logo
+    // upload system (applyLogoDataUrl etc.): this uploads a generic extra
+    // graphic, not the brand logo, so it gets its own small preview+delete
+    // wiring using the same visual pattern rather than the shared
+    // logo-specific functions.
+    (function () {
+      var input = document.getElementById('addUploadInput');
+      var label = document.getElementById('addUploadLabel');
+      var preview = document.getElementById('addUploadPreview');
+      var deleteBtn = document.getElementById('addUploadDelete');
+      if (!input) return;
+
+      input.addEventListener('change', function () {
+        var file = input.files && input.files[0];
+        if (!file) return;
+        var reader = new FileReader();
+        reader.onload = function () {
+          preview.src = reader.result;
+          preview.hidden = false;
+          label.classList.add('has-image');
+          label.title = file.name;
+          deleteBtn.hidden = false;
+        };
+        reader.readAsDataURL(file);
+      });
+
+      deleteBtn.addEventListener('click', function () {
+        input.value = '';
+        preview.hidden = true;
+        preview.src = '';
+        label.classList.remove('has-image');
+        label.removeAttribute('title');
+        deleteBtn.hidden = true;
+      });
+    })();
+  </script>
+
+  <script>
+    // "Add" tab's text tiles: single-select, picking one is the thing
+    // "Add text" below would act on (not wired to the preview yet — see
+    // the markup comment on #menuPanelAdd).
+    document.getElementById('addTextTiles').addEventListener('click', function (e) {
+      var tile = e.target.closest('.editor-text-tile');
+      if (!tile) return;
+      document.querySelectorAll('#addTextTiles .editor-text-tile.is-selected').forEach(function (el) {
+        el.classList.remove('is-selected');
+      });
+      tile.classList.add('is-selected');
+    });
   </script>
 
 </body>
